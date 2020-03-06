@@ -1,0 +1,8 @@
+# IDE Stuff
+.idea
+__pycache__
+
+
+# Style Transcompile
+*.sass
+*.scss

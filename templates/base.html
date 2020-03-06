@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Golf Pool{% endblock %}</title>
+
+    <link rel="icon" href="/static/img/golf-club.png">
+
+    {% if is_local %}
+    <link rel="stylesheet" href="/static/fontawesome/css/all.css">
+    <script src="/static/js/library/jquery-3.3.1.min.js"></script>
+    {% else %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css" integrity="sha256-8B1OaG0zT7uYA572S2xOxWACq9NXYPQ+U5kHPV1bJN4=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.0.min.js" integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
+    {% endif %}
+    <script>
+        function out(message) {
+            console.log(message);
+        }
+        function toggle_mobile_nav() {
+            $("#mobile-nav").fadeToggle().find('section').css("margin-top", $("#top-nav").css("height"));
+            $("html, body").toggleClass("disable-scroll");
+        }
+        function lazy_load(e) {
+            e.siblings(".loader").addClass("hide");
+            e.removeClass("hide");
+        }
+        function finder(obj, attribute, value) {
+            const n = obj.length;
+            for(let i = 0; i < n; i++) {
+                if(obj[i][attribute] === value) {
+                    return obj[i];
+                }
+            }
+            return undefined;
+        }
+        function ordinal_suffix_of(i) {
+            let j = i % 10;
+            let k = i % 100;
+            if (j === 1 && k !== 11) {
+                return i + "st";
+            }
+            if (j === 2 && k !== 12) {
+                return i + "nd";
+            }
+            if (j === 3 && k !== 13) {
+                return i + "rd";
+            }
+            return i + "th";
+        }
+    </script>
+    {% block add_head %}
+        <link rel="stylesheet" href="/static/css/library/bulma.min.css">
+        <link rel="stylesheet" href="/static/css/base.min.css">
+    {% endblock %}
+</head>
+{% set nav_menu = [
+    ("/", "Home"),
+    ("/picks/make", "Make Picks"),
+    ("/picks/change", "Change Picks"),
+    ("/standings/live", "Standings"),
+    ("/picks/poolwide/2019", "Poolwide Picks"),
+] %}{#TODO: Finish these pages
+("/players/search", "Search Player")
+("/archive", "Archive")#}
+
+<nav id="top-nav" class="navbar is-light">
+      <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img src="/static/img/golfer-sil.png">
+                <span id="site-name">Golf Pool</span>
+            </a>
+            <a id="nav-burger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" onclick="toggle_mobile_nav()">
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+            </a>
+      </div>
+      <div class="navbar-menu">
+          <div class="navbar-start">
+          </div>
+          <div class="navbar-end">
+          {% for item in nav_menu %}
+              <a class="navbar-item" href="{{ item[0] }}">{{ item[1] }}</a>
+          {% endfor %}
+          </div>
+      </div>
+</nav>
+
+<div id="mobile-nav">
+    <section class="section">
+        <div class="menu">
+            <ul class="menu-list">
+                {% for item in nav_menu %}
+                <li class="has-text-centered"><a class="mobile-nav-item is-size-4" href="{{ item[0] }}">{{ item[1] }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+</div>
+
+
+<body style="margin-bottom:15px">
+<div class="hero page-title-hero">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">{% block hero_title %}{% endblock %}</h1>
+    </div>
+  </div>
+    {% block hero_foot %}{% endblock %}
+</div>
+{% block body %}
+{% endblock %}
+{% block add_below %}{% endblock %}
+</body>
+</html>

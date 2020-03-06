@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block add_head %}
+<link rel="stylesheet" href="/static/css/locked-page.min.css">
+{% endblock %}
+
+{% block body %}
+<section class="section">
+    <h1 class="title has-text-centered">Sorry this page is currently locked</h1>
+    <br>
+    <h1 class="has-text-centered" style="font-size: 50px"><span class="icon"><i class="fas fa-lock"></i></span></h1>
+</section>
+{% endblock %}

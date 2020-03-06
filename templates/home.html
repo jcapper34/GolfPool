@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Golf Pool{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <div class="content">
+            <h1>Welcome to the 2019 Golf Pool</h1>
+            <p>Use this page to make your picks, change your picks, and view standings</p>
+        </div>
+        <div id="home-page-buttons" class="has-text-centered">
+            <a href="/picksets/make"><button class="button" style="width:80%;margin: 10px">Make Picks</button></a><br>
+            <a href="/picksets/change"><button class="button" style="width:80%;margin: 10px">Change Picks</button></a><br>
+            <a href="/standings/live"><button class="button" style="width:80%;margin: 10px">Standings</button></a>
+            <a href="/picksets/poolwide/2019"><button class="button" style="width:80%;margin: 10px">Poolwide Picks</button></a>
+        </div>
+    </div>
+</section>
+{% endblock %}
