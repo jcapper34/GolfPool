@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% from "level-4-macro.html" import level_4_field, level_4_script %}
+
+{% block title %}Change Picks | {{ pickset['name'] }}{% endblock %}
+{% block hero_title %}Change Picks{% endblock %}
+
+{#TODO: Create assoc sass file#}
+{% block add_head %}
+    <link rel="stylesheet" href="/static/css/library/bulma.min.css">
+    <link rel="stylesheet" href="/static/css/base.min.css">
+<style>
+.select, .pick-select {
+    width: 100%;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div id="change-picks-container" class="container" data-psid="{{ pickset['id'] }}" data-psname="{{ pickset['name'] }}" data-email="{{ pickset['email'] }}">
+        <div class="level is-mobile">
+            <div class="level-left"><h1 class="title is-4">Editing Pickset: {{ pickset['name'] }}</h1></div>
+            <div class="level-right"><a href="/picks/change/logout" class="level-item">Logout</a></div>
+        </div>
+        <hr>
+        <div class="columns">
+        {% set picks = pickset['picks'] %}
+        {% set picked_13 = [picks[:3], picks[3:6], picks[6:8]] %}
+        {% set picked_4 = picks[8:10] %}
+            {% for players in picked_13 %}
+            {% set num_level = loop.index %}
+            {% set level_index = loop.index0 %}
+            <div class="column pick-column">
+                <h1 class="title">Level {{ loop.index }}</h1>
+                {% for player in players %}
+                <div class="field">
+                    <div class="control">
+                        <div class="select">
+                            <select class="level-{{ num_level }}-input pick-select" autocomplete="off">
+                                <option value="{{ player[1] }}*{{ player[0] }}" data-original="original" selected="selected">{{ player[1] }}</option>
+                                {% for p in levels[level_index]|sort(attribute=1) %}
+                                    {% if player[0] != p[0] %}
+                                    <option value="{{ p[1] }}*{{ p[0] }}">{{ p[1] }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        <h1 class="title">Level 4</h1>
+        {{ level_4_field('1', value=picked_4[0][1]) }}
+        {{ level_4_field('2', value=picked_4[1][1]) }}
+        <div class="field is-grouped is-grouped-right">
+            <div class="control">
+                <a id="delete-pickset-link"><button class="button is-primary">Delete</button></a>
+            </div>
+            <div class="control">
+                <button class="button is-light" onclick="set_to_default()" type="button"><span class="icon"><i class="fas fa-undo"></i></span> </button>
+            </div>
+            <div class="control">
+                <button class="button is-link" id="save-changes">Save</button>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block add_below %}
+<script src="/make_picks/static/js/change-picks.js"></script>
+{{ level_4_script() }}
+{% endblock %}
