@@ -16,7 +16,7 @@ app.register_blueprint(results.routes.results_mod, url_prefix='/results')
 
 @app.route("/")
 def index():
-    return "HELLO WORLD"
+    return render_template("home.html")
 
 
 if __name__ == "__main__":

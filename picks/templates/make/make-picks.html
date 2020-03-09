@@ -1,18 +1,13 @@
 {% extends "base.html" %}
-{% from "loader-macros.html" import lazy_loader %}
-{% from "level-4-macro.html" import level_4_field, level_4_script  %}
 
 {% block title %}Make Picks{% endblock %}
 {% block add_head %}
-    <link rel="stylesheet" href="/static/css/library/animate.min.css">
-    <link rel="stylesheet" href="/make_picks/static/css/make-picks.min.css">
-    <link rel="stylesheet" href="/static/css/library/bulma-tooltip.min.css">
-    <script src="/static/js/library/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="/picks/static/css/make-picks.min.css">
 {% endblock %}
 
 {% block hero_title %}Make Picks{% endblock %}
 
-{# Macros #}
+{### MACROS ###}
 {% macro general_field(label="", name="", type="", maxlength=75, icon="", filter_pin=false, show_icon=false, error_message="", capitalize=False) %}
     <label class="label">{{ label }}</label>
     <div class="field {% if show_icon %}has-addons{% endif %}" data-tooltip="{{ error_message }}">
@@ -46,23 +41,23 @@
 {% macro main_level_field(level, picks_allowed, players) %}
     <div class="box pick-box main-level-box" data-allowed="{{ picks_allowed }}" data-level="{{ level }}">
         <div class="level is-mobile" style="margin-bottom: 5px">
-            <div class="level-left"><h2 class="title">Level {{ level }}</h2>&nbsp;(<span class="num-picked"></span>/{{ picks_allowed }})</div>
+            <div class="level-left"><h2 class="title">Level {{ level }}</h2>&nbsp;(<span class="num-picked">0</span>/{{ picks_allowed }})</div>
             <div class="level-right"><label class="level-item">Show Details &nbsp;<input class="show-details" type="checkbox"></label></div>
         </div>
         <p class="section-description">Pick {{ picks_allowed }} players from the list below by clicking on their name. Check the checkbox on the right to see photos and rankings.</p>
         <hr>
         <div class="columns is-multiline">
-            {% for player in players|sort(attribute=1) %}
-                {% set pid = player[0] %}
-                {% set name = player[1] %}
-                <div class="column is-half player-column" data-pid="{{ pid }}">
+            {% for player in players|sort(attribute="name") %}
+                <div class="column is-half player-column" data-pid="{{ player.id }}">
                     <label>
-                        <input class="player-checkbox" type="checkbox" value="{{ name }}*{{ pid }}" name="level-{{ level }}">
-                        <span class="button">{{ name }}</span>
+                        <input class="player-checkbox" type="checkbox" value="{{ player.name }}*{{ player.id }}" name="level-{{ player.level }}">
+                        <span class="button">{{ player.name }}</span>
                     </label>
                     <div class="box player-details">
                         <div class="media">
-                            {{ lazy_loader(photo_url % pid, media_left=False) }}
+                                <figure class="media-left image is-128x128">
+                                    <img alt="{{ player.name }}" src="{{ player.photo_url }}">
+                                </figure>
                             <div class="media-content">
                                 <table class="table is-fullwidth">
                                     <tr><th>World Golf Ranking</th><td class="owgr-rank">-</td></tr>
@@ -80,30 +75,13 @@
 
 
 {% block body %}
+
 <div class="columns">
-    <div class="column is-2 is-1-tablet is-hidden-touch">
-        <div id="make-picks-menu" class="menu side-menu">
-            <p class="menu-label">Fields</p>
-            <ul class="menu-list">
-                <li>
-                    <a class="go-to-button" data-id="general-section">
-                        <span>General</span>
-                        <span class="check-icon icon is-small hide" style="color:#23d160"><i class="fas fa-check"></i></span>
-                    </a>
-                </li>
-                {% for i in range(1,5) %}
-                <li>
-                    <a class="go-to-button" data-id="level-{{ i }}-section">
-                        <span>Level {{ i }}</span>
-                        <span class="check-icon icon is-small hide" style="color:#23d160"><i class="fas fa-check"></i></span>
-                    </a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
+{# TODO: Put menu list Here  #}
+    {# Main Picks Container #}
     <div class="column">
     <form id="make-picks-form" method="post" action="/picks/submit">
+        {# General Information Section #}
         <section id="general-section" class="section">
             <div class="box pick-box">
                 <h1 class="title">General</h1>
@@ -114,17 +92,22 @@
             </div>
         </section>
 
+        {# Levels 1-3 Section #}
         {% set num_picks = [3,3,2] %}
-        {% for level_players in levels %}
-            {{ main_level_field(loop.index, num_picks[loop.index0], level_players) }}
+        {% for n in num_picks %}
+            {{ main_level_field(loop.index, n, level_players[loop.index0]) }}
         {% endfor %}
+
+        {# Levels 4 Section #}
         <div class="box pick-box">
             <h1 class="title">Level 4</h1>
             <p class="section-description">Type in any two players who are not listed above.</p>
             <hr>
-            {{ level_4_field("1") }}
-            {{ level_4_field("2") }}
+{#            {{ level_4_field("1") }}#}
+{#            {{ level_4_field("2") }}#}
         </div>
+
+        {# Submission Section #}
         <section class="section">
             <div class="container">
                 <div class="field is-grouped is-grouped-right">
@@ -137,10 +120,6 @@
     </form>
     </div>
 </div>
-{% endblock %}
 
-{% block add_below %}
-<script>const owgr_url = "{{ OWGR_URL }}";</script>
-<script src="/make_picks/static/js/make-picks.js"></script>
-{{ level_4_script(display_check=True) }}
+<script src="/picks/static/js/make-picks.js"></script>
 {% endblock %}

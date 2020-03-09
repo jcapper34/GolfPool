@@ -10,9 +10,12 @@ GET_LEVELS_QUERY = """
                     JOIN player AS pl ON pl.id = lx.player_id
                 WHERE lx.season_year = %s
             """
-def get_levels(year, conn=None):
+def get_levels(year, separate=True, conn=None):
     conn = filter_conn(conn)
     results = conn.exec_fetch(GET_LEVELS_QUERY, (year,))
     players = [Player(pid=row['player_id'], name=row['name'], level=row['level']) for row in results]
 
-    return level_separate(players)
+    if separate:
+        return level_separate(players)
+
+    return players

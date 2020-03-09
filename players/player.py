@@ -3,6 +3,8 @@ from db.db_helper import filter_conn
 from picksets import pickset
 
 class Player:
+    PGA_PHOTO_URL = "https://pga-tour-res.cloudinary.com/image/upload/c_fill,d_headshots_default.png,dpr_2.0,f_auto,g_face:center,h_300,q_auto,w_300/headshots_%s.png"
+
     def __init__(self, pid, name=None, **kwargs):
         # General
         self.id = pid
@@ -19,6 +21,9 @@ class Player:
         # Picks
         self.picked_by = None
         self.num_picked = kwargs.get("num_picked")
+
+        # Photo
+        self.photo_url = Player.PGA_PHOTO_URL % pid
 
 
     # Parameters: pid, year
