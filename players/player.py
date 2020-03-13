@@ -35,6 +35,12 @@ class Player:
                         ORDER BY name"""
 
     def fill_who_picked(self, year, conn=None):
+        """
+        :param year:
+        :param conn:
+        :return:
+        """
+
         conn = filter_conn(conn)
 
         results = conn.exec_fetch(self.GET_WHO_PICKED_QUERY, (self.id, year))

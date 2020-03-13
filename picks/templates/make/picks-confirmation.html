@@ -1,3 +1,9 @@
+{#
+Params:
+    - Info {"name", "email", "pin"}
+    - Picks {level_separated(players)}
+#}
+
 {% extends "base.html" %}
 
 {% block title %}Picks Confirmation | {{ info.name }}{% endblock %}
@@ -10,7 +16,6 @@
         <h2><strong>Email:</strong> {{ info.email }}</h2>
         <h2><strong>PIN:</strong> {{ info.pin }}</h2><br>
         <table class="table is-fullwidth is-bordered">
-            {% set picks = [info['picks'][:3], info['picks'][3:6], info['picks'][6:8], info['picks'][8:10]] %}
             {% for pick_level in picks %}
                 <tr><th class="has-text-centered" rowspan="{{ pick_level|length }}">Level {{ loop.index }}</th><td class="has-text-centered">{{ pick_level[0].name }}</td></tr>
                 {% for player in pick_level[1:] %}

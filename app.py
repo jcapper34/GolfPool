@@ -1,4 +1,4 @@
-from flask import Flask, render_template, render_template_string
+from flask import Flask, render_template, redirect, url_for
 import picks, results
 
 # Creates app
@@ -13,11 +13,26 @@ app.register_blueprint(results.routes.results_mod, url_prefix='/results')
 
 
 ### ROUTES BEGIN ###
-
 @app.route("/")
 def index():
     return render_template("home.html")
 
+
+## Aliases ##
+@app.route("/picksets/make")
+def picks_make_alias():
+    return redirect(url_for('picks.picks_make'))
+
+@app.route("/picksets/change")
+def picks_change_alias():
+    return redirect(url_for('picks.picks_change'))
+
+
+## Error Pages ##
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('404.html'), 404
 
 if __name__ == "__main__":
     app.run()

@@ -14,6 +14,7 @@ def picks_index():
 def picks_make():
     return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR-1))
 
+
 # Change Picks Page
 @picks_mod.route("/change")
 def picks_change():

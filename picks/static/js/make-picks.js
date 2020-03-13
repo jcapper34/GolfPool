@@ -1,24 +1,6 @@
-function shuffle_pin(button) {
-    let input = button.closest('.field').find('.general-input');
-    let newVal = String();
-    for(let i = 0; i < 4; i++) {
-        newVal += String(Math.floor((Math.random() * 10)));
-    }
-    input.val(newVal);
-}
-
-function toggle_show_pin(button) {
-    let input = button.closest('.field').find('.general-input');
-    if(input.attr('type') === 'password') {
-        input.attr('type', 'text');
-    }
-    else {
-        input.attr('type', 'password');
-    }
-}
-
-
-// Form Validating
+/*
+FORM VALIDATING
+ */
 function check_general_input(e) {
     const name = e.attr('name');
     const val = e.val();
@@ -112,8 +94,6 @@ $(".player-checkbox").change(function() {
     set_progress();
 });
 
-// Level 4 functions are in Macro
-
 function check_entire_form() {
     let valid = true;
 
@@ -159,94 +139,25 @@ $("#make-picks-form").submit(function() {
     return false;
 });
 
+/*
+EXTRA EFFECTS
+*/
 
-function set_owgr() {
-    $.ajax({
-        url: owgr_url,
-        success: function(r) {
-            const player_data = r["tours"][0]["years"][0]["stats"][0]["details"];
-            $(".player-column").each(function() {
-                const pid = $(this).data("pid");
-                let rank = 'NA';
-                for(let i = 0; i < player_data.length; i++) {
-                    const p = player_data[i];
-                    if(p['plrNum'] == pid) {
-                        rank = p["curRank"];
-                    }
-                }
-                $(this).find('.owgr-rank').text(rank);
-            });
-        },
-        error: function(e) {
-            console.log(e);
-        }
-    });
+function shuffle_pin(button) {
+    let input = button.closest('.field').find('.general-input');
+    let newVal = String();
+    for(let i = 0; i < 4; i++) {
+        newVal += String(Math.floor((Math.random() * 10)));
+    }
+    input.val(newVal);
 }
 
-function get_last_year() {
-    $.ajax({
-        url: '/static/json/leaderboard-2018.json',
-        success: function(data) {
-            $(".player-column").each(function () {
-                const pid = $(this).data('pid');
-                let rank = 'NA';
-                for(i = 0; i < data.length; i++) {
-                    const p = data[i];
-                    if(p['pid'] == pid) {
-                         rank = p['pos'];
-                         break;
-                    }
-                }
-                $(this).find('.pos-2018').text(rank);
-            });
-        },
-        error: function(e) {console.log(e);}
-    });
-}
-
-function set_progress() {
-    $(".pick-box").each(function() {
-        let num_picked = $(this).find(".player-checkbox:checked").length;
-        $(this).find(".num-picked").text(num_picked);
-    });
-}
-
-// On document load
-$(document).ready(function() {
-    // Uncomment below for Testing
-    // $("input[name='name']").val('John Capper');
-    // $("input[name='email']").val('j.capper2@gmail.com');
-    // $("input[name='pin']").val('9999');
-    // for(let level = 1; level <= 3; level++) {
-    //     let it = 3;
-    //     if (level === 3) it = 2;
-    //     for (let i = 0; i < it; i++) {
-    //         $("input[name='level-" + level + "']").eq(i).prop('checked', true);
-    //     }
-    // }
-    // $("input[name='level-4']").eq(0).val('Steven Alker');
-    // $("input[name='level-4']").eq(1).val('James Allenby');
-
-    // check_entire_form();
-    // set_owgr();
-    // get_last_year();
-    // set_progress();
-    // $(".show-details").prop("checked", false);
-
-});
-
-
-$(".show-details").change(function() {
-    const is_checked = $(this).prop("checked");
-    let detail_boxes = $(this).closest('.main-level-box').find(".player-details");
-    if(is_checked) {
-        detail_boxes.slideDown();
-        detail_boxes.each(function() {
-            let img = $(this).find(".player-img");
-            img.attr('src', img.data('src'))
-        });
+function toggle_show_pin(button) {
+    let input = button.closest('.field').find('.general-input');
+    if(input.attr('type') === 'password') {
+        input.attr('type', 'text');
     }
     else {
-        detail_boxes.slideUp();
+        input.attr('type', 'password');
     }
-});
+}
