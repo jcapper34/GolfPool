@@ -1,120 +1,6 @@
 /*
-FORM VALIDATING
+ENTIRE FORM
  */
-function check_general_input(e) {
-    const name = e.attr('name');
-    const val = e.val();
-    let field = e.closest(".field");
-
-    // No flags if no value
-    if(val === '') {
-        e.removeClass("is-success").removeClass("is-danger");
-        field.find(".fa-check, .fa-exclamation-triangle").addClass('hide');
-        return;
-    }
-
-    let valid = false;
-
-    if(name === 'name') {               // For Name
-        valid = ( (isNaN(val)) && (val.length > 2) );
-    }
-    else if(name === 'email') {         // For Email
-        valid = ( (val.length > 3) && (val.includes("@")) && (val.includes(".")) && (val.indexOf("@") > 0));
-    }
-    else if(name === 'pin') {           // For PIN
-        valid = ( (!isNaN(val)) && (val.length === 4) );
-    }
-
-
-    if (valid) {
-        e.addClass("is-success").removeClass("is-danger");
-        field.find(".fa-check").removeClass('hide');
-        field.find(".fa-exclamation-triangle").addClass('hide');
-    }
-    else {
-        e.addClass("is-danger").removeClass("is-success");
-        field.find(".fa-exclamation-triangle").removeClass('hide');
-        field.find(".fa-check").addClass('hide');
-        field.addClass('tooltip is-tooltip-active');
-        window.setTimeout(function() {
-            field.removeClass('tooltip is-tooltip-active');
-        }, 1500);
-    }
-
-    return valid;
-}
-
-function check_all_general() {
-    let valid = true;
-    $(".general-input").each(function () {
-        if (!check_general_input($(this))) {
-            valid = false;
-        }
-    });
-
-    let check_icon = $('#make-picks-menu').find(".check-icon").eq(0);
-    if(valid)
-        check_icon.removeClass('hide');
-    else
-        check_icon.addClass('hide');
-
-    return valid;
-}
-
-function check_main_level(pickBox, recently_selected) {
-    const picksAllowed = pickBox.data('allowed');
-    let len = pickBox.find(".player-checkbox:checked").length;
-    const level = pickBox.data('level');
-    let check_icon = $('#make-picks-menu').find('.check-icon').eq(level);
-
-    if ((len > picksAllowed) && (recently_selected !== undefined)) {
-        recently_selected.prop("checked", false);
-        len--;
-    }
-    if (len === picksAllowed) {
-        check_icon.removeClass('hide');
-        return true;
-    }
-    else {
-        check_icon.addClass('hide');
-        return false;
-    }
-}
-
-$(".player-checkbox").change(function() {
-    let pick_box = $(this).closest(".pick-box");
-    if(pick_box.find(".player-checkbox:checked").length > 0) {
-        pick_box.find(".reset-level").fadeIn()
-    }
-    else {
-        pick_box.find(".reset-level").fadeOut()
-    }
-
-    check_main_level($(this).closest('.pick-box'), $(this));
-    set_progress();
-});
-
-function check_entire_form() {
-    let valid = true;
-
-    // Check general fields
-    if( !check_all_general() )
-        valid = false;
-
-    // Check all main level picks
-    $(".pick-box").each(function() {
-        const level = $(this).data('level');
-        if((level > 0) && (level < 4))
-            if( !check_main_level($(this)) )
-                valid = false;
-    });
-
-    if( !check_level_4() )
-        valid = false;
-
-    return valid;
-
-}
 
 // Checks form on submission
 $("#make-picks-form").submit(function() {
@@ -139,6 +25,138 @@ $("#make-picks-form").submit(function() {
     return false;
 });
 
+function check_entire_form() {
+    let valid = true;
+
+    // Checking general fields
+    $('.general-input').each(function() {
+        const success = !general_field_checker($(this));
+        if(success === undefined || !success)
+            valid = false;
+    });
+
+    return valid;
+}
+
+/*
+GENERAL FIELDS
+ */
+
+function general_field_checker(elementSelector) {
+    const fieldName = elementSelector.attr("name");
+
+    let check_func;
+    if(fieldName === 'name') check_func = check_name_input;
+    else if(fieldName === 'email') check_func = check_email_input;
+    else if(fieldName === 'pin') check_func = check_pin_input;
+
+    const success = check_func(elementSelector);
+    if(success !== undefined) {
+        do_general_effects(success, elementSelector);
+    }
+    return success;
+}
+
+function check_name_input(elementSelector) {
+    const val = elementSelector.val();
+    if(val === '') {
+        return clear_general_flags(elementSelector);
+    }
+
+    return (isNaN(val)) && (val.length > 2);
+}
+
+function check_email_input(elementSelector) {
+    const val = elementSelector.val();
+    if(val === '') {
+        return clear_general_flags(elementSelector);
+    }
+    return (val.length > 3) && (val.includes("@")) && (val.includes(".")) && (val.indexOf("@") > 0);
+}
+
+function check_pin_input(elementSelector) {
+    const val = elementSelector.val();
+    if(val === '') {
+        return clear_general_flags(elementSelector);
+    }
+    return (!isNaN(val)) && (val.length === 4);
+}
+
+function do_general_effects(success, elementSelector) {
+    let field = elementSelector.closest(".field");
+    if (success) {
+        elementSelector.addClass("is-success").removeClass("is-danger");
+        field.find(".fa-check").removeClass('hide');
+        field.find(".fa-exclamation-triangle").addClass('hide');
+    }
+    else {
+        elementSelector.addClass("is-danger").removeClass("is-success");
+        field.find(".fa-exclamation-triangle").removeClass('hide');
+        field.find(".fa-check").addClass('hide');
+        field.addClass('tooltip is-tooltip-active');
+        window.setTimeout(function() {
+            field.removeClass('tooltip is-tooltip-active');
+        }, 1500);
+    }
+}
+
+function clear_general_flags(elementSelector) {
+    let field = elementSelector.closest('.field');
+    elementSelector.removeClass("is-success").removeClass("is-danger");
+    field.find(".fa-check, .fa-exclamation-triangle").addClass('hide');
+}
+
+/*
+MAIN LEVEL FIELDS
+ */
+
+$(".player-checkbox").change(function() {
+    let pickBox = $(this).closest(".pick-box");
+    check_main_level(pickBox, $(this));
+    main_level_effects(pickBox);
+});
+
+function check_main_level(pickBox, recently_selected) {
+    const picksAllowed = pickBox.data('allowed');
+    let len = pickBox.find(".player-checkbox:checked").length;
+    const level = pickBox.data('level');
+
+    if ((len > picksAllowed) && (recently_selected !== undefined)) {
+        recently_selected.prop("checked", false);
+        len--;
+    }
+    return len === picksAllowed;
+}
+
+function main_level_player_details(checkBox) {
+    let pickBox = checkBox.closest('.pick-box');
+    let playerDetailsBox = pickBox.find(".player-details");
+    if(checkBox.prop('checked')) {  //Show Details
+        playerDetailsBox.slideDown();
+        lazy_load(playerDetailsBox.find('img'));
+    }
+    else {  //Hide Details
+        playerDetailsBox.slideUp();
+    }
+}
+
+function main_level_effects(pickBox) {
+    const numPicked = pickBox.find(".player-checkbox:checked").length;
+    if(numPicked > 0) {   // If any players have been selected
+        pickBox.find(".reset-level").fadeIn();
+    }
+    else {
+        pickBox.find(".reset-level").fadeOut();
+    }
+
+    pickBox.find(".num-picked").text(numPicked);    // Update to show how many of that level were picked
+}
+
+function reset_main_level(pickBox) {
+    pickBox.find('.player-checkbox').prop('checked', false);
+    main_level_effects(pickBox);
+}
+
 /*
 EXTRA EFFECTS
 */
@@ -160,4 +178,8 @@ function toggle_show_pin(button) {
     else {
         input.attr('type', 'password');
     }
+}
+
+function lazy_load(image_e) {
+    ;
 }
