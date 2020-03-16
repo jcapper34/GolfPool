@@ -133,7 +133,9 @@ function main_level_player_details(checkBox) {
     let playerDetailsBox = pickBox.find(".player-details");
     if(checkBox.prop('checked')) {  //Show Details
         playerDetailsBox.slideDown();
-        lazy_load(playerDetailsBox.find('img'));
+        playerDetailsBox.find("img").each(function() {  //Load images
+            $(this).attr("src", $(this).data('src'));
+        });
     }
     else {  //Hide Details
         playerDetailsBox.slideUp();
@@ -178,8 +180,4 @@ function toggle_show_pin(button) {
     else {
         input.attr('type', 'password');
     }
-}
-
-function lazy_load(image_e) {
-    ;
 }
