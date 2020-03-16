@@ -1,7 +1,7 @@
-USE_LOCAL = False
+USE_LOCAL = True
 LOCAL_DB_CREDENTIALS = {
-            "dbname": 'johncapper',
-            "user": 'johncapper',
+            "dbname": 'postgres',
+            "user": 'jcapp',
             "host": 'localhost',
             "password": 'cmcapper',
             "options": '-c search_path=golfpool'
@@ -14,3 +14,4 @@ HEROKU_DB_CREDENTIALS = {
             "password": 'fdc587747cf954a402fc66ca4c5710e908b006200ccff68db953b32ed352a2a9',
             "options": '-c search_path=golfpool'
 }
+

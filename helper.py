@@ -11,4 +11,5 @@ def splash(obj):
 
 
 ### CONSTANTS ###
-CURRENT_YEAR = int(datetime.now().year)
+NOW = datetime.now()
+CURRENT_YEAR = int(NOW.year)

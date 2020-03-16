@@ -1,14 +1,15 @@
 {#
 Params:
     - level_players
+    - OWGR_URL
 #}
 {% extends "base.html" %}
 
-{% block title %}Make Picks{% endblock %}
 {% block add_head %}
 <link rel="stylesheet" href="/picks/static/css/make-picks.min.css">
 {% endblock %}
 
+{% block title %}Make Picks{% endblock %}
 {% block hero_title %}Make Picks{% endblock %}
 
 {### MACROS ###}
@@ -72,7 +73,7 @@ Params:
                             <div class="media-content">
                                 <table class="table is-fullwidth">
                                     <tr><th>World Golf Ranking</th><td class="owgr-rank">-</td></tr>
-                                    <tr><th>2018 Pool Ranking</th><td class="pos-2018">-</td></tr>
+                                    <tr><th>2019 Pool Ranking</th><td class="pos-2019">-</td></tr>
                                 </table>
                             </div>
                         </div>
@@ -129,6 +130,9 @@ Params:
     </form>
     </div>
 </div>
-
+<script>
+{# Vars for Script #}
+var OWGR_URL = '{{ OWGR_URL }}';
+</script>
 <script src="/picks/static/js/make-picks.js"></script>
 {% endblock %}

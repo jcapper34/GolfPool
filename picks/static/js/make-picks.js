@@ -4,25 +4,26 @@ ENTIRE FORM
 
 // Checks form on submission
 $("#make-picks-form").submit(function() {
-    const form_validated = check_entire_form();
-    if(form_validated) {
-        //Check for inconsistent name-pid pairs
-        $(".level-4-hidden").each(function () {
-            if($(this).val() === '') {
-                $(this).val("None");
-            }
-        });
-
-        const confirmed = window.confirm("Are you sure you would like to submit? You can change your picks later by using your PIN");
-        if(confirmed) {
-            return true;
-        }
-    }
-    else {
-        window.alert("Please complete entire form and/or fix errors before submitting");
-    }
-
-    return false;
+    return true;
+    // const form_validated = check_entire_form();
+    // if(form_validated) {
+    //     //Check for inconsistent name-pid pairs
+    //     $(".level-4-hidden").each(function () {
+    //         if($(this).val() === '') {
+    //             $(this).val("None");
+    //         }
+    //     });
+    //
+    //     const confirmed = window.confirm("Are you sure you would like to submit? You can change your picks later by using your PIN");
+    //     if(confirmed) {
+    //         return true;
+    //     }
+    // }
+    // else {
+    //     window.alert("Please complete entire form and/or fix errors before submitting");
+    // }
+    //
+    // return false;
 });
 
 function check_entire_form() {
@@ -159,6 +160,7 @@ function reset_main_level(pickBox) {
     main_level_effects(pickBox);
 }
 
+
 /*
 EXTRA EFFECTS
 */
@@ -181,3 +183,20 @@ function toggle_show_pin(button) {
         input.attr('type', 'password');
     }
 }
+
+/* PAGE STARTUP */
+
+$(document).ready(function() {
+    // Insert OWGR
+    $.ajax({
+        url: OWGR_URL,
+        type: 'GET',
+        success: function (response) {
+            const rankings = response.tours[0].years[0].stats[0].details;
+            for(const i in rankings) {  // Update player details
+                const player = rankings[i];
+                $(".player-column[data-pid='" + player.plrNum + "']").find('.owgr-rank').text(player.curRank);
+            }
+        }
+    });
+});
