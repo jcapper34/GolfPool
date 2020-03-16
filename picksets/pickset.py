@@ -3,6 +3,10 @@ from db.db_helper import filter_conn
 from players import player
 
 class Pickset:
+    ### CONSTANTS ###
+    PICKS_ALLOWED = [3, 3, 2, 2]
+
+    ### CONSTRUCTOR ###
     def __init__(self, psid, name=None, email=None, pin=None, picks=None, points=None, pos=None):
         # General Info
         self.id = psid
@@ -17,12 +21,23 @@ class Pickset:
         self.points = points
         self.pos = pos
 
-
+    ### HELPERS ###
     def get_pids(self):
         pass
 
-    ### Database Requests ###
+    def validate_picks(self):
+        if len(self.picks) != len(Pickset.PICKS_ALLOWED):   ## Check for correct number of levels
+            return False
 
+        for i in range(len(self.picks)):
+            level_players = self.picks[i]
+            if len(level_players) != Pickset.PICKS_ALLOWED[i]:
+                return False
+
+        return True
+
+
+    ### Database Requests ###
     # Parameters: ps.id
     # Returns: pid, pl.name, level
     GET_PICKS_QUERY = """
@@ -41,7 +56,6 @@ class Pickset:
         results = conn.exec_fetch(Pickset.GET_PICKS_QUERY, (self.id,))
 
         self.picks = [player.Player(row['pid'], row['name'], level=row['level']) for row in results]
-
 
     def fill_tournament_history(self, year, conn=None):
         pass

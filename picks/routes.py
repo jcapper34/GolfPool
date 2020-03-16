@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from helper import CURRENT_YEAR, splash
+from picksets.picksets_submit import submit_picks
 from players.players_db import get_levels
 from players.player import Player
 
@@ -27,7 +28,16 @@ def picks_change():
 # Picks Submission
 @picks_mod.route("/submit", methods=['POST'])
 def picks_submit():
-    return "TODO"
+    pickset = submit_picks(
+        name=request.form.get("name").capitalize(),
+        email=request.form.get("email"),
+        pin=request.form.get("pin"),
+        level_1=request.form.getlist("level-1"),
+        level_2=request.form.getlist("level-2"),
+        level_3=request.form.getlist("level-3"),
+        level_4=None
+    )
+    return str(pickset)
 
 
 # Poolwide Picks Page
