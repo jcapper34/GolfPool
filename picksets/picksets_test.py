@@ -1,10 +1,11 @@
 from picksets.pickset import Pickset
+from picksets.picksets_submit import submit_picks
 from players.players_helper import level_separate
 from picksets.picksets_db import get_most_picked, get_all_picks
 from db.conn import Conn
 from db.db_helper import filter_conn
 
-### INDIVIDUAL ###
+""" INDIVIDUAL """
 def test_fill_picks(psid=1, name='Sarah Mathy', conn=None):
     pickset = Pickset(psid=psid, name=name)
     pickset.fill_picks(conn=conn)
@@ -25,3 +26,21 @@ def test_all_picks(year=2019, conn=None):
         if len(pickset.picks) != picks_len:
             print("Unequal number of picksets")
 
+def test_submit_picks():
+    pickset = Pickset(
+        name='John Capper',
+        email='j.capper2@gmail.com',
+        pin=5753
+    )
+    success = pickset.submit_picks([
+        ['Rickie Fowler*32102', 'Rory McIlroy*28237', 'Tiger Woods*08793'],
+        ['Adam Scott*24502', 'Bryson DeChambeau*47959', 'Henrik Stenson*21528'],
+        ['Aaron Wise*49964', 'Abraham Ancer*45526'],
+        ['Aaron Wise*4960', 'Abraham Ancer*4526']
+        ]
+    )
+    print(success)
+
+
+if __name__ == '__main__':
+    test_submit_picks()

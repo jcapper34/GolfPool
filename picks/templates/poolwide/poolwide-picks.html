@@ -2,11 +2,12 @@
 params:
     - pickset_info
     - picks
+    - year
 #}
 {% extends "base.html" %}
 
-{% block title %}Poolwide Picks{% endblock %}
-{% block hero_title %} {% endblock %}
+{% block title %}Poolwide Picks {{ year }}{% endblock %}
+{% block hero_title %}Poolwide Picks {{ year }}{% endblock %}
 
 {% block body %}
 <section class="section">

@@ -57,6 +57,6 @@ class Player:
 
 
 
-    ### Overrides ###
+    """ Overrides """
     def __str__(self):
         return "Player: id=%s, name='%s'" % (self.id, self.name)

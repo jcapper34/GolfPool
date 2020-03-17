@@ -1,6 +1,7 @@
 from pprint import pprint
 from datetime import datetime
 
+""" FUNCTIONS """
 def splash(obj):
     if isinstance(obj, list):
         obj = [val.__str__() for val in obj]
@@ -10,6 +11,6 @@ def splash(obj):
     pprint(obj)
 
 
-### CONSTANTS ###
+""" CONSTANTS """
 NOW = datetime.now()
 CURRENT_YEAR = int(NOW.year)
