@@ -1,3 +1,75 @@
-{% macro head_includes() %}
+{% macro helper_scripts() %}
+    <script>
+        function out(message) {
+            console.log(message);
+        }
+        function toggle_mobile_nav() {
+            $("#mobile-nav").fadeToggle().find('section').css("margin-top", $("#top-nav").css("height"));
+            $("html, body").toggleClass("disable-scroll");
+        }
+        function lazy_load(e) {
+            e.siblings(".loader").addClass("hide");
+            e.removeClass("hide");
+        }
+        function finder(obj, attribute, value) {
+            const n = obj.length;
+            for(let i = 0; i < n; i++) {
+                if(obj[i][attribute] === value) {
+                    return obj[i];
+                }
+            }
+            return undefined;
+        }
+    </script>
+{% endmacro %}
 
+{% macro head_includes(is_local) %}
+    {% if is_local %}
+    <link rel="stylesheet" href="/static/fontawesome/css/all.css">
+    <script src="/static/js/library/jquery-3.3.1.min.js"></script>
+    {% else %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css" integrity="sha256-8B1OaG0zT7uYA572S2xOxWACq9NXYPQ+U5kHPV1bJN4=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.0.min.js" integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
+    {% endif %}
+{% endmacro %}
+
+{% macro top_nav(nav_menu) %}
+<nav id="top-nav" class="navbar is-light">
+      <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img src="/static/img/golfer-sil.png">
+                <span id="site-name">Golf Pool</span>
+            </a>
+            <a id="nav-burger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" onclick="toggle_mobile_nav()">
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+            </a>
+      </div>
+      <div class="navbar-menu">
+          <div class="navbar-start">
+          </div>
+          <div class="navbar-end">
+          {% for item in nav_menu %}
+              <a class="navbar-item" href="{{ item[0] }}">{{ item[1] }}</a>
+          {% endfor %}
+          </div>
+      </div>
+</nav>
+
+{% endmacro %}
+
+{% macro mobile_nav(nav_menu) %}
+    <div id="mobile-nav">
+        <section class="section">
+            <div class="menu">
+                <ul class="menu-list">
+                    {% for item in nav_menu %}
+                    <li class="has-text-centered"><a class="mobile-nav-item is-size-4" href="{{ item[0] }}">{{ item[1] }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+    </div>
 {% endmacro %}

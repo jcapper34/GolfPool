@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for
 import picks, results
-
+from db.db_var import USE_LOCAL
 
 app = Flask(__name__)   # Creates app
 
@@ -36,6 +36,12 @@ def results_live_alias():
 def page_not_found(e):
     # note that we set the 404 status explicitly
     return render_template('404.html'), 404
+
+""" JINJA GLOBALS """
+@app.context_processor
+def is_local():
+    return dict(is_local=USE_LOCAL)
+
 
 if __name__ == "__main__":
     app.run()

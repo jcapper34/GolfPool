@@ -4,6 +4,7 @@ Params:
     - OWGR_URL
 #}
 {% extends "base.html" %}
+{% import "make/make-picks.macro.html" as mp_macs  %}
 
 {% block add_head %}
 <link rel="stylesheet" href="/picks/static/css/make-picks.css">
@@ -12,80 +13,7 @@ Params:
 {% block title %}Make Picks{% endblock %}
 {% block hero_title %}Make Picks{% endblock %}
 
-{### MACROS ###}
-{% macro general_field(label, name, type="", maxlength=75, icon="", filter_pin=false, show_icon=false, error_message="", capitalize=False) %}
-    <label class="label">{{ label }}</label>
-    <div class="field {% if show_icon %}has-addons{% endif %}" data-tooltip="{{ error_message }}">
-          <div class="control has-icons-left has-icons-right {% if show_icon %}is-expanded{% endif %}">
-            <input name="{{ name }}" class="input animated general-input" type="{{ type }}"
-                 onblur="general_field_checker($(this))" maxlength="{{ maxlength }}"
-                 autocomplete="off"
-                {% if capitalize %}
-                style="text-transform: capitalize"
-                {% endif %}
-                 required>
-              <span class="icon is-left is-small">
-                  <i class="{{ icon }}"></i>
-              </span>
-              <span class="icon is-right is-small">
-                  <i class="fas fa-check hide"></i>
-                  <i class="fas fa-exclamation-triangle hide"></i>
-              </span>
-          </div>
-          {% if show_icon %}
-          <div class="control">
-            <button class="button show-input-button" type="button" onclick="toggle_show_pin($(this))"><i class="fas fa-eye"></i></button>
-          </div>
-          <div class="control">
-            <button class="button random-pin-button" type="button" onclick="shuffle_pin($(this))"><i class="fas fa-random"></i></button>
-          </div>
-          {% endif %}
-    </div>
-{% endmacro %}
-
-{% macro main_level_field(level, picks_allowed, players) %}
-    <div class="box pick-box main-level-box" data-allowed="{{ picks_allowed }}" data-level="{{ level }}">
-
-        {# Pickbox Header #}
-        <div class="level is-mobile" style="margin-bottom: 5px">
-            <div class="level-left"><h2 class="title">Level {{ level }}</h2>&nbsp;(<span class="num-picked">0</span>/{{ picks_allowed }})</div>
-            <div class="level-right">
-                <label class="level-item">Show Details &nbsp;<input class="show-details" type="checkbox" onchange="main_level_player_details($(this))"></label>
-                <a class="level-item icon reset-level" onclick="reset_main_level($(this).closest('.pick-box'))" style="display: none"><i class="fas fa-undo"></i></a>
-            </div>
-        </div>
-        <p class="section-description">Pick {{ picks_allowed }} players from the list below by clicking on their name. Check the checkbox on the right to see photos and rankings.</p>
-        <hr>
-
-        {# Pickbox body #}
-        <div class="columns is-multiline">
-            {% for player in players|sort(attribute="name") %}
-                <div class="column is-half player-column" data-pid="{{ player.id }}">
-                    <label>
-                        <input class="player-checkbox" type="checkbox" value="{{ player.name }}*{{ player.id }}" name="level-{{ player.level }}">
-                        <span class="button">{{ player.name }}</span>
-                    </label>
-                    <div class="box player-details">
-                        <div class="media">
-                                <figure class="media-left image is-128x128">
-                                    <img alt="{{ player.name }} Photo" data-src="{{ player.photo_url }}">
-                                </figure>
-                            <div class="media-content">
-                                <table class="table is-fullwidth">
-                                    <tr><th>World Golf Ranking</th><td class="owgr-rank">-</td></tr>
-                                    <tr><th>2019 Pool Ranking</th><td class="pos-2019">-</td></tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-{% endmacro %}
-
 {% block body %}
-
 <div class="columns">
 {# TODO: Put menu list Here  #}
     {# Main Picks Container #}
@@ -96,16 +24,16 @@ Params:
             <div class="box pick-box">
                 <h1 class="title">General</h1>
                 <p class="section-description">Enter your name, email, and a pin. The pin is for if you end up wanting to change your picks.</p><hr>
-                {{ general_field(label="Name", name="name", type="text", icon="fas fa-user", capitalize=True, error_message="Please enter a valid name") }}
-                {{ general_field(label="Email", name="email", type="email", icon="fas fa-envelope", error_message="Please enter a valid email") }}
-                {{ general_field(label="PIN", name="pin", type="password", icon="fas fa-key", maxlength=4, filter_pin=true, show_icon=true, error_message="PIN must have 4 numbers") }}
+                {{ mp_macs.general_field(label="Name", name="name", type="text", icon="fas fa-user", capitalize=True, error_message="Please enter a valid name") }}
+                {{ mp_macs.general_field(label="Email", name="email", type="email", icon="fas fa-envelope", error_message="Please enter a valid email") }}
+                {{ mp_macs.general_field(label="PIN", name="pin", type="password", icon="fas fa-key", maxlength=4, filter_pin=true, show_icon=true, error_message="PIN must have 4 numbers") }}
             </div>
         </section>
 
         {# Levels 1-3 Section #}
         {% set num_picks = [3,3,2] %}
         {% for n in num_picks %}
-            {{ main_level_field(loop.index, n, level_players[loop.index0]) }}
+            {{ mp_macs.main_level_field(loop.index, n, level_players[loop.index0]) }}
         {% endfor %}
 
         {# Levels 4 Section #}
