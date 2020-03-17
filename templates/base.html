@@ -36,20 +36,7 @@
             }
             return undefined;
         }
-        function ordinal_suffix_of(i) {
-            let j = i % 10;
-            let k = i % 100;
-            if (j === 1 && k !== 11) {
-                return i + "st";
-            }
-            if (j === 2 && k !== 12) {
-                return i + "nd";
-            }
-            if (j === 3 && k !== 13) {
-                return i + "rd";
-            }
-            return i + "th";
-        }
+
     </script>
     {% block add_head %}
         <link rel="stylesheet" href="/static/css/library/bulma.min.css">
@@ -58,9 +45,9 @@
 </head>
 {% set nav_menu = [
     ("/", "Home"),
-    ("/picks/make", "Make Picks"),
-    ("/picks/change", "Change Picks"),
-    ("/standings/live", "Standings"),
+    (url_for('picks.picks_make'), "Make Picks"),
+    (url_for('picks.picks_change'), "Change Picks"),
+    (url_for('results.results_live'), "Standings"),
     (url_for('picks.picks_poolwide'), "Poolwide Picks"),
 ] %}{#TODO: Finish these pages
 ("/players/search", "Search Player")
@@ -88,18 +75,18 @@
           </div>
       </div>
 </nav>
-
-<div id="mobile-nav">
-    <section class="section">
-        <div class="menu">
-            <ul class="menu-list">
-                {% for item in nav_menu %}
-                <li class="has-text-centered"><a class="mobile-nav-item is-size-4" href="{{ item[0] }}">{{ item[1] }}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
-    </section>
-</div>
+{#TODO#}
+{#<div id="mobile-nav">#}
+{#    <section class="section">#}
+{#        <div class="menu">#}
+{#            <ul class="menu-list">#}
+{#                {% for item in nav_menu %}#}
+{#                <li class="has-text-centered"><a class="mobile-nav-item is-size-4" href="{{ item[0] }}">{{ item[1] }}</a></li>#}
+{#                {% endfor %}#}
+{#            </ul>#}
+{#        </div>#}
+{#    </section>#}
+{#</div>#}
 
 
 <body style="margin-bottom:15px">

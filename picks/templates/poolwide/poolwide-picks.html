@@ -1,16 +1,39 @@
 {#
-params:
-    - pickset_info
-    - picks
+Params:
     - year
+    - all_picks
 #}
 {% extends "base.html" %}
+{% import 'poolwide/poolwide-picks.macro.html' as tabs %}
 
-{% block title %}Poolwide Picks {{ year }}{% endblock %}
-{% block hero_title %}Poolwide Picks {{ year }}{% endblock %}
+{% block title %}Poolwide Picks - {{ year }}{% endblock %}
+{% block hero_title %}Poolwide Picks - {{ year }}{% endblock %}
+
+{% block add_head %}
+<link rel="stylesheet" href="/picks/static/css/poolwide-picks.css">
+{% endblock %}
+
+{# Poolwide Picks Menu #}
+{% block hero_foot %}
+    <div class="hero-foot">
+        <div id="picks-tabs" class="tabs is-centered">
+            <ul>
+                <li class="is-active"><a onclick="prompt_picks_table()">Picks Table</a></li>
+                <li><a onclick="prompt_most_picked()">Most Picked</a></li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
 
 {% block body %}
-<section class="section">
+    {{ tabs.all_picks_tab(all_picks) }}
 
-</section>
+
+{% endblock %}
+
+{% block add_below %}
+    <script>
+    const year = {{ year }};
+    </script>
+    <script src="/picks/static/js/poolwide-picks.js"></script>
 {% endblock %}

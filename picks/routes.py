@@ -2,6 +2,7 @@ from pprint import pprint
 from flask import Blueprint, render_template, request
 from helper import CURRENT_YEAR, splash
 from picksets.pickset import Pickset
+from picksets.picksets_db import get_all_picks
 from picksets.picksets_submit import submit_picks
 from players.players_db import get_levels
 from players.player import Player
@@ -51,4 +52,7 @@ def picks_submit():
 @picks_mod.route("/poolwide")
 @picks_mod.route("/poolwide/<int:year>")
 def picks_poolwide(year=CURRENT_YEAR):
-    return render_template('poolwide/poolwide-picks.html', year=year)
+    if year == CURRENT_YEAR:
+        return render_template('locked-page.html')
+
+    return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))

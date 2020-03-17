@@ -26,6 +26,10 @@ def picks_make_alias():
 def picks_change_alias():
     return redirect(url_for('picks.picks_change'))
 
+@app.route("/standings/live")
+def results_live_alias():
+    return redirect(url_for('results.results_live'))
+
 
 """ Error Pages """
 @app.errorhandler(404)
