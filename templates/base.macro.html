@@ -24,7 +24,7 @@
 {% endmacro %}
 
 {% macro head_includes(is_local) %}
-    {% if is_local %}
+    {% if is_local %}   {# Then use local files only #}
     <link rel="stylesheet" href="/static/fontawesome/css/all.css">
     <script src="/static/js/library/jquery-3.3.1.min.js"></script>
     {% else %}

@@ -9,7 +9,7 @@
 
     <link rel="icon" href="/static/img/golf-club.png">
 
-    {{ macs.head_includes() }}
+    {{ macs.head_includes(is_local) }}
     {{ macs.helper_scripts() }}
 
     {# Default Stylesheets #}
@@ -40,8 +40,7 @@
   </div>
     {% block hero_foot %}{% endblock %}
 </div>
-{% block body %}
-{% endblock %}
+{% block body %}{% endblock %}
 {% block add_below %}{% endblock %}
 </body>
 </html>
