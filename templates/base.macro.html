@@ -12,8 +12,7 @@
             e.removeClass("hide");
         }
         function finder(obj, attribute, value) {
-            const n = obj.length;
-            for(let i = 0; i < n; i++) {
+            for(let i = 0; i < obj.length; i++) {
                 if(obj[i][attribute] === value) {
                     return obj[i];
                 }

@@ -4,26 +4,20 @@ ENTIRE FORM
 
 // Checks form on submission
 $("#make-picks-form").submit(function() {
-    return true;
-    // const form_validated = check_entire_form();
-    // if(form_validated) {
-    //     //Check for inconsistent name-pid pairs
-    //     $(".level-4-hidden").each(function () {
-    //         if($(this).val() === '') {
-    //             $(this).val("None");
-    //         }
-    //     });
-    //
-    //     const confirmed = window.confirm("Are you sure you would like to submit? You can change your picks later by using your PIN");
-    //     if(confirmed) {
-    //         return true;
-    //     }
-    // }
-    // else {
-    //     window.alert("Please complete entire form and/or fix errors before submitting");
-    // }
-    //
-    // return false;
+    if(check_entire_form()) {
+        //Check for inconsistent name-pid pairs
+        $(".level-4-hidden").each(function () {
+            if($(this).val() === '') {
+                $(this).val("None");
+            }
+        });
+
+        return window.confirm("Are you sure you would like to submit? You can change your picks later by using your PIN");
+
+    }
+
+    window.alert("Please complete entire form and/or fix errors before submitting");
+    return false;
 });
 
 function check_entire_form() {
@@ -31,7 +25,7 @@ function check_entire_form() {
 
     // Checking general fields
     $('.general-input').each(function() {
-        const success = !general_field_checker($(this));
+        const success = general_field_checker($(this));
         if(success === undefined || !success)
             valid = false;
     });
@@ -162,6 +156,76 @@ function reset_main_level(pickBox) {
 
 
 /*
+LEVEL 4 Functions
+*/
+function create_player_suggestions(input_element) {
+    const val = input_element.val().toLowerCase();
+    if(val === '') {// If no value, then don't do anything
+        input_element.closest('.level-4-field').find('.suggestions-box').addClass('hide');
+        return;
+    }
+
+
+    const nameCheck = function(name, val) {
+        return name.substr(0, val.length).toLowerCase() === val;
+    };
+
+    let suggestions = [];
+    let count = 0;
+
+    for(let i = 0; i < OWGR_rankings.length; i++) {
+        const player = OWGR_rankings[i];
+        const playerFirst = player.plrName.first;
+        const playerLast = player.plrName.last;
+        const playerFull = [playerFirst, playerLast].join(' ');
+
+        if (nameCheck(playerFirst, val) || nameCheck(playerLast, val) || nameCheck(playerFull, val)) {
+            suggestions.push([player.plrNum, playerFull]); // In the form (pid, name)
+            count++;
+            if (count === 5)
+                break;
+        }
+    }
+    show_player_suggestions(input_element.closest('.level-4-field'), suggestions);
+
+}
+
+
+function show_player_suggestions(fieldElement, suggestions) {
+    let suggestionsBox = $("#suggestions-box");
+    suggestionsBox.removeClass("hide"); // Show Suggestions
+
+    let i = 0;
+    suggestionsBox.find(".level-4-option").each(function() {
+        let td = $(this);
+        if(i < suggestions.length) {
+            /* Set and show option */
+            td.removeClass("hide").
+                find(".level-4-option-name")
+                    .text(suggestions[i][1])
+                    .data("pid", suggestions[i][0]);
+        }
+        else {
+            /* Reset and hide option */
+            td.addClass("hide").
+                find(".level-4-option-name")
+                    .empty()
+                    .data("pid", "");
+        }
+        i++;
+    });
+}
+
+function add_level_4(tdElement) {
+    const name = tdElement.text();
+    const pid = tdElement.data('pid');
+
+    $("#suggestions-box").addClass('hide');
+
+
+}
+
+/*
 EXTRA EFFECTS
 */
 
@@ -185,16 +249,16 @@ function toggle_show_pin(button) {
 }
 
 /* PAGE STARTUP */
-
+var OWGR_rankings;
 $(document).ready(function() {
     // Insert OWGR
     $.ajax({
         url: OWGR_URL,
         type: 'GET',
         success: function (response) {
-            const rankings = response.tours[0].years[0].stats[0].details;
-            for(const i in rankings) {  // Update player details
-                const player = rankings[i];
+            OWGR_rankings = response.tours[0].years[0].stats[0].details;
+            for(const i in OWGR_rankings) {  // Update player details
+                const player = OWGR_rankings[i];
                 $(".player-column[data-pid='" + player.plrNum + "']").find('.owgr-rank').text(player.curRank);
             }
         }

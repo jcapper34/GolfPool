@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for
 import picks, results
-from db.db_var import USE_LOCAL
+from db.db_config import USE_LOCAL
 
 app = Flask(__name__)   # Creates app
 

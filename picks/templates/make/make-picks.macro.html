@@ -68,3 +68,29 @@
         </div>
     </div>
 {% endmacro %}
+
+{# LEVEL 4 STUFF #}
+{% macro level_4_section(value="") %}
+    <div class="box pick-box">
+        <h1 class="title">Level 4</h1>
+        <p class="section-description">Type in any two players who are not listed above.</p>
+        <hr>
+        <div class="level-4-field field" data-tooltip="Note: This player may not play in the Master's">
+            <div class="control">
+                <input id="level-4-text" onkeyup="create_player_suggestions($(this))" class="input" value="{{ value }}" autocomplete="off" data-original="{{ value }}" required>
+                <div id="suggestions-box" class="box hide">
+                    <table style="width:100%">
+                        {% for i in range(5) %}
+                        <tr class="hide level-4-option">
+                            <td class="level-4-option-name" data-pid="" onclick="add_level_4($(this))"></td>
+                            <td style="text-align: center"></td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <table id="level-4-picks" class="table is-fullwidth"></table>
+    </div>
+{% endmacro %}
+

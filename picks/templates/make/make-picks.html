@@ -37,13 +37,7 @@ Params:
         {% endfor %}
 
         {# Levels 4 Section #}
-        <div class="box pick-box">
-            <h1 class="title">Level 4</h1>
-            <p class="section-description">Type in any two players who are not listed above.</p>
-            <hr>
-{#            {{ level_4_field("1") }}#}
-{#            {{ level_4_field("2") }}#}
-        </div>
+        {{ mp_macs.level_4_section() }}
 
         {# Submission Section #}
         <section class="section">

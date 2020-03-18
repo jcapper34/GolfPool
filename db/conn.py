@@ -1,6 +1,6 @@
 import psycopg2
 import psycopg2.extras
-from db.db_var import USE_LOCAL, LOCAL_DB_CREDENTIALS, HEROKU_DB_CREDENTIALS
+from db.db_config import USE_LOCAL, LOCAL_DB_CREDENTIALS, HEROKU_DB_CREDENTIALS
 
 
 class Conn:

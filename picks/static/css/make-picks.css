@@ -8555,6 +8555,16 @@ label.panel-block:hover {
   border-radius: 5px;
 }
 
+/* GENERAL INPUT */
+.general-input {
+  border-radius: 5px;
+}
+
+.general-input:focus {
+  outline: none;
+}
+
+/* MAIN LEVEL PICKS */
 .player-checkbox + span {
   width: 100%;
 }
@@ -8582,14 +8592,6 @@ label.panel-block:hover {
 
 .go-to-button {
   border: 3px solid transparent;
-}
-
-.general-input {
-  border-radius: 5px;
-}
-
-.general-input:focus {
-  outline: none;
 }
 
 .player-checkbox {
@@ -8644,6 +8646,30 @@ label {
 
 .pick-box hr {
   margin-top: 10px;
+}
+
+/* LEVEL 4 PICKS */
+#suggestions-box {
+  padding: 0;
+}
+
+.level-4-option td {
+  cursor: pointer;
+  padding: 4px 8px 4px 8px;
+}
+
+.level-4-option:hover {
+  background: #23d160;
+  color: white;
+}
+
+#level-4-text {
+  text-transform: capitalize;
+  padding: 16px 10px 16px 10px;
+}
+
+#level-4-text, .level-4-option td {
+  font-size: 16px;
 }
 
 /*# sourceMappingURL=make-picks.css.map */
