@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Change Picks{% endblock %}
+{% block hero_title %}Change Picks{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <form id="change-picks-form">
+            <div class="field">
+                <label class="label">Email</label>
+                <div class="control">
+                    <input id="login-email" type="email" name="email" class="input" style="text-transform: lowercase" required>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">PIN</label>
+                <div class="control">
+                    <input id="login-pin" maxlength="4" name="pin" type="password" class="input" style="width:60%" onkeyup="check_enter(event)" required>
+                </div>
+            </div>
+            <div class="field is-grouped is-grouped-right">
+                <div class="control">
+                    <input id="submit-button" class="button is-link" type="button" value="Submit" onclick="submit_login()">
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block add_below %}
+<script src="/picks/static/js/change-picks.js"></script>
+{% endblock %}

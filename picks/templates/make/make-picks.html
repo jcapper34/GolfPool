@@ -15,10 +15,9 @@ Params:
 
 {% block body %}
 <div class="columns">
-{# TODO: Put menu list Here  #}
     {# Main Picks Container #}
     <div class="column">
-    <form id="make-picks-form" method="post" action="/picks/submit">
+    <form id="make-picks-form" method="post" action="{{ url_for('picks.picks_submit') }}"  onsubmit="submit_make_picks()">
         {# General Information Section #}
         <section id="general-section" class="section">
             <div class="box pick-box">

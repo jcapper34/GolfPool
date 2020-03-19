@@ -3,7 +3,7 @@ ENTIRE FORM
  */
 
 // Checks form on submission
-$("#make-picks-form").submit(function() {
+function submit_make_picks() {
     if(check_entire_form()) {
         //Check for inconsistent name-pid pairs
         $(".level-4-hidden").each(function () {
@@ -18,17 +18,28 @@ $("#make-picks-form").submit(function() {
 
     window.alert("Please complete entire form and/or fix errors before submitting");
     return false;
-});
+};
 
 function check_entire_form() {
     let valid = true;
 
     // Checking general fields
-    $('.general-input').each(function() {
-        const success = general_field_checker($(this));
+    const generalInputs = $(".general-input");
+    for(let i = 0; i < generalInputs.length; i++) {
+        const success = general_field_checker(generalInputs.eq(i));
         if(success === undefined || !success)
-            valid = false;
-    });
+            return false;
+    }
+
+    const mainLevelBoxes = $(".main-level-box");
+    for(let i = 0; i < mainLevelBoxes.length; i++){
+        if(!check_main_level(mainLevelBoxes.eq(i)))
+            return false;
+    }
+
+    // Checking level 4
+    if(!check_all_level_4())
+        return false;
 
     return valid;
 }
@@ -106,8 +117,9 @@ MAIN LEVEL FIELDS
  */
 
 $(".player-checkbox").change(function() {
-    let pickBox = $(this).closest(".pick-box");
-    check_main_level(pickBox, $(this));
+    let e = $(this);
+    let pickBox = e.closest(".pick-box");
+    check_main_level(pickBox, e);
     main_level_effects(pickBox);
 });
 
@@ -158,14 +170,30 @@ function reset_main_level(pickBox) {
 /*
 LEVEL 4 Functions
 */
+
+// TODO: Update to include players like Fred Couples and John Daly
 function create_player_suggestions(input_element) {
     const val = input_element.val().toLowerCase();
     if(val === '') {// If no value, then don't do anything
-        input_element.closest('.level-4-field').find('.suggestions-box').addClass('hide');
+        $("#suggestions-box").addClass('hide');
         return;
     }
 
+    const isValid = function(pid) {
+        let valid = true;
 
+        $("input[name='level-4']").each(function() {    // Check if already picked
+            if($(this).val().split('*')[1] === pid)
+                valid = false;
+        });
+
+        $(".player-column").each(function() {   // Check if in levels 1-3
+            // out($(this).data('pid'));
+            if(String($(this).data('pid')) === pid)
+                valid = false;
+        });
+        return valid;
+    };
     const nameCheck = function(name, val) {
         return name.substr(0, val.length).toLowerCase() === val;
     };
@@ -179,7 +207,7 @@ function create_player_suggestions(input_element) {
         const playerLast = player.plrName.last;
         const playerFull = [playerFirst, playerLast].join(' ');
 
-        if (nameCheck(playerFirst, val) || nameCheck(playerLast, val) || nameCheck(playerFull, val)) {
+        if ( (nameCheck(playerFirst, val) || nameCheck(playerLast, val) || nameCheck(playerFull, val)) && isValid(player.plrNum)){
             suggestions.push([player.plrNum, playerFull]); // In the form (pid, name)
             count++;
             if (count === 5)
@@ -189,7 +217,6 @@ function create_player_suggestions(input_element) {
     show_player_suggestions(input_element.closest('.level-4-field'), suggestions);
 
 }
-
 
 function show_player_suggestions(fieldElement, suggestions) {
     let suggestionsBox = $("#suggestions-box");
@@ -220,9 +247,42 @@ function add_level_4(tdElement) {
     const name = tdElement.text();
     const pid = tdElement.data('pid');
 
+    /* Reset inputs */
     $("#suggestions-box").addClass('hide');
 
+    let textInput = $("#level-4-text");
+    textInput.val('');
 
+    let picksTable = $("#level-4-picks");
+    const numPicked = picksTable.find("tr").length;
+    if(numPicked < 2 ) {
+        if(numPicked === 1)
+            textInput.prop('disabled', true);
+        picksTable.append("<tr>" +
+            "<td>" + name + "</td>" +
+            "<td><a onclick='remove_level_4($(this))'><i class='fa fa-times'></i></td>" +
+            "<td class='hide'><input type='hidden' name='level-4' value='" + [name, pid].join('*') + "'></td>" +
+            "</tr>"
+        );
+    }
+}
+
+function remove_level_4(tdElement) {
+    tdElement.closest("tr").remove();
+    $("#level-4-text").prop("disabled", false);
+}
+
+function check_all_level_4() {
+    const level4Inputs = $("input[name='level-4']");
+    if(level4Inputs.length !== 2 || level4Inputs.eq(0).val() == level4Inputs.eq(1).val())   // Check if correct number and the picks don't match
+        return false;
+
+    let valid = true;
+    level4Inputs.each(function () {
+        if($(this).val() === '')
+            valid = false;
+    });
+    return valid;
 }
 
 /*
@@ -248,7 +308,10 @@ function toggle_show_pin(button) {
     }
 }
 
-/* PAGE STARTUP */
+/*
+PAGE STARTUP
+*/
+
 var OWGR_rankings;
 $(document).ready(function() {
     // Insert OWGR

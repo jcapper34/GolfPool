@@ -1,113 +1,48 @@
-$.ajaxSetup({ traditional: true });
+/*
+FOR LOGIN
+ */
+function submit_login() {
+    let button = $("#submit-button");
+    const email = $("#login-email").val();
+    const pin = $("#login-pin").val();
 
-function set_to_default() {
-    $(".select").removeClass("is-danger");
-    $(".pick-select").each(function() {
-        $(this).find("option[data-original='original']").prop("selected", true);
-    });
-}
-
-$(".pick-select").change(function () {
-    let e = $(this);
-    const val = e.val();
-
-    let duplicates = [];
-    $(this).closest('.pick-column').find(".pick-select").each(function() {
-        if ($(this).val() === val) {
-            duplicates.push($(this).parent());
-        }
-    });
-    if(duplicates.length > 1) {
-        for(let i = 0; i < duplicates.length; i++) {
-            duplicates[i].addClass("is-danger");
-        }
-    }
-    else {
-        $(".select").removeClass("is-danger");
-    }
-});
-
-$("#save-changes").click(function() {
-    let button = $(this);
-    let valid = true;
-    const container = $("#change-picks-container");
-    let data = {
-        "psid": container.data("psid"),
-        "psname": container.data("psname"),
-        "email": container.data("email")
-    };
-    for(let i = 1; i <= 4; i++) {
-        let pick_level = [];
-        $(".level-"+i+"-input").each(function () {
-            if(($(this).val() === undefined) || ($(this).val() === "") )
-                valid = false;
-            pick_level.push($(this).val());
-        });
-        data['level-'+i] = pick_level;
-    }
-    out(data);
-
-    if($(".select.is-danger").length > 0) {
-        valid = false;
-    }
-
-    if(!valid) {
-        window.alert("Please complete entire form or fix errors");
+    if((email === "") || (pin === "") ) {
+        window.alert("Please complete form before submitting");
         return;
     }
-    button.addClass("is-loading");
-    out(data);
+    button.addClass('is-loading');
     $.ajax({
-        url: "/picks/change/save",
-        type: "POST",
-        data: data,
-        success: function (r) {
-            out(r);
-            button.removeClass("is-loading");
-            if(r == '10') {
-                window.alert("You have been logged out. Please log back in and try again");
-                return;
+        url: "/picks/change/submit-login",
+        method: "POST",
+        data: {email:email, pin:pin},
+        type: 'json',
+        success: function(r) {
+            if(r.success) {
+                window.location.reload();
             }
-            if(r == '00') {
-                window.alert("Unable to submit. Please fix errors");
-                return;
+            else {
+                window.alert("Login credentials incorrect, please try again");
             }
-            window.alert("Picks saved successfully. You have been sent a confirmation email");
-
+            button.removeClass('is-loading');
         },
         error: function(e) {
             console.log(e);
             window.alert("Unable to connect to server. Please try again later");
-            button.removeClass("is-loading");
+            button.removeClass('is-loading');
         }
-    });
+    })
+}
 
-});
-
-$("#delete-pickset-link").click(function() {
-    const container = $("#change-picks-container");
-    const c = window.confirm("Are you sure you would like to delete the pickset: " + container.data("psname") + "? This action cannot be undone");
-    if(!c) {
-        return;
+function check_enter(event) {
+    if(event.keyCode === 13) {  // Checks if enter key is selected
+        submit_login();
     }
+}
 
-    $.ajax({
-        url: '/picks/delete',
-        type: 'POST',
-        data: {"psid": container.data("psid")},
-        success: function (r) {
-            if(r != '1') {
-                window.alert("You have been logged out. Please log back in then try again");
-                return;
-            }
 
-            window.alert("Successfully deleted pickset");
-            window.location.reload();
-        },
-        error: function(e) {
-            console.log(e);
-            window.alert("There was an error connecting to server. Please try again later");
-        }
-
-    });
-});
+/*
+CHANGE PICKS PAGE
+ */
+function submit_change_picks() {
+    return false;
+}

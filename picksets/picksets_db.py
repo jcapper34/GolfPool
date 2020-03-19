@@ -3,6 +3,7 @@ from db.conn import Conn
 
 # GROUP FUNCTIONS #
 from db.db_helper import filter_conn
+from helper import CURRENT_YEAR
 from picksets.pickset import Pickset
 from players.player import Player
 
@@ -61,3 +62,20 @@ def get_most_picked(year, conn=None):
     conn = filter_conn(conn)
     results = conn.exec_fetch(GET_MOST_PICKED_QUERY, (year,))
     return [Player(row['id'], row['name'], level=row['lev'], num_picked=row['num_picked']) for row in results]
+
+# Parameters: email, pin, year
+# Returns: ps.id
+GET_LOGIN_QUERY = """
+    SELECT ps.id FROM participant AS pa
+        JOIN pickset ps on pa.id = ps.participant_id
+        WHERE pa.email = %s AND pa.pin = %s AND ps.season_year = %s
+        LIMIT 1
+"""
+def get_login(email, pin):
+    conn = Conn()
+    result = conn.exec_fetch(GET_LOGIN_QUERY, (email, pin, 2019))   # Remember to change year
+
+    if conn.cur.rowcount == 0:
+        return False
+
+    return result[0][0]
