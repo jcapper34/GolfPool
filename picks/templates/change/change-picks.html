@@ -1,5 +1,5 @@
 {#
-params: level_players, year, OWGR_RANKINGS
+params: level_players, pickset, year, OWGR_RANKINGS
 -
 #}
 {% extends "base.html" %}
@@ -7,22 +7,28 @@ params: level_players, year, OWGR_RANKINGS
 {% block add_head %}
 <link rel="stylesheet" href="/picks/static/css/change-picks.css">
 {% endblock %}
-{% block title %}Change Picks{% endblock %}
-{% block hero_title %}Change Picks{% endblock %}
+{% block title %}Change Picks | {{ pickset.name }}{% endblock %}
+{% block hero_title %}Change Picks - {{ pickset.name }}{% endblock %}
 
 {% block body %}
+
+{# Logout Box #}
+<div style="padding:5px" class="has-text-centered">
+    <a href="{{ url_for('picks.picks_change_logout') }}">Logout</a>
+</div>
+
+{# Picks Sections #}
 <div class="columns">
-    {# Main Picks Container #}
     <div class="column">
         <form id="make-picks-form" method="post" action="{{ url_for('picks.picks_submit_changes') }}" onsubmit="submit_change_picks()">
             {# Levels 1-3 Section #}
             {% set num_picks = [3,3,2] %}
             {% for n in num_picks %}
-                {{ mp_macs.main_level_field(loop.index, n, level_players[loop.index0]) }}
+                {{ mp_macs.main_level_field(loop.index, n, level_players[loop.index0], picks=pickset.picks[loop.index0]) }}
             {% endfor %}
 
             {# Levels 4 Section #}
-            {{ mp_macs.level_4_section() }}
+            {{ mp_macs.level_4_section(pickset.picks[3]) }}
 
             {# Submission Section #}
             <section class="section">

@@ -61,3 +61,9 @@ class Player:
     """ Overrides """
     def __str__(self):
         return "Player: id=%s, name='%s'" % (self.id, self.name)
+
+    def __hash__(self): # So 'in' keyword can be used
+        return int(self.id)
+
+    def __eq__(self, other):    # Allows for comparison
+        return self.id == other.id and self.name == other.name

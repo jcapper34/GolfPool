@@ -28,7 +28,7 @@
     </div>
 {% endmacro %}
 
-{% macro main_level_field(level, picks_allowed, players) %}
+{% macro main_level_field(level, picks_allowed, players, picks=()) %}
     <div class="box pick-box main-level-box" data-allowed="{{ picks_allowed }}" data-level="{{ level }}">
 
         {# Pickbox Header #}
@@ -36,7 +36,7 @@
             <div class="level-left"><h2 class="title">Level {{ level }}</h2>&nbsp;(<span class="num-picked">0</span>/{{ picks_allowed }})</div>
             <div class="level-right">
                 <label class="level-item">Show Details &nbsp;<input class="show-details" type="checkbox" onchange="main_level_player_details($(this))"></label>
-                <a class="level-item icon reset-level" onclick="reset_main_level($(this).closest('.pick-box'))" style="display: none"><i class="fas fa-undo"></i></a>
+                <a class="level-item icon reset-level" onclick="reset_main_level($(this).closest('.pick-box'))"><i class="fas fa-undo"></i></a>
             </div>
         </div>
         <p class="section-description">Pick {{ picks_allowed }} players from the list below by clicking on their name. Check the checkbox on the right to see photos and rankings.</p>
@@ -47,7 +47,7 @@
             {% for player in players|sort(attribute="name") %}
                 <div class="column is-half player-column" data-pid="{{ player.id }}">
                     <label>
-                        <input class="player-checkbox" type="checkbox" value="{{ player.name }}*{{ player.id }}" name="level-{{ player.level }}">
+                        <input class="player-checkbox" type="checkbox" value="{{ player.name }}*{{ player.id }}" name="level-{{ player.level }}"  {% if player in picks %}checked{% endif %}> {# Check if it was picked #}
                         <span class="button">{{ player.name }}</span>
                     </label>
                     <div class="box player-details">
@@ -70,27 +70,36 @@
 {% endmacro %}
 
 {# LEVEL 4 STUFF #}
-{% macro level_4_section(value="") %}
+{% macro level_4_section(values=()) %}
     <div class="box pick-box">
         <h1 class="title">Level 4</h1>
         <p class="section-description">Type in any two players who are not listed above.</p>
         <hr>
         <div class="level-4-field field" data-tooltip="Note: This player may not play in the Master's">
             <div class="control">
-                <input id="level-4-text" onkeyup="create_player_suggestions($(this))" class="input" value="{{ value }}" autocomplete="off" data-original="{{ value }}" required>
+                <input id="level-4-text" onkeyup="create_player_suggestions($(this))" class="input" autocomplete="off" data-original="{{ value }}" required {% if values %}disabled{% endif %}> {# If values are given, then they are changing picks #}
                 <div id="suggestions-box" class="box hide">
-                    <table style="width:100%">
+                    <table>
                         {% for i in range(5) %}
-                        <tr class="hide level-4-option">
-                            <td class="level-4-option-name" data-pid="" onclick="add_level_4($(this))"></td>
-                            <td style="text-align: center"></td>
+                        <tr class="hide level-4-option" onclick="add_level_4($(this))">
+                            <td class="level-4-option-name" data-pid=""></td>
+                            <td style="has-text-centered"></td>
                         </tr>
                         {% endfor %}
                     </table>
                 </div>
             </div>
         </div>
-        <table id="level-4-picks" class="table is-fullwidth"></table>
+        <table id="level-4-picks" class="table is-fullwidth">
+            {# For when changing picks #}
+            {% for val in values %}
+            <tr>    {# If changing, make sure to change js as well #}
+                <td>{{ val.name }}</td>
+                <td><a onclick='remove_level_4($(this))'><i class='fa fa-times'></i></td>
+                <td class='hide'><input type='hidden' name='level-4' value='{{ val.name }}*{{ val.id }}'></td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 {% endmacro %}
 

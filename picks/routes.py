@@ -1,9 +1,10 @@
 from pprint import pprint
-from flask import Blueprint, render_template, request, session, redirect, jsonify
+from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for
+
+from db.conn import Conn
 from helper import CURRENT_YEAR, splash
 from picksets.pickset import Pickset
 from picksets.picksets_db import get_all_picks, get_login
-from picksets.picksets_submit import submit_picks
 from players.players_db import get_levels
 from players.player import Player
 
@@ -14,42 +15,75 @@ picks_mod = Blueprint("picks", __name__, template_folder='templates', static_fol
 # Root of Picks Module
 @picks_mod.route("/")
 def picks_index():
-    return "Hello Picks"
+    return "<a href='%s'>Make Picks</a><br><a href='%s'>Change Picks</a>" % (url_for('picks.picks_make'), url_for('picks.picks_change'))
+
+
+
 
 # Make Picks Page
 @picks_mod.route("/make")
 def picks_make():
-    return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR-1), OWGR_URL=Player.OWGR_URL % str(CURRENT_YEAR))
-
-
-# Change Picks Page
-@picks_mod.route("/change")
-def picks_change():
-    if session.get('psid') is None: # If not logged in
-        return render_template('change/change-picks-login.html')
-
-    return render_template("change/change-picks.html", level_players=get_levels(CURRENT_YEAR-1), year=CURRENT_YEAR-1, OWGR_URL=Player.OWGR_URL % str(CURRENT_YEAR))
+    return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR), OWGR_URL=Player.OWGR_URL % str(CURRENT_YEAR))
 
 # Make Picks Submission
 @picks_mod.route("/submit", methods=['POST'])
 def picks_submit():
     pickset = Pickset(
-        name=request.form.get("name").capitalize(),
+        name=request.form.get("name").title(), #Ensure name is capitalized
         email=request.form.get("email"),
         pin=request.form.get("pin")
     )
+    try:
+        # Submit pickset, will return pickset id
+        psid = pickset.submit_picks([
+            request.form.getlist("level-1"),
+            request.form.getlist("level-2"),
+            request.form.getlist("level-3"),
+            request.form.getlist("level-4")
+            ])
+        if not psid: #If form not in correct format
+            return "Error: Picks not submitted correctly."
+    except Exception as e:   # If internal error
+        print(e)
+        return "Server Error: Please try again later"
 
-    pickset = submit_picks(
-        name=request.form.get("name").capitalize(),
-        email=request.form.get("email"),
-        pin=request.form.get("pin"),
-        level_1=request.form.getlist("level-1"),
-        level_2=request.form.getlist("level-2"),
-        level_3=request.form.getlist("level-3"),
-        level_4=request.form.getlist("level-3")
-    )
-    return "TODO"
+    session['psid'] = psid  # Set session
+    return redirect(url_for('picks.picks_confirmation'))
 
+# Picks Confirmation Page
+@picks_mod.route("/confirmation")
+def picks_confirmation():
+    psid = session.get('psid')
+    if psid is None:    # If no longer a session
+        return redirect("index")
+
+    # Get pickset
+    pickset = Pickset(psid=psid)
+    pickset.fill_picks()
+
+    return render_template("make/picks-confirmation.html", pickset=pickset)
+
+
+
+# Change Picks Page
+@picks_mod.route("/change")
+def picks_change():
+    psid = session.get('psid')
+    if psid is None: # If not logged in
+        return render_template('change/change-picks-login.html')
+
+    conn = Conn()   # Will be used more than once
+
+    # Get pickset
+    pickset = Pickset(psid=psid)
+    pickset.fill_picks(conn=conn)
+
+    return render_template("change/change-picks.html",
+                           level_players=get_levels(CURRENT_YEAR, conn=conn),
+                           pickset=pickset,
+                           year=CURRENT_YEAR,
+                           OWGR_URL=Player.OWGR_URL % str(CURRENT_YEAR)
+                           )
 
 # Change Picks Login
 @picks_mod.route("/change/submit-login", methods=['POST'])
@@ -66,32 +100,31 @@ def picks_change_login():
 
     return jsonify(resp)
 
+
+# Change Picks Logout
+@picks_mod.route("/change/logout")
+def picks_change_logout():
+    if session.get('psid') is not None: # If logged in
+        session.clear()
+
+    return redirect(url_for('picks.picks_change'))
+
+
+
+
 # Change Picks Submission
 @picks_mod.route("/submit-changes", methods=['POST'])
 def picks_submit_changes():
-    return ""
-    # pickset = Pickset(
-    #     name=request.form.get("name").capitalize(),
-    #     email=request.form.get("email"),
-    #     pin=request.form.get("pin")
-    # )
-    #
-    # pickset = submit_picks(
-    #     name=request.form.get("name").capitalize(),
-    #     email=request.form.get("email"),
-    #     pin=request.form.get("pin"),
-    #     level_1=request.form.getlist("level-1"),
-    #     level_2=request.form.getlist("level-2"),
-    #     level_3=request.form.getlist("level-3"),
-    #     level_4=request.form.getlist("level-3")
-    # )
-    # return "TODO"
+    return "TODO"
+
+
 
 # Poolwide Picks Page
 @picks_mod.route("/poolwide")
 @picks_mod.route("/poolwide/<int:year>")
 def picks_poolwide(year=CURRENT_YEAR):
-    if year == CURRENT_YEAR:
-        return render_template('locked-page.html')
+    # Uncomment Block if distributing
+    # if year == CURRENT_YEAR:
+    #     return render_template('locked-page.html')
 
     return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))

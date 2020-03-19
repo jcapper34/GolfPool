@@ -263,7 +263,7 @@ function add_level_4(tdElement) {
             "<td><a onclick='remove_level_4($(this))'><i class='fa fa-times'></i></td>" +
             "<td class='hide'><input type='hidden' name='level-4' value='" + [name, pid].join('*') + "'></td>" +
             "</tr>"
-        );
+        );  //If changing, make sure to change macro as well
     }
 }
 

@@ -8648,6 +8648,10 @@ label {
   margin-top: 10px;
 }
 
+.reset-level {
+  display: none;
+}
+
 /* LEVEL 4 PICKS */
 #suggestions-box {
   padding: 0;
@@ -8670,6 +8674,10 @@ label {
 
 #level-4-text, .level-4-option td {
   font-size: 16px;
+}
+
+#suggestions-box table {
+  width: 100%;
 }
 
 /*# sourceMappingURL=change-picks.css.map */

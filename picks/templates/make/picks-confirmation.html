@@ -1,22 +1,22 @@
 {#
 Params:
-    - Info {"name", "email", "pin"}
-    - Picks {level_separated(players)}
+    - pickset {name, email, pin, picks}
 #}
 
 {% extends "base.html" %}
 
-{% block title %}Picks Confirmation | {{ info.name }}{% endblock %}
+{% block title %}Picks Confirmation | {{ pickset.name }}{% endblock %}
 {% block hero_title %}Picks Confirmation{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
-        <h1 class="title">Picks For {{ info.name }}</h1>
-        <h2><strong>Email:</strong> {{ info.email }}</h2>
-        <h2><strong>PIN:</strong> {{ info.pin }}</h2><br>
+        <h1 class="title">Picks For {{ pickset.name }}</h1>
+        <p>Please check that you have received a confirmation email. If you would like to change your picks, click <a href="{{ url_for('picks.picks_change') }}">here</a>. It may ask you to enter your email and PIN</p><br>
+        <h2><strong>Email:</strong> {{ pickset.email }}</h2>
+        <h2><strong>PIN:</strong> {{ pickset.pin }}</h2><br>
         <table class="table is-fullwidth is-bordered">
-            {% for pick_level in picks %}
+            {% for pick_level in pickset.picks %}
                 <tr><th class="has-text-centered" rowspan="{{ pick_level|length }}">Level {{ loop.index }}</th><td class="has-text-centered">{{ pick_level[0].name }}</td></tr>
                 {% for player in pick_level[1:] %}
                 <tr><td class="has-text-centered">{{ player.name }}</td></tr>

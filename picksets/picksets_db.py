@@ -27,22 +27,25 @@ def get_all_picks(year, conn=None):
     conn = filter_conn(conn)
 
     results = conn.exec_fetch(GET_ALL_PICKS_QUERY, (year,))
+    if not results:
+        return []
 
-    picksets = []
+    # I'll explain later lol
+    picksets = set()
     current_psid = results[0]['psid']
-    current_picklist = []
+    current_picklist = set()
     row_len = conn.cur.rowcount
     for i in range(row_len):
         row = results[i]
         player = Player(pid=row['pid'], name=row['name'], level=row['level'])
         if row['psid'] != current_psid:
             current_psid = row['psid']
-            picksets.append(Pickset(psid=current_psid, name=row['psname'], picks=current_picklist))
-            current_picklist = [player]
+            picksets.add(Pickset(psid=current_psid, name=row['psname'], picks=current_picklist))
+            current_picklist = {player}
         else:
-            current_picklist.append(player)
+            current_picklist.add(player)
             if i == row_len - 1:
-                picksets.append(Pickset(psid=current_psid, name=row['psname'], picks=current_picklist))
+                picksets.add(Pickset(psid=current_psid, name=row['psname'], picks=current_picklist))
 
     return picksets
 
@@ -61,7 +64,7 @@ GET_MOST_PICKED_QUERY = """
 def get_most_picked(year, conn=None):
     conn = filter_conn(conn)
     results = conn.exec_fetch(GET_MOST_PICKED_QUERY, (year,))
-    return [Player(row['id'], row['name'], level=row['lev'], num_picked=row['num_picked']) for row in results]
+    return {Player(row['id'], row['name'], level=row['lev'], num_picked=row['num_picked']) for row in results}
 
 # Parameters: email, pin, year
 # Returns: ps.id
