@@ -15,7 +15,7 @@
                 {% for pickset in all_picks %}
                     <tr class="all-picks-row" onclick="$(this).toggleClass('has-background-grey-lighter')">
                         <td class="participant-name"><a>{{ pickset.name }}</a></td>
-                        {% for player in pickset.picks %}
+                        {% for player in pickset.picks %}   {# Picks should not be level separated #}
                             <td class="player-name" data-pid="{{ player.id }}">{{ player.name }}</td>
                         {% endfor %}
                     </tr>

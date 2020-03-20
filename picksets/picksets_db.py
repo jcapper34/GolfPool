@@ -9,6 +9,8 @@ from players.player import Player
 
 # Parameters: year
 # Returns: psid, psname, pid, pl.name, pl.level
+from players.players_helper import level_separate
+
 GET_ALL_PICKS_QUERY = """
                 SELECT ps.id AS psid, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, px.player_id AS pid, pl.name, COALESCE(lx.level, 4) AS level
                         FROM picks_xref AS px
@@ -23,7 +25,7 @@ GET_ALL_PICKS_QUERY = """
                         WHERE ps.season_year = %s
                         ORDER BY psname, level, pl.name
                         """
-def get_all_picks(year, conn=None):
+def get_all_picks(year, separate=False, conn=None):
     conn = filter_conn(conn)
 
     results = conn.exec_fetch(GET_ALL_PICKS_QUERY, (year,))
@@ -33,18 +35,22 @@ def get_all_picks(year, conn=None):
     # I'll explain later lol
     picksets = set()
     current_psid = results[0]['psid']
-    current_picklist = set()
+    current_picklist = []
     row_len = conn.cur.rowcount
     for i in range(row_len):
         row = results[i]
         player = Player(pid=row['pid'], name=row['name'], level=row['level'])
         if row['psid'] != current_psid:
             current_psid = row['psid']
+            if separate:    # Separate by level
+                current_picklist = level_separate(current_picklist)
             picksets.add(Pickset(psid=current_psid, name=row['psname'], picks=current_picklist))
-            current_picklist = {player}
+            current_picklist = [player]
         else:
-            current_picklist.add(player)
+            current_picklist.append(player)
             if i == row_len - 1:
+                if separate:    # Separate by level
+                    current_picklist = level_separate(current_picklist)
                 picksets.add(Pickset(psid=current_psid, name=row['psname'], picks=current_picklist))
 
     return picksets

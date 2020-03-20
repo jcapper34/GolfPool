@@ -101,6 +101,7 @@ class Pickset:
         query = "INSERT INTO picks_xref (player_id, pickset_id) VALUES"
         for level_players in self.picks:
             for picked_player in level_players:
+                print(picked_player)
                 # Create new db player if doesn't exist
                 conn.exec("INSERT INTO player (id, name) VALUES (%s, %s) ON CONFLICT DO NOTHING", (picked_player.id, picked_player.name))
 

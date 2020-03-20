@@ -81,8 +81,8 @@
                 <div id="suggestions-box" class="box hide">
                     <table>
                         {% for i in range(5) %}
-                        <tr class="hide level-4-option" onclick="add_level_4($(this))">
-                            <td class="level-4-option-name" data-pid=""></td>
+                        <tr class="hide level-4-option">
+                            <td class="level-4-option-name" data-pid="" onclick="add_level_4($(this))"></td>
                             <td style="has-text-centered"></td>
                         </tr>
                         {% endfor %}

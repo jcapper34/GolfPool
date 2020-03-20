@@ -21,7 +21,7 @@ class Postman:
         msg = EmailMessage()
         msg['From'] = self.SENDER_EMAIL
         msg['To'] = self.recipients
-        msg['Subject'] = "Testing picks"
+        msg['Subject'] = self.message_subject
         msg.set_content(self.message_body)
 
 
