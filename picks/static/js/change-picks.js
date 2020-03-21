@@ -39,17 +39,23 @@ function check_enter(event) {
     }
 }
 
-
 /*
 CHANGE PICKS PAGE
  */
 function submit_change_picks(form) {
+    let button = $("#submit-picks-button");
+    button.addClass('is-loading');
+
     if (!check_entire_form(false)) {
         window.alert("Form requirements not met");
         return false;
     }
     $.post('submit-changes', form.serialize(), function (response) {
-        out(response);
+        window.alert(response);
+    }).fail(function() {
+        window.alert("Server Error: Please try again later");
+    }).done(function() {
+        button.removeClass('is-loading');
     });
     return false;
 }
@@ -66,4 +72,5 @@ function revert_picks() {
     });
 }
 
-revert_picks();
+
+revert_picks(); // Ensures form starts with current picks

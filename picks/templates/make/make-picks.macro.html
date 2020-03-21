@@ -1,3 +1,14 @@
+{% macro general_section() %}
+    <section id="general-section" class="section">
+        <div class="box pick-box">
+            <h1 class="title">General</h1>
+            <p class="section-description">Enter your name, email, and a pin. The pin is for if you end up wanting to change your picks.</p><hr>
+            {{ general_field(label="Name", name="name", type="text", icon="fas fa-user", capitalize=True, error_message="Please enter a valid name") }}
+            {{ general_field(label="Email", name="email", type="email", icon="fas fa-envelope", error_message="Please enter a valid email") }}
+            {{ general_field(label="PIN", name="pin", type="password", icon="fas fa-key", maxlength=4, filter_pin=true, show_icon=true, error_message="PIN must have 4 numbers") }}
+        </div>
+    </section>
+{% endmacro %}
 {% macro general_field(label, name, type="", maxlength=75, icon="", filter_pin=false, show_icon=false, error_message="", capitalize=False) %}
     <label class="label">{{ label }}</label>
     <div class="field {% if show_icon %}has-addons{% endif %}" data-tooltip="{{ error_message }}">

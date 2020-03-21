@@ -110,9 +110,25 @@ def picks_change_logout():
 # Change Picks Submission
 @picks_mod.route("/submit-changes", methods=['POST'])
 def picks_submit_changes():
+    f = request.form
 
-    return ""
+    if session.get("psid") != int(f.get("psid")):
+        return "Your session has expired, please log back in"
 
+    pickset = Pickset(
+        psid=f.get("psid"),
+        name=f.get("name"),
+        email=f.get("email"),
+        pin=f.get("pin")
+    )
+    try:
+        if not pickset.submit_change_picks([f.getlist('level-'+str(l)) for l in range(1,5)]):
+            return "Error: Form not filled out correctly"
+    except Exception as e:
+        print(e)
+        return "Server Error: Please try again later"
+
+    return "Picks saved successfully, please check your email"
 
 
 # Poolwide Picks Page

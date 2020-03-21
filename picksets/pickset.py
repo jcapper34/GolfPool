@@ -28,14 +28,15 @@ class Pickset:
         self.pos = pos
 
     """ PICK SUBMISSION """
-    def submit_picks(self, form_picks):
+    def submit_picks(self, form_picks, conn=None):
+        conn = filter_conn(conn)
         # Get main levels
         self.picks = Pickset.extract_form_picks(form_picks)
 
         if not self.validate_picks():   # Make sure picks are valid
             return False
 
-        psid = self.insert_picks()
+        psid = self.db_inserts(conn=conn)
 
         # Send Email
         postman = Postman((self.email,))
@@ -44,14 +45,23 @@ class Pickset:
 
         return psid
 
-    def submit_change_picks(self, form_picks):
+    def submit_change_picks(self, form_picks, conn=None):
+        conn = filter_conn(conn)
+
         # Get main levels
         self.picks = Pickset.extract_form_picks(form_picks)
 
         if not self.validate_picks():   # Make sure picks are valid
             return False
 
+        self.db_update_picks(conn=conn)
 
+        # Send email
+        postman = Postman((self.email,))
+        postman.make_picks_message(self.name, self.pin, self.picks, update=True)
+        postman.send_message()
+
+        return True
 
 
     @staticmethod
@@ -69,13 +79,11 @@ class Pickset:
 
     def validate_picks(self):
         if len(self.picks) != len(Pickset.PICKS_ALLOWED):  ## Check for correct number of levels
-            print(1)
             return False
 
         for i in range(len(self.picks)):
             level_players = self.picks[i]
             if len(level_players) != Pickset.PICKS_ALLOWED[i]:
-                print(2)
                 return False
         return True
 
@@ -96,7 +104,7 @@ class Pickset:
         INSERT INTO pickset (participant_id, season_year) VALUES (%s,%s)
         RETURNING id
     """
-    def insert_picks(self, year=CURRENT_YEAR, conn=None):
+    def db_inserts(self, year=CURRENT_YEAR, conn=None):
         conn = filter_conn(conn)   # Make connection
 
         """ Ensure that level 4 players are not in levels 1-3 """
@@ -111,25 +119,38 @@ class Pickset:
 
         """ Insert pickset """
         results = conn.exec_fetch(Pickset.INSERT_PICKSET_QUERY, (partid, year))
-        psid = results[0][0]
+        self.id = results[0][0]
 
         """ Insert picks """
+        self.db_insert_picks(conn=conn)
+
+        conn.commit()   # Make sure to commit changes
+
+        return self.id
+
+    def db_insert_picks(self, conn=None):
+        conn = filter_conn(conn)
+
         query = "INSERT INTO picks_xref (player_id, pickset_id) VALUES"
         for level_players in self.picks:
             for picked_player in level_players:
-                print(picked_player)
                 # Create new db player if doesn't exist
                 conn.exec("INSERT INTO player (id, name) VALUES (%s, %s) ON CONFLICT DO NOTHING", (picked_player.id, picked_player.name))
 
                 # Add to picks insert query
-                s = conn.cur.mogrify(" (%s, %s),", (picked_player.id, psid)).decode("utf-8")
+                s = conn.cur.mogrify(" (%s, %s),", (picked_player.id, self.id)).decode("utf-8")
                 query = ''.join((query, s))
 
-        conn.exec(query[:-1])    # DB picks insert
+        conn.exec(query[:-1])  # DB picks insert
 
-        conn.commit()   # Make sure to commit changes
+    def db_update_picks(self, conn=None):
+        conn = filter_conn(conn)
 
-        return psid
+        conn.exec("DELETE FROM picks_xref WHERE pickset_id=%s", (self.id,))   # Delete previous picks
+
+        self.db_insert_picks(conn=conn)  # Insert new picks
+
+        conn.commit()
 
 
     """ DB FILLS """
