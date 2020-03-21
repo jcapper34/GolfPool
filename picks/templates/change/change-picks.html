@@ -38,7 +38,18 @@ params: level_players, pickset, year, OWGR_RANKINGS
             {{ mp_macs.level_4_section(pickset.picks[3]) }}
 
             {# Submission Section #}
-            {{ mp_macs.submit_section() }}
+            <section class="section">
+                <div class="container">
+                    <div class="field is-grouped is-grouped-right">
+                        <div class="control">
+                            <button onclick="revert_picks()" class="button is-light is-pulled-right" type="button">Revert</button>
+                        </div>
+                        <div class="control">
+                            <button id="submit-picks-button" class="button is-link is-pulled-right" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </form>
     </div>
 </div>
