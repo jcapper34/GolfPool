@@ -20,7 +20,14 @@ params: level_players, pickset, year, OWGR_RANKINGS
 {# Picks Sections #}
 <div class="columns">
     <div class="column">
-        <form id="make-picks-form" method="post" action="{{ url_for('picks.picks_submit_changes') }}" onsubmit="submit_change_picks()">
+        <form id="make-picks-form" onsubmit="return submit_change_picks($(this))">
+
+            {#  Hidden General Fields #}
+            <input type="hidden" name="psid" value="{{ pickset.id }}">
+            <input type="hidden" name="name" value="{{ pickset.name }}">
+            <input type="hidden" name="email" value="{{ pickset.email }}">
+            <input type="hidden" name="pin" value="{{ pickset.pin }}">
+
             {# Levels 1-3 Section #}
             {% set num_picks = [3,3,2] %}
             {% for n in num_picks %}
@@ -31,23 +38,21 @@ params: level_players, pickset, year, OWGR_RANKINGS
             {{ mp_macs.level_4_section(pickset.picks[3]) }}
 
             {# Submission Section #}
-            <section class="section">
-                <div class="container">
-                    <div class="field is-grouped is-grouped-right">
-                        <div class="control">
-                            <button id="submit-picks-button" class="button is-link is-pulled-right" type="submit">Submit</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {{ mp_macs.submit_section() }}
         </form>
     </div>
 </div>
+
 {% endblock %}
 
 {% block add_below %}
 <script>
 const OWGR_URL = '{{ OWGR_URL }}';
+
+{# Initial Picks #}
+const initialMainLevels = {{ (pickset.picks[0]|map(attribute='id')|list + pickset.picks[1]|map(attribute='id')|list + pickset.picks[2]|map(attribute='id')|list)|tojson }};
+
+{#const initialLevel4 = {{ pickset.picks[0]|map(attribute='id')|tojson }};#}
 </script>
 <script src="/picks/static/js/make-picks.js"></script>
 <script src="/picks/static/js/change-picks.js"></script>

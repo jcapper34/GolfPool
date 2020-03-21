@@ -4,7 +4,7 @@ ENTIRE FORM
 
 // Checks form on submission
 function submit_make_picks() {
-    if(check_entire_form()) {
+    if(check_entire_form(true)) {
         //Check for inconsistent name-pid pairs
         $(".level-4-hidden").each(function () {
             if($(this).val() === '') {
@@ -20,15 +20,17 @@ function submit_make_picks() {
     return false;
 };
 
-function check_entire_form() {
+function check_entire_form(checkGeneral) {
     let valid = true;
 
-    // Checking general fields
-    const generalInputs = $(".general-input");
-    for(let i = 0; i < generalInputs.length; i++) {
-        const success = general_field_checker(generalInputs.eq(i));
-        if(success === undefined || !success)
-            return false;
+    if(checkGeneral) {
+        // Checking general fields
+        const generalInputs = $(".general-input");
+        for (let i = 0; i < generalInputs.length; i++) {
+            const success = general_field_checker(generalInputs.eq(i));
+            if (success === undefined || !success)
+                return false;
+        }
     }
 
     const mainLevelBoxes = $(".main-level-box");
@@ -117,11 +119,14 @@ MAIN LEVEL FIELDS
  */
 
 $(".player-checkbox").change(function() {
-    let e = $(this);
-    let pickBox = e.closest(".pick-box");
-    check_main_level(pickBox, e);
-    main_level_effects(pickBox);
+    select_player($(this));
 });
+
+function select_player(checkbox) {
+    let pickBox = checkbox.closest(".pick-box");
+    check_main_level(pickBox, checkbox);
+    main_level_effects(pickBox);
+}
 
 function check_main_level(pickBox, recently_selected) {
     const picksAllowed = pickBox.data('allowed');
@@ -314,6 +319,11 @@ PAGE STARTUP
 
 var OWGR_rankings;
 $(document).ready(function() {
+    // Do effects for starting state
+    $(".main-level-box").each(function() {
+       main_level_effects($(this));
+    });
+
     // Insert OWGR
     $.ajax({
         url: OWGR_URL,

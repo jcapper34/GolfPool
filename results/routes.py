@@ -4,10 +4,12 @@ results_mod = Blueprint("results", __name__, template_folder='templates')   # Re
 
 # Root of Results Module
 @results_mod.route("/")
-def results_index():
-    return "Hello picks"
-
-# Live Standings
 @results_mod.route("/live")
 def results_live():
-    return "TODO"
+    return "Hello picks"
+
+
+# Past Standings
+@results_mod.route("/<int:year>/<tid>")
+def result_history(year, tid):
+    return str(year) + tid

@@ -30,14 +30,7 @@ class Pickset:
     """ PICK SUBMISSION """
     def submit_picks(self, form_picks):
         # Get main levels
-        self.picks = []  # Set of lists of type Player
-        for level in form_picks:
-            level_players = []
-            for p in level:  # Iterate through form inputted players
-                player_data = p.split('*')
-                level_players.append(player.Player(name=player_data[0], pid=player_data[1]))
-
-            self.picks.append(level_players)
+        self.picks = Pickset.extract_form_picks(form_picks)
 
         if not self.validate_picks():   # Make sure picks are valid
             return False
@@ -50,6 +43,29 @@ class Pickset:
         postman.send_message()
 
         return psid
+
+    def submit_change_picks(self, form_picks):
+        # Get main levels
+        self.picks = Pickset.extract_form_picks(form_picks)
+
+        if not self.validate_picks():   # Make sure picks are valid
+            return False
+
+
+
+
+    @staticmethod
+    def extract_form_picks(form_picks):
+        picks = []  # Set of lists of type Player
+        for level in form_picks:
+            level_players = []
+            for p in level:  # Iterate through form inputted players
+                player_data = p.split('*')
+                level_players.append(player.Player(name=player_data[0], pid=player_data[1]))
+
+            picks.append(level_players)
+
+        return picks
 
     def validate_picks(self):
         if len(self.picks) != len(Pickset.PICKS_ALLOWED):  ## Check for correct number of levels
@@ -140,7 +156,7 @@ class Pickset:
         if not results:
             return []
 
-        self.picks = {player.Player(row['pid'], row['name'], level=row['level']) for row in results}
+        self.picks = [player.Player(row['pid'], row['name'], level=row['level']) for row in results]
         self.picks = level_separate(self.picks)
 
         self.name = results[0]['psname']
@@ -153,7 +169,7 @@ class Pickset:
 
     """ HELPERS """
     def get_pids(self):
-        pass
+        return [p.id for level_players in self.picks for p in level_players]
 
 
     """ Overrides """

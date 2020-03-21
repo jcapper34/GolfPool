@@ -18,8 +18,6 @@ def picks_index():
     return "<a href='%s'>Make Picks</a><br><a href='%s'>Change Picks</a>" % (url_for('picks.picks_make'), url_for('picks.picks_change'))
 
 
-
-
 # Make Picks Page
 @picks_mod.route("/make")
 def picks_make():
@@ -62,7 +60,6 @@ def picks_confirmation():
     pickset.fill_picks()
 
     return render_template("make/picks-confirmation.html", pickset=pickset)
-
 
 
 # Change Picks Page
@@ -110,12 +107,11 @@ def picks_change_logout():
     return redirect(url_for('picks.picks_change'))
 
 
-
-
 # Change Picks Submission
 @picks_mod.route("/submit-changes", methods=['POST'])
 def picks_submit_changes():
-    return "TODO"
+
+    return ""
 
 
 
@@ -128,3 +124,8 @@ def picks_poolwide(year=CURRENT_YEAR):
     #     return render_template('locked-page.html')
 
     return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))
+
+# Most picked macro
+@picks_mod.route("/most-picked")
+def picks_most(year=CURRENT_YEAR):
+    return ""

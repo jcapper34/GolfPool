@@ -17,7 +17,7 @@ Params:
 <div class="columns">
     {# Main Picks Container #}
     <div class="column">
-    <form id="make-picks-form" method="post" action="{{ url_for('picks.picks_submit') }}"  onsubmit="submit_make_picks()">
+    <form id="make-picks-form" method="post" action="{{ url_for('picks.picks_submit') }}"  onsubmit="return submit_make_picks()">
         {# General Information Section #}
         <section id="general-section" class="section">
             <div class="box pick-box">
@@ -39,15 +39,7 @@ Params:
         {{ mp_macs.level_4_section() }}
 
         {# Submission Section #}
-        <section class="section">
-            <div class="container">
-                <div class="field is-grouped is-grouped-right">
-                    <div class="control">
-                        <button id="submit-picks-button" class="button is-link is-pulled-right" type="submit">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </section>
+        {{ mp_macs.submit_section() }}
     </form>
     </div>
 </div>
