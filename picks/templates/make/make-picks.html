@@ -2,6 +2,7 @@
 Params:
     - level_players
     - OWGR_URL
+    - year
 #}
 {% extends "base.html" %}
 {% import "make/make-picks.macro.html" as mp_macs  %}
@@ -10,8 +11,8 @@ Params:
 <link rel="stylesheet" href="/picks/static/css/make-picks.css">
 {% endblock %}
 
-{% block title %}Make Picks{% endblock %}
-{% block hero_title %}Make Picks{% endblock %}
+{% block title %}Golf Pool | Make Picks{% endblock %}
+{% block hero_title %}Make Picks - {{ year }}{% endblock %}
 
 {% block body %}
 <div class="columns">

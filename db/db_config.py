@@ -1,6 +1,7 @@
 from os import environ
 
 USE_LOCAL = environ.get("USE_LOCAL") is not None    # Will be true if running locally
+# USE_LOCAL = True   # Uncomment if you want to use the remote DB locally
 
 LOCAL_DB_CREDENTIALS = {
             "dbname": 'postgres',

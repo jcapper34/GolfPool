@@ -1,0 +1,16 @@
+{#
+params: None
+#}
+{% extends "base.html" %}
+
+{% block title %}Golf Pool{% endblock %}
+
+
+{% block body %}
+<section class="section">
+    <div class="content">
+        <h1 class="title has-text-centered">Oops, the server returned an error. Please try again later</h1>
+        <p class="has-text-centered">Clicks <a href="{{ url_for('index') }}">here</a> to return home</p>
+    </div>
+</section>
+{% endblock %}

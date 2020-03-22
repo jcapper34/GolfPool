@@ -9,12 +9,6 @@ function toggle_slider(e) {
     });
 }
 
-// Closes Modal when esc is pressed
-$(document).keyup(function(e) {
-    if(e.keyCode === 27) close_modal();
-});
-
-
 /* Standings Header */
 function standings_search() {
     const val = $("#tournament-search").val().toLowerCase();

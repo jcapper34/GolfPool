@@ -1,12 +1,5 @@
-function close_modal() {
-    $("#standings-modal").fadeOut(function() {
-        $(this).removeClass("is-active");
-    });
-    $("body").removeClass('modal-open');
-}
-
 function prompt_pickset_modal(psid, name, pos) {
-    let modal = $("#standings-modal").addClass("is-active");
+    let modal = $("#standings-modal").addClass("is-active modal-open");
 
     /* Set modal header */
     modal.find(".modal-card-title").text(pos + " | " + name);
@@ -27,3 +20,17 @@ function attach_prompt_modal() {
         prompt_pickset_modal(row.data("psid"), row.find(".td-name").text(), row.find(".td-pos").text());
     });
 }
+
+function close_modal() {
+    $("#standings-modal").fadeOut(function() {
+        $(this).removeClass("is-active");
+    });
+    $("body").removeClass('modal-open');
+}
+
+// Closes Modal when esc is pressed
+$(document).keyup(function(e) {
+    if(e.keyCode === 27) close_modal();
+});
+
+
