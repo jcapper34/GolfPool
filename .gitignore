@@ -1,7 +1,10 @@
 # IDE Stuff
-.idea
-__pycache__
+.idea/
+__pycache__/
 
 # Style Transcompile
 *.sass
 *.scss
+
+# Virtual Environment
+venv/

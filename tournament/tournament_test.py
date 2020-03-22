@@ -12,3 +12,8 @@ def test_fill_db_standings(year=2019, tid='014', conn=None):
     standings = Tournament()
     standings.fill_db_standings(year=year, tid=tid, conn=conn)
     splash(standings.picksets)
+
+
+
+if __name__ == "__main__":
+    pass

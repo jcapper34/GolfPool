@@ -18,4 +18,28 @@
             <li onclick="modal_switch_tabs($(this), '#tournament-history-section')"><a>Tournament History</a></li>
         </ul>
     </div>
+    {# CURRENT TOURNAMENT SECTION #}
+    <section class="tab-section" id="current-tournament-section">
+        <div style="text-align:right;margin: 10px">
+            <label style="cursor: pointer">
+                Organize
+                <input type="checkbox" onchange="organize_table($(this))">
+            </label>
+        </div>
+        <table class="table is-fullwidth is-hoverable">
+            <thead><tr><th>&nbsp;</th><th>Name</th><th class="has-text-centered">Position</th><th class="has-text-centered">Points</th></tr></thead>
+            <tbody>
+            {% for player in pickset.picks|sort(attribute="points", reverse=True) %}
+                <tr onclick="prompt_pickset_modal($(this).data('pid'), $(this).find('.td-player-name').text(), false, undefined)" style="cursor: pointer" class="pick-row" data-pid="{{ player.id }}" data-level="{{ player.level }}">
+                    <td><figure class="image is-64x64"><img src="{{ player.photo_url }}"></figure></td> {# TODO: Lazy Loader #}
+                    <td class="td-player-name">
+                        {{ player.name }}
+                    </td>
+                    <td class="has-text-centered">{% if player.pos is not none %}{{ player.pos }}{% else %}-{% endif %}</td>
+                    <td class="td-points has-text-centered">{{ player.points }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
 {% endmacro %}

@@ -46,18 +46,18 @@ def get_pickset_modal(year, tid):
 
     # Get Pickset
     pickset = Pickset(psid=psid)
-    pickset.fill_picks(conn=conn)
+    pickset.fill_picks(separate=False, conn=conn)
 
     # Get Tournament results for each picked player
-    for level_players in pickset.picks:
-        for player in level_players:
-            pl = func_find(tournament.players, lambda p: p.id == player.id)
-            if pl is None:  # If not found
-                continue
+    for player in pickset.picks:
+        pl = func_find(tournament.players, lambda p: p.id == player.id)
+        if pl is None:  # If not found
+            player.points = 0
+            continue
 
-            player.pos = pl.pos
-            player.points = pl.points
-            player.total = pl.total
+        player.pos = pl.pos
+        player.points = pl.points
+        player.total = pl.total
 
     pickset_modal = get_template_attribute("modal.macro.html", "pickset_modal")
     return pickset_modal(pickset)
