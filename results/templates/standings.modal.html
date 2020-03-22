@@ -20,7 +20,7 @@
         <div id="standings-menu-items">
             <ul class="menu-list">
                 <p class="menu-label">Dynamic Results</p>
-                <li><a class="" href="{{ url_for('results.results_live') }}">Live Standings</a></li>
+                <li><a class="{% if current_tid == 'live' %}is-active{% endif %}" href="{{ url_for('results.results_live') }}">Live Standings</a></li>
             </ul>
             <p class="menu-label">Final Results</p>
             <ul class="menu-list">

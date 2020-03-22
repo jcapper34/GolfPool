@@ -13,7 +13,10 @@ results_mod = Blueprint("results", __name__, template_folder='templates', static
 @results_mod.route("/live")
 def results_live():
     # TODO: Live Results. Should be fun lol
-    return "Hello picks"
+    tournament = Tournament()
+    tournament.api_fill()
+
+    return render_template('standings-live.html', tournament=tournament)
 
 
 # Past Standings
@@ -23,14 +26,16 @@ def results_past(year, tid):
 
     # Get Database Standings
     tournament = Tournament()
-    tournament.fill_db_rankings(year, tid, conn=conn)
+    if not tournament.fill_db_rankings(year, tid, conn=conn):   # If tournament not found in DB
+        return render_template("locked-page.html", title='Golf Pool | Locked Tournament')
+
     tournament.fill_db_standings(year, tid, conn=conn)
 
     # Merge all picks with tournament
     all_picks = get_all_picks(year, conn=conn)
     tournament.merge_all_picks(all_picks)
 
-    return render_template('standings.html', tournament=tournament)
+    return render_template('standings-past.html', tournament=tournament)
 
 
 # Past Standings

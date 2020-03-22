@@ -1,7 +1,7 @@
 from pprint import pprint
 
 from db.db_helper import filter_conn
-from helper import func_find
+from helper import func_find, CURRENT_YEAR
 from picksets.pickset import Pickset
 from players.player import Player
 
@@ -75,11 +75,13 @@ class Tournament:
 
         self.picksets = [Pickset(psid=row['psid'], name=row['name'], points=row['points'], pos=row['pos']) for row in results]
 
-    """ API FILLS """
 
+    """ API FILLS """
+    def api_fill(self, tid='live', year=CURRENT_YEAR):
+        self.tid = tid
+        self.year = year
 
     ### CALCULATIONS ###
-
 
     """ MERGES """
     def merge_all_picks(self, all_picks):
