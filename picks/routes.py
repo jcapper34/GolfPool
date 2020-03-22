@@ -27,7 +27,7 @@ def picks_make():
 @picks_mod.route("/submit", methods=['POST'])
 def picks_submit():
     pickset = Pickset(
-        name=request.form.get("name").title(), #Ensure name is capitalized
+        name=request.form.get("name").strip().title(), #Ensure name is capitalized
         email=request.form.get("email"),
         pin=request.form.get("pin")
     )
@@ -144,4 +144,5 @@ def picks_poolwide(year=CURRENT_YEAR):
 # Most picked macro
 @picks_mod.route("/most-picked")
 def picks_most(year=CURRENT_YEAR):
+    # TODO: Ajax make-picks page
     return ""

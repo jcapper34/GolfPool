@@ -1,5 +1,4 @@
 from picksets.pickset import Pickset
-from picksets.picksets_submit import submit_picks
 from players.players_helper import level_separate
 from picksets.picksets_db import get_most_picked, get_all_picks
 from db.conn import Conn
@@ -9,9 +8,9 @@ from db.db_helper import filter_conn
 def test_fill_picks(psid=1, name='Sarah Mathy', conn=None):
     pickset = Pickset(psid=psid, name=name)
     pickset.fill_picks(conn=conn)
-    print("Picks for " + pickset.__str__())
-    for level in level_separate(pickset.picks):
-        print('\t', [p.__str__() for p in level])
+    print(pickset.picks)
+    # for level in pickset.picks:
+    #     print('\t', [p.__str__() for p in level])
 
 def test_most_picked(year=2019, conn=None):
     most_picked = get_most_picked(year, conn=conn)
@@ -43,4 +42,4 @@ def test_submit_picks():
 
 
 if __name__ == '__main__':
-    test_submit_picks()
+    test_fill_picks()

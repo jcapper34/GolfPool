@@ -4,7 +4,7 @@ from mailer.test_mailer import test_picks_send
 from picksets.picksets_test import *
 from players.players_test import *
 from db.conn import Conn
-from standings.standings_test import test_fill_db_rankings, test_fill_db_standings
+from tournament.tournament_test import test_fill_db_rankings, test_fill_db_standings
 from mailer.postman import Postman
 
 if __name__ == '__main__':

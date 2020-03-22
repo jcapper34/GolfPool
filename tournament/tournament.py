@@ -1,16 +1,19 @@
+from pprint import pprint
+
 from db.db_helper import filter_conn
+from helper import func_find
 from picksets.pickset import Pickset
 from players.player import Player
 
 
-class Standings:
-    def __init__(self, tid=None, tournament_name=None):
+class Tournament:
+    def __init__(self, tid=None, year=None, tournament_name=None):
         self.tid = tid
-        self.tournament_name = tournament_name
+        self.year = year
+        self.name = tournament_name
 
         self.players = []
         self.picksets = []
-
 
     ### DATABASE FILLS ###
 
@@ -32,7 +35,7 @@ class Standings:
         conn = filter_conn(conn)
         if tid == 'cumulative': tid = None
 
-        raw_players = conn.exec_fetch(Standings.GET_DB_RANKINGS_QUERY, (year, tid))
+        raw_players = conn.exec_fetch(Tournament.GET_DB_RANKINGS_QUERY, (year, tid))
 
         if not raw_players:
             return False
@@ -46,11 +49,10 @@ class Standings:
             "100": "British Open",
             "033": "PGA Championship"
         }
-        if tid is None:
-            self.tournament_name = "Cumulative"
-            self.tid = "cumulative"
-        else:
-            self.tournament_name = tournament_names[tid]
+
+        self.tid = "cumulative" if tid is None else tid
+        self.name = "Cumulative" if tid is None else tournament_names[tid]
+        self.year = year
 
     # Parameters: year, tid
     # Returns: pos, psid, name, points ORDERED & RANKED BY pos
@@ -69,11 +71,18 @@ class Standings:
         conn = filter_conn(conn)
         if tid == 'cumulative': tid = None
 
-        results = conn.exec_fetch(Standings.GET_DB_STANDINGS_QUERY, (year, tid))
+        results = conn.exec_fetch(Tournament.GET_DB_STANDINGS_QUERY, (year, tid))
 
         self.picksets = [Pickset(psid=row['psid'], name=row['name'], points=row['points'], pos=row['pos']) for row in results]
 
-    ### API FILLS ###
+    """ API FILLS """
 
 
     ### CALCULATIONS ###
+
+
+    """ MERGES """
+    def merge_all_picks(self, all_picks):
+        for pickset in self.picksets:
+            ps2 = func_find(all_picks, lambda ps: ps.id == pickset.id)
+            pickset.picks = ps2.picks

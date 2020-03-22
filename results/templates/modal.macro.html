@@ -1,0 +1,21 @@
+{% macro blank_modal(modal_id="standings-modal") %}
+<div id="{{ modal_id }}" class="modal">
+    <div class="modal-background" onclick="close_modal()"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title"></p>
+            <button class="delete" aria-label="close" onclick="close_modal()"></button>
+        </header>
+        <section class="modal-card-body"></section>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro pickset_modal(pickset) %}
+    <div class="tabs is-centered">
+        <ul>
+            <li onclick="modal_switch_tabs($(this), '#current-tournament-section')" class="is-active"><a>Current Tournament</a></li>
+            <li onclick="modal_switch_tabs($(this), '#tournament-history-section')"><a>Tournament History</a></li>
+        </ul>
+    </div>
+{% endmacro %}

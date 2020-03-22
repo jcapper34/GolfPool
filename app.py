@@ -26,10 +26,11 @@ def picks_make_alias():
 def picks_change_alias():
     return redirect(url_for('picks.picks_change'))
 
-@app.route("/standings/live")
+@app.route("/tournament/live")
 def results_live_alias():
     return redirect(url_for('results.results_live'))
 
+# TODO: Past Results alias
 
 """ Error Pages """
 @app.errorhandler(404)

@@ -1,104 +1,42 @@
+{#
+params:
+- menu
+- tournament
+#}
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
-{% block hero_title %}{{ title }}{% endblock %}
+{% block title %} Standings | {{ tournament.name }} {{ tournament.year }}{% endblock %}
+{% block hero_title %} Standings {% endblock %}
 
 {% block add_head %}
-<link rel="stylesheet" href="/standings/static/css/standings.min.css?v=1.3">
-{% if is_live %}
-    {% if is_local %}
-    <script src="/static/js/library/js.cookie.js"></script>
-    {% else %}
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
-    {% endif %}
-{% endif %}
+<link rel="stylesheet" href="/results/static/css/standings.css">
 {% endblock %}
 
-{% from "modal.html" import pickset_modal %}
 
 {% block body %}
-<div id="standings-modal" class="modal">
-    <div class="modal-background" onclick="close_modal()"></div>
-    <div class="modal-card">
-        <header class="modal-card-head">
-            <p class="modal-card-title"></p>
-            <button class="delete" aria-label="close" onclick="close_modal()"></button>
-        </header>
-        <section class="modal-card-body">{{ pickset_modal() }}</section>
-    </div>
-</div>
+    {% from "modal.macro.html" import blank_modal %}
+    {{ blank_modal() }}
 
-{% set menu = { "014": "Masters",
-                "033": "PGA Championship",
-                "026": "US Open",
-                "100": "British Open",
-                "cumulative": "Cumulative"} %}
+    {% import 'standings.modal.html' as smac %}
+    <div id="main-columns" class="columns">
+        <div class="column is-2">
+            {{ smac.standings_menu(tournament.tid, tournament.year) }}
+        </div>
+        <section id="standings-main-section" class="section column">
+            {{ smac.standings_header(tournament.name, tournament.year) }}
 
-<div id="main-columns" class="columns">
-    <div class="column is-2">
-        <div id="standings-menu" class="menu">
-            <div id="standings-menu-header" class="level is-mobile">
-                <div class="level-left">
-                    <h4 class="subtitle">Menu</h4>
-                </div>
-                <div class="level-right">
-                    <a class="navbar-burger" onclick="$('#standings-menu-items').slideToggle()">
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                    </a>
+            {# Tables #}
+            <div id="standings-tables">
+                <div class="columns">
+                {{ smac.standings_table(tournament.picksets) }}
+                {{ smac.leaderboard_table(tournament.players) }}
                 </div>
             </div>
-            <div id="standings-menu-items">
-                {% if show_live_link %}
-                <ul class="menu-list">
-                    <p class="menu-label">Dynamic Results</p>
-                    <li><a class="{% if is_live %}is-active{% endif %}" href="/standings/live">Live Standings</a></li>
-                </ul>
-                {% endif %}
-                <p class="menu-label">Final Results</p>
-                <ul class="menu-list">
-                    {% for tid in menu %}
-                        <li><a class="{% if tid == leaderboard.tid and not is_live %}is-active{% endif %}" href="/standings/{{ year }}/{{ tid }}">{{ menu[tid] }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+        </section>
     </div>
-    <section id="standings-main-section" class="section column">
-        <div class="level">
-            <div class="level-left" style="padding: 10px">
-                <div>
-                    <h1 class="title" style="margin-bottom: 5px">
-                    {{ leaderboard.tournament_name }} - {{ year }}
-                    {% if is_live %}
-                    <a id="refresh-standings"><span class="icon"><i class="fas fa-sync"></i></span></a>
-                    {% endif %}
-                    </h1>
-                    {% if is_live %}<p>Note: Results are approximately 5 min behind realtime</p>{% endif %}
-                </div>
-            </div>
-            <div class="level-right">
-                <input id="standings-search" class="input level-item" placeholder="Search">
-            </div>
-        </div>
-        <div class="switch-box">
-            <label class="switch">
-              <input id="table-switch" type="checkbox" checked onchange="switch_table($(this))" autocomplete="off">
-              <span class="slider round"></span>
-            </label>
-        </div>
-        {% from "standings.macro.html" import standings_tables %}
-        <div id="standings-tables">{{ standings_tables(standings, leaderboard) }}</div>
-    </section>
-</div>
+
 {% endblock %}
 
 {% block add_below %}
-<script>
-    var is_live = {{ is_live|lower }};
-    var tid = "{{ leaderboard.tid }}";
-    var year = "{{ year }}";
-</script>
-<script src="/standings/static/js/standings.js?v=2.6"></script>
+<script src="/results/static/js/standings.js"></script>
 {% endblock %}

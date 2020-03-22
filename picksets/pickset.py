@@ -170,15 +170,17 @@ class Pickset:
             ON pl.id = lx.player_id AND ps.season_year = lx.season_year
           WHERE ps.id = %s ORDER BY lx.level
                       """
-    def fill_picks(self, conn=None):
+    def fill_picks(self, separate=True, conn=None):
         conn = filter_conn(conn)
 
         results = conn.exec_fetch(Pickset.GET_PICKS_QUERY, (self.id,))
+
         if not results:
             return []
 
         self.picks = [player.Player(row['pid'], row['name'], level=row['level']) for row in results]
-        self.picks = level_separate(self.picks)
+        if separate:
+            self.picks = level_separate(self.picks)
 
         self.name = results[0]['psname']
         self.email = results[0]['email']

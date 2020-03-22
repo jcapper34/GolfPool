@@ -12,7 +12,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% for pickset in all_picks %}
+                {% for pickset in all_picks|sort(attribute='name') %}
                     <tr class="all-picks-row" onclick="$(this).toggleClass('has-background-grey-lighter')">
                         <td class="participant-name"><a>{{ pickset.name }}</a></td>
                         {% for player in pickset.picks %}   {# Picks should not be level separated #}
