@@ -138,7 +138,7 @@ def picks_submit_changes():
 @picks_mod.route("/poolwide/<int:year>")
 def picks_poolwide(year=CURRENT_YEAR):
     if year == CURRENT_YEAR and HIDE_PICKS and not RUNNING_LOCALLY:
-        return render_template('locked-page.html')
+        return render_template('locked-page.html', title="Poolwide Picks")
 
     return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))
 
