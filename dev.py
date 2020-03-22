@@ -65,7 +65,7 @@ def insert_levels(year=CURRENT_YEAR):
     conn = Conn()
 
     # Do clean up
-    conn.exec_commit("DELETE FROM level_xref WHERE season_year = %s", (year,))
+    conn.exec("DELETE FROM level_xref WHERE season_year = %s", (year,))
 
     for level_num in range(1, len(levels)+1):
         for player_name in levels[level_num-1]:
@@ -82,4 +82,4 @@ def insert_levels(year=CURRENT_YEAR):
 
 
 if __name__ == "__main__":
-    insert_levels(2020)
+    insert_levels()

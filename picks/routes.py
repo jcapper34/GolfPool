@@ -2,13 +2,15 @@ from pprint import pprint
 from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for
 
 from db.conn import Conn
-from helper import CURRENT_YEAR, splash
+from helper import CURRENT_YEAR, splash, RUNNING_LOCALLY
 from picksets.pickset import Pickset
 from picksets.picksets_db import get_all_picks, get_login
 from players.players_db import get_levels
 from players.player import Player
 
 picks_mod = Blueprint("picks", __name__, template_folder='templates', static_folder='static')   # Register Blueprint
+
+HIDE_PICKS = True
 
 """ ROUTES """
 
@@ -135,9 +137,8 @@ def picks_submit_changes():
 @picks_mod.route("/poolwide")
 @picks_mod.route("/poolwide/<int:year>")
 def picks_poolwide(year=CURRENT_YEAR):
-    # Uncomment Block if distributing
-    # if year == CURRENT_YEAR:
-    #     return render_template('locked-page.html')
+    if year == CURRENT_YEAR and HIDE_PICKS and not RUNNING_LOCALLY:
+        return render_template('locked-page.html')
 
     return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))
 

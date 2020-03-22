@@ -1,5 +1,6 @@
 from pprint import pprint
 from datetime import datetime
+from os import environ
 
 """ FUNCTIONS """
 def splash(obj):
@@ -32,4 +33,5 @@ def func_find(obj, func, limit=1):
 """ CONSTANTS """
 NOW = datetime.now()
 CURRENT_YEAR = int(NOW.year)
-# CURRENT_YEAR = 2020
+
+RUNNING_LOCALLY = environ.get("USE_LOCAL") is not None
