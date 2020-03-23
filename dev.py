@@ -1,4 +1,7 @@
-from helper import CURRENT_YEAR
+from pprint import pprint
+
+import requests
+from helper import CURRENT_YEAR, func_find
 from db.conn import Conn
 
 
@@ -79,7 +82,17 @@ def insert_levels(year=CURRENT_YEAR):
     conn.commit()
 
 
+def test_api():
+    data = requests.get("https://www.golfchannel.com/api/v2/events/GetWidgetEvents/7").json()
+    pprint(data)
+
+channel_tids = {
+    'The Masters': 0,
+    'PGA Championship': 0,
+    'US Open': 0,
+    'The Open': 16953
+}
 
 
 if __name__ == "__main__":
-    insert_levels()
+    test_api()

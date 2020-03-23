@@ -1,5 +1,7 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request, jsonify
 import picks, results
+from urllib.parse import urlparse
+from requests import get as http_get
 from db.db_config import USE_LOCAL
 
 app = Flask(__name__)   # Creates app
@@ -31,6 +33,16 @@ def results_live_alias():
     return redirect(url_for('results.results_live'))
 
 # TODO: Past Results alias
+
+
+""" HELPERS """
+@app.route("/api-retriever", methods=['POST'])
+def api_retriever():
+    url = request.form.get("url")
+    if urlparse(url).netloc == 'www.golfchannel.com':
+        return jsonify(http_get(url).json())
+
+    return jsonify({})
 
 """ Error Pages """
 @app.errorhandler(404)

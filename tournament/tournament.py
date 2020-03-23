@@ -7,6 +7,9 @@ from players.player import Player
 
 
 class Tournament:
+    # Golf Channel URL
+    LEADERBOARD_URL = "https://www.golfchannel.com/api/v2/events/%s/leaderboard" # Parameters: tournament_id
+
     def __init__(self, tid=None, year=None, tournament_name=None):
         self.tid = tid
         self.year = year
@@ -36,7 +39,6 @@ class Tournament:
         if tid == 'cumulative': tid = None
 
         raw_players = conn.exec_fetch(Tournament.GET_DB_RANKINGS_QUERY, (year, tid))
-
         if not raw_players:
             return False
 
@@ -53,6 +55,8 @@ class Tournament:
         self.tid = "cumulative" if tid is None else tid
         self.name = "Cumulative" if tid is None else tournament_names[tid]
         self.year = year
+
+        return True
 
     # Parameters: year, tid
     # Returns: pos, psid, name, points ORDERED & RANKED BY pos
@@ -72,9 +76,12 @@ class Tournament:
         if tid == 'cumulative': tid = None
 
         results = conn.exec_fetch(Tournament.GET_DB_STANDINGS_QUERY, (year, tid))
+        if not results:
+            return False
 
         self.picksets = [Pickset(psid=row['psid'], name=row['name'], points=row['points'], pos=row['pos']) for row in results]
 
+        return True
 
     """ API FILLS """
     def api_fill(self, tid='live', year=CURRENT_YEAR):

@@ -143,15 +143,10 @@ function check_main_level(pickBox, recently_selected) {
 function main_level_player_details(checkBox) {
     let pickBox = checkBox.closest('.pick-box');
     let playerDetailsBox = pickBox.find(".player-details");
-    if(checkBox.prop('checked')) {  //Show Details
+    if(checkBox.prop('checked'))  //Show Details
         playerDetailsBox.slideDown();
-        playerDetailsBox.find("img").each(function() {  //Load images
-            $(this).attr("src", $(this).data('src'));
-        });
-    }
-    else {  //Hide Details
+    else  //Hide Details
         playerDetailsBox.slideUp();
-    }
 }
 
 function main_level_effects(pickBox) {
@@ -317,23 +312,33 @@ function toggle_show_pin(button) {
 PAGE STARTUP
 */
 
-var OWGR_rankings;
+function set_OWGR() {
+    $.post('/api-retriever', {url: OWGR_URL}, function (OWGR_rankings) {
+            for(const i in OWGR_rankings) {  // Update player details
+                const player = OWGR_rankings[i];
+                let playerColumn = $(".player-column[data-pid='" + player.golferId + "']");
+                playerColumn.find('.owgr-rank').text(player.currentRank);   // Show OWGR Rank
+                playerColumn.find("img").attr('src', player.imageUrl);  //Set player's image
+            }
+        }
+    );
+}
+
+var apiPlayers;
+function get_api_players() {
+    $.post('/api-retriever', {url: API_PLAYERS_URL}, function (response) {
+       apiPlayers = response;
+    });
+}
+
 $(document).ready(function() {
     // Do effects for starting state
     $(".main-level-box").each(function() {
        main_level_effects($(this));
     });
+    $(".show-details:checked").each(function() {main_level_player_details($(this))});
 
-    // Insert OWGR
-    $.ajax({
-        url: OWGR_URL,
-        type: 'GET',
-        success: function (response) {
-            OWGR_rankings = response.tours[0].years[0].stats[0].details;
-            for(const i in OWGR_rankings) {  // Update player details
-                const player = OWGR_rankings[i];
-                $(".player-column[data-pid='" + player.plrNum + "']").find('.owgr-rank').text(player.curRank);
-            }
-        }
-    });
+    // Retrieve API Data
+    set_OWGR();
+    get_api_players();
 });
