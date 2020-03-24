@@ -12,9 +12,9 @@ from players.player import Player
 from players.players_helper import level_separate
 
 # Parameters: year
-# Returns: psid, psname, pid, pl.name, level
+# Returns: psid, psname, pid, pl.name, level, pl.tour_id
 GET_ALL_PICKS_QUERY = """
-                SELECT ps.id AS psid, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, px.player_id AS pid, pl.name, COALESCE(lx.level, 4) AS level
+                SELECT ps.id AS psid, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, px.player_id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.tour_id
                         FROM picks_xref AS px
                         JOIN pickset AS ps
                             ON px.pickset_id = ps.id
@@ -37,14 +37,14 @@ def get_all_picks(year, separate=False, conn=None):
     # Makes a mapping of picks to pickset
     pickset_map = {}
     for row in results:
-        player = Player(pid=row['pid'], name=row['name'], level=row['level'])
+        player = Player(pid=row['pid'], name=row['name'], level=row['level'], tour_id=row['tour_id'])
         psid = row['psid']
         if pickset_map.get(psid) is None:
             pickset_map[psid] = Pickset(psid=psid, name=row['psname'], picks=[player])
         else:
             pickset_map[psid].picks.append(player)
 
-    pickset_list = pickset_map.values()
+    pickset_list = list(pickset_map.values())
 
     if separate:
         picksets = []
@@ -54,31 +54,6 @@ def get_all_picks(year, separate=False, conn=None):
         return picksets
 
     return pickset_list
-
-    # I'll explain later lol
-    # picksets = []
-    # current_psid = results[0]['psid']
-    # current_picklist = []
-    # row_len = conn.cur.rowcount
-    # for i in range(row_len):
-    #     row = results[i]
-    #     player = Player(pid=row['pid'], name=row['name'], level=row['level'])
-    #     if row['psid'] != current_psid:
-    #         current_psid = row['psid']
-    #         if separate:    # Separate by level
-    #             current_picklist = level_separate(current_picklist)
-    #         picksets.append(Pickset(psid=current_psid, name=row['psname'], picks=current_picklist))
-    #         current_picklist = [player]
-    #     else:
-    #         current_picklist.append(player)
-    #         if i == row_len - 1:
-    #             if separate:    # Separate by level
-    #                 current_picklist = level_separate(current_picklist)
-    #             picksets.append(Pickset(psid=current_psid, name=row['psname'], picks=current_picklist))
-
-
-
-    # return picksets
 
 
 # Parameters: year

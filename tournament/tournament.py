@@ -1,14 +1,15 @@
 from pprint import pprint
 
 from db.db_helper import filter_conn
-from helper import func_find, CURRENT_YEAR
+from helper import func_find, CURRENT_YEAR, get_json
 from picksets.pickset import Pickset
+from picksets.picksets_db import get_all_picks
 from players.player import Player
 
 
 class Tournament:
     # Golf Channel URL
-    LEADERBOARD_URL = "https://www.golfchannel.com/api/v2/events/%s/leaderboard" # Parameters: tournament_id
+    LEADERBOARD_URL = "https://www.golfchannel.com/api/v2/events/%d/leaderboard" # Parameters: tournament_id
 
     def __init__(self, tid=None, year=None, tournament_name=None):
         self.tid = tid
@@ -89,6 +90,32 @@ class Tournament:
         self.year = year
 
     ### CALCULATIONS ###
+    def calculate_standings(self, conn=None):
+        conn = filter_conn(conn)
+        self.picksets = get_all_picks(self.year, conn=conn) # Load DB Picks
+
+        point_template = get_json('tournament/data/point-template.json')  # Load Point Template Data
+
+        api_tournament = get_json(Tournament.LEADERBOARD_URL % 17893)['result'] # Get Tournament From API
+        leaderboard = api_tournament['golfers']
+        self.players = [Player(pid=pl['golferId'],
+                               name=pl['firstName'] + " " + pl['lastName'],
+                               pos=pl['position'],
+                               points=point_template[str(pl['sortHelp'])] if pl['sortHelp'] <= 20 else 0,
+                               total=pl['overallPar']
+                               ) for pl in leaderboard] # Create Player objects of leaderboard
+
+        self.name = api_tournament.get("eventName")
+
+        for pickset in self.picksets:
+            if pickset.points is None:
+                pickset.points = 0
+            for picked_player in pickset.picks:
+                match = func_find(self.players, func=lambda x: x.id == picked_player.id)
+                if match is not None:
+                    pickset.points += match.points
+
+        self.picksets.sort(key=lambda x: x.points, reverse=True)    # Sort Standings
 
     """ MERGES """
     def merge_all_picks(self, all_picks):

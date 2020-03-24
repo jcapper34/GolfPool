@@ -23,7 +23,7 @@ def picks_index():
 # Make Picks Page
 @picks_mod.route("/make")
 def picks_make():
-    return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % 19, API_PLAYERS_URL=Player.ALL_PLAYERS_URL, year=CURRENT_YEAR)
+    return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % 19, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
 
 # Make Picks Submission
 @picks_mod.route("/submit", methods=['POST'])

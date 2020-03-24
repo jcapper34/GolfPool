@@ -143,6 +143,10 @@ function check_main_level(pickBox, recently_selected) {
 function main_level_player_details(checkBox) {
     let pickBox = checkBox.closest('.pick-box');
     let playerDetailsBox = pickBox.find(".player-details");
+
+    playerDetailsBox.find("img").each(function() {
+        $(this).attr('src', $(this).data('src'));   // Load Image
+    });
     if(checkBox.prop('checked'))  //Show Details
         playerDetailsBox.slideDown();
     else  //Hide Details
@@ -201,14 +205,13 @@ function create_player_suggestions(input_element) {
     let suggestions = [];
     let count = 0;
 
-    for(let i = 0; i < OWGR_rankings.length; i++) {
-        const player = OWGR_rankings[i];
-        const playerFirst = player.plrName.first;
-        const playerLast = player.plrName.last;
-        const playerFull = [playerFirst, playerLast].join(' ');
+    for(const i in apiPlayers) {
+        const player = apiPlayers[i];
+        const playerFirst = player.firstName;
+        const playerLast = player.lastName;
 
-        if ( (nameCheck(playerFirst, val) || nameCheck(playerLast, val) || nameCheck(playerFull, val)) && isValid(player.plrNum)){
-            suggestions.push([player.plrNum, playerFull]); // In the form (pid, name)
+        if ( (nameCheck(playerFirst, val) || nameCheck(playerLast, val) || nameCheck(player.name, val)) && isValid(player.id)){
+            suggestions.push([player.id, player.name]); // In the form (pid, name)
             count++;
             if (count === 5)
                 break;
@@ -318,17 +321,30 @@ function set_OWGR() {
                 const player = OWGR_rankings[i];
                 let playerColumn = $(".player-column[data-pid='" + player.golferId + "']");
                 playerColumn.find('.owgr-rank').text(player.currentRank);   // Show OWGR Rank
-                playerColumn.find("img").attr('src', player.imageUrl);  //Set player's image
             }
         }
     );
 }
 
-var apiPlayers;
+var apiPlayers = {};
 function get_api_players() {
     $.post('/api-retriever', {url: API_PLAYERS_URL}, function (response) {
-       apiPlayers = response;
+       apiPlayers = Object.values(response.items);
+       apiPlayers = append_to_api_players(apiPlayers);
     });
+
+}
+
+function append_to_api_players(api_list) {  //Allows me to add popular players that don't show up
+    const newPlayers = [
+        {
+            id: 43344,
+            name: "Si Woo Kim",
+            firstName: 'Si Woo',
+            lastName: 'Kim',
+        }
+    ];
+    return api_list.concat(newPlayers);
 }
 
 $(document).ready(function() {

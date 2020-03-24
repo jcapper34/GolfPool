@@ -1,6 +1,9 @@
+import json
 from pprint import pprint
 from datetime import datetime
 from os import environ
+
+import requests
 
 """ FUNCTIONS """
 def splash(obj):
@@ -28,6 +31,17 @@ def func_find(obj, func, limit=1):
         return found[0]
 
     return found
+
+
+def get_json(url):
+    try:
+        if 'http' in url.lower():
+            return requests.get(url).json()
+    except json.JSONDecodeError as e:
+        raise
+
+    with open(url) as f:
+        return json.load(f)
 
 
 """ CONSTANTS """

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, get_template_attribute
 
 from db.conn import Conn
-from helper import func_find
+from helper import func_find, CURRENT_YEAR
 from picksets.pickset import Pickset
 from picksets.picksets_db import get_all_picks
 from tournament.tournament import Tournament
@@ -13,8 +13,8 @@ results_mod = Blueprint("results", __name__, template_folder='templates', static
 @results_mod.route("/live")
 def results_live():
     # TODO: Live Results. Should be fun lol
-    tournament = Tournament()
-    tournament.api_fill()
+    tournament = Tournament(year=CURRENT_YEAR)
+    tournament.calculate_standings()
 
     return render_template('standings-live.html', tournament=tournament)
 
