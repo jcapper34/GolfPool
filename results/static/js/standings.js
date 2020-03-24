@@ -1,15 +1,8 @@
 /* HTML Inserts */
 const ripple_html = "<div class='lds-ripple'><div></div><div></div></div>";
 
-function toggle_slider(e) {
-    let icon = e.find(".icon i");
-    e.next().closest(".collapse-wrapper").stop().slideToggle(function() {
-        icon.toggleClass("fa-angle-down");
-        icon.toggleClass("fa-angle-up");
-    });
-}
-
 /* Standings Header */
+// TOD): Standings Search
 function standings_search() {
     const val = $("#tournament-search").val().toLowerCase();
     const size = val.length;
@@ -25,56 +18,8 @@ function standings_search() {
 }
 $("#tournament-search").keyup(standings_search);
 
-function standings_refresh() {
-    let button = $(this).find("i");
-    // Rotate link
-    $({deg: 0}).animate({deg: 360}, {
-        duration: 1000,
-        step: function(now) {
-            button.css({
-                transform: 'rotate(' + now + 'deg)'
-            });
-        }
-    });
-
-    // Retrieve Standings
-    let standings_tables = $("#tournament-tables").html(ripple_html);
-    $.ajax({
-        url: window.location.pathname,
-        data: {refresh: true, tid: tid},
-        success: function(r) {
-            standings_tables.html(r);
-
-            standings_cookie();
-            attach_prompt_modal();
-            attach_filter_checkbox();
-            switch_table($("#table-switch"));
-        },
-        error: function(e) {
-            console.log(e);
-            window.alert("Unable to refresh. Please try again later");
-        }
-    })
-}
-$("#refresh-tournament").click(standings_refresh);
-
 /* Standings Tables */
-function switch_table(e) {
-    let label = e.parent().find("label");
-    if(!e.prop('checked')) {
-        label.text("Leaderboard");
-        $("#leaderboard-table-column").show();
-        $("#tournament-table-column").hide();
-    }
-    else {
-        label.text("Standings");
-        $("#leaderboard-table-column").hide();
-        $("#tournament-table-column").show();
-    }
-
-}
-
-function attach_filter_checkbox() {
+function attach_filter_checkbox() {    // Must be re-attached after refresh
     const filter_checkbox = function(e, picks) {
         if (e.prop("checked") === true) {
             $(".player-row").each(function () {
@@ -131,9 +76,66 @@ function attach_filter_checkbox() {
     });
 }
 
-/* Cookies */
+// TODO: Mobile Switch Table
+function switch_table(e) {
+    let label = e.parent().find("label");
+    if(!e.prop('checked')) {
+        label.text("Leaderboard");
+        $("#leaderboard-table-column").show();
+        $("#tournament-table-column").hide();
+    }
+    else {
+        label.text("Standings");
+        $("#leaderboard-table-column").hide();
+        $("#tournament-table-column").show();
+    }
+
+}
+// TODO: Mobile Toggle Slider
+function toggle_slider(e) {
+    let icon = e.find(".icon i");
+    e.next().closest(".collapse-wrapper").stop().slideToggle(function() {
+        icon.toggleClass("fa-angle-down");
+        icon.toggleClass("fa-angle-up");
+    });
+}
+
+
+/* Live Standings */
+function standings_refresh() {
+    // Spin link
+    let button = $("#refresh-standings").find("i");
+    $({deg: 0}).animate({deg: 360}, {
+        duration: 1000,
+        step: function(now) {
+            button.css({
+                transform: 'rotate(' + now + 'deg)'
+            });
+        }
+    });
+
+    // Retrieve Standings
+    let standings_table = $("#standings-table-column").html(ripple_html);
+    let leaderboard_table = $("#leaderboard-table-column").html(ripple_html);
+
+    // Get new standings from Server
+    $.get(window.location.pathname,{refresh: true},function(r) {
+        standings_table.html(r[0]);   // Put standings table
+        leaderboard_table.html(r[1]);   // Put leaderboard table
+
+        // standings_cookie();
+        attach_prompt_modal();
+        attach_filter_checkbox();
+        // switch_table($("#table-switch"));
+    }).fail(function(e) {
+            console.log(e);
+            window.alert("Unable to refresh. Please try again later");
+        });
+}
+
+// TODO: Live Standings Cookies
 function standings_cookie() {
-    if((is_live) && (navigator.cookieEnabled)) {
+    if(navigator.cookieEnabled) {
         const cookie_name = "last-tournament";
         let pickset_rows = $(".pickset-row");
         let old_standings = Cookies.getJSON(cookie_name);
@@ -162,8 +164,9 @@ function standings_cookie() {
     }
 }
 
+
 /* On startup */
-$(document).ready(function(){
+$(document).ready(function() {
     $(".filter-checkbox").prop("checked", false);
     // standings_search();
     // standings_cookie();

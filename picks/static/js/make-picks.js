@@ -175,7 +175,6 @@ function reset_main_level(pickBox) {
 LEVEL 4 Functions
 */
 
-// TODO: Update to include players like Fred Couples and John Daly
 function create_player_suggestions(input_element) {
     const val = input_element.val().toLowerCase();
     if(val === '') {// If no value, then don't do anything

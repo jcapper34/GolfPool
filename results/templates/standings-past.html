@@ -17,7 +17,7 @@ params:
     {% from "modal.macro.html" import blank_modal %}
     {{ blank_modal() }}
 
-    {% import 'standings-macro.html' as smac %}
+    {% import 'standings.macro.html' as smac %}
     <div id="main-columns" class="columns">
         <div class="column is-2">
             {{ smac.standings_menu(tournament.tid, tournament.year) }}

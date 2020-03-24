@@ -18,6 +18,4 @@ if __name__ == '__main__':
     # test_fill_db_rankings(conn=conn)
     # test_fill_db_standings(conn=conn)
     tournament = Tournament(year=2019)
-    tournament.calculate_standings()
-    for ps in tournament.picksets:
-        print(ps)
+    tournament.api_get_live()

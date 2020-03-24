@@ -26,6 +26,7 @@ class Pickset:
         # Tournament
         self.points = points
         self.pos = pos
+        self.tournament_history = None
 
     """ PICK SUBMISSION """
     def submit_picks(self, form_picks, conn=None):
@@ -186,8 +187,20 @@ class Pickset:
         self.email = results[0]['email']
         self.pin = results[0]['pin']
 
+
+    """
+    Parameters: season_year, ps.id
+    Returns: tournament.name, pos, points
+    """
+    GET_TOURNAMENT_HISTORY_QUERY = """SELECT t.name, esx.position AS pos, esx.points FROM event_standings_xref AS esx
+                                                        JOIN tournament AS t
+                                                            ON t.id = esx.tournament_id
+                                                        WHERE esx.season_year = %s AND esx.pickset_id = %s"""
     def fill_tournament_history(self, year, conn=None):
-        pass
+        conn = filter_conn(conn)
+
+        self.tournament_history = conn.exec_fetch(Pickset.GET_TOURNAMENT_HISTORY_QUERY, (year, self.id))
+
 
 
     """ HELPERS """

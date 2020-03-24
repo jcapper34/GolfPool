@@ -18,8 +18,8 @@ Params:
     <div class="hero-foot">
         <div id="picks-tabs" class="tabs is-centered">
             <ul>
-                <li class="is-active"><a onclick="prompt_picks_table()">Picks Table</a></li>
-                <li><a onclick="prompt_most_picked()">Most Picked</a></li>
+                <li class="is-active"><a onclick="prompt_picks_table($(this).parent())">Picks Table</a></li>
+                <li><a onclick="prompt_most_picked($(this).parent())">Most Picked</a></li>
             </ul>
         </div>
     </div>
@@ -28,7 +28,7 @@ Params:
 {% block body %}
     {{ tabs.all_picks_tab(all_picks) }}
 
-
+    <section id="most-picked-section" class="section"></section>    {# Will be ajaxed in #}
 {% endblock %}
 
 {% block add_below %}

@@ -1,5 +1,29 @@
+/* Element Caching */
+let modal = $("#standings-modal");
+let modalCardBody = modal.find(".modal-card-body");
+
+function attach_prompt_modal() {    // Must be re-attached after refresh
+    $(".pickset-row").find('td:not(.td-filter, .td-star)').click(function() {
+        let row = $(this).closest("tr");
+        prompt_pickset_modal(row.data("psid"), row.find(".td-name").text(), row.find(".td-pos").text());
+    });
+}
+
+function close_modal() {
+    modal.removeClass("is-active");
+    $("body").removeClass('modal-open');
+}
+
+// Closes Modal when esc is pressed
+$(document).keyup(function(e) {
+    if(e.keyCode === 27) close_modal();
+});
+
+
+/* Pickset Modal */
 function prompt_pickset_modal(psid, name, pos) {
-    let modal = $("#standings-modal").addClass("is-active modal-open");
+    modal.addClass("is-active modal-open");
+    modalCardBody.html(ripple_html);
 
     /* Set modal header */
     modal.find(".modal-card-title").text(pos + " | " + name);
@@ -8,16 +32,9 @@ function prompt_pickset_modal(psid, name, pos) {
 
     /* Get modal body */
     $.get(window.location.href+"/get-pickset-modal", {psid:psid}, function(response) {
-        modal.find(".modal-card-body").html(response);
+        modalCardBody.html(response);
     }).fail(function() {
         window.alert("Server Error: Could not load info");
-    });
-}
-
-function attach_prompt_modal() {
-    $(".pickset-row").find('td:not(.td-filter, .td-star)').click(function() {
-        let row = $(this).closest("tr");
-        prompt_pickset_modal(row.data("psid"), row.find(".td-name").text(), row.find(".td-pos").text());
     });
 }
 
@@ -68,13 +85,15 @@ function combine_picks_table(table) {
     });
 }
 
-function close_modal() {
-    $("#standings-modal").removeClass("is-active");
-    $("body").removeClass('modal-open');
+function pickset_switch_tabs(li_element) {
+    let tabs = modal.find(".tabs");
+
+    // Highlight Active Tab
+    tabs.find("li").removeClass("is-active");
+    li_element.addClass('is-active');
+
+    $("#current-tournament-section").toggle();
+    $("#tournament-history-section").toggle();
 }
 
-// Closes Modal when esc is pressed
-$(document).keyup(function(e) {
-    if(e.keyCode === 27) close_modal();
-});
-
+/* Player Modal */

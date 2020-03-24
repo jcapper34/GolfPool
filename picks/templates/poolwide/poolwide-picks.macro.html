@@ -29,35 +29,34 @@
 
 
 {% macro most_picked_tab(most_picked_players) %}
-<section id="most-picked-section" class="section hide">
-    <div class="container">
-        <div id="format-checkbox">
-            <label class="checkbox">
-                <input onclick="switch_format($(this))" type="checkbox" autocomplete="off">
-                By Level
-            </label>
-        </div>
-        <table class="table is-hoverable is-fullwidth">
-            <thead>
-                <tr><th>Name</th><th class="has-text-centered">Number Picked</th></tr>
-            </thead>
-            <tbody>
-                {% for player in most_picked_players %}
-                <tr data-pid="{{ player[0] }}" class="most-picked-row" data-level="{{ player[3] }}" data-numpicked="{{ player[2] }}">
-                    <td class="player-name">{{ player[1] }}</td>
-                    <td class="has-text-centered">
-                        <span class="columns is-mobile">
-                            <span class="column is-four-fifths">
-                                <progress class="progress is-link" max="100" data-end="{{ player[2] }}"></progress>
-                            </span>
-                            <span class="column num-picked">
-                            </span>
-                        </span>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="container">
+    <div id="format-checkbox">
+        <label class="checkbox">    {# TODO: Organize by leves #}
+            <input id="organize-most-picked" onclick="organize_most_picked()" type="checkbox" autocomplete="off">
+            By Level
+        </label>
     </div>
-</section>
+    <table class="table is-hoverable is-fullwidth">
+        <thead>
+            <tr><th>Name</th><th class="has-text-centered">Number Picked</th></tr>
+        </thead>
+        <tbody>
+            {% for player in most_picked_players %}
+            <tr data-pid="{{ player.pid }}" class="most-picked-row" data-level="{{ player.level }}" data-numpicked="{{ player.num_picked }}">
+                <td class="player-name">{{ player.name }}</td>
+                <td class="has-text-centered">
+                    <span class="columns is-mobile">
+                        <span class="column is-four-fifths">
+                            <progress class="progress is-link" max="100" data-end="{{ player.num_picked }}"></progress>
+                        </span>
+                        <span class="column num-picked">
+                        </span>
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endmacro %}

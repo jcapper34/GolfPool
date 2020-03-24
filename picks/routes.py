@@ -1,10 +1,10 @@
 from pprint import pprint
-from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for
+from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for, get_template_attribute
 
 from db.conn import Conn
 from helper import CURRENT_YEAR, splash, RUNNING_LOCALLY
 from picksets.pickset import Pickset
-from picksets.picksets_db import get_all_picks, get_login
+from picksets.picksets_db import get_all_picks, get_login, get_most_picked
 from players.players_db import get_levels
 from players.player import Player
 
@@ -143,7 +143,8 @@ def picks_poolwide(year=CURRENT_YEAR):
     return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))
 
 # Most picked macro
-@picks_mod.route("/most-picked")
+@picks_mod.route("/most-picked/<int:year>")
 def picks_most(year=CURRENT_YEAR):
-    # TODO: Ajax make-picks page
-    return ""
+    most_picked_macro = get_template_attribute("poolwide/poolwide-picks.macro.html", "most_picked_tab")
+
+    return most_picked_macro(get_most_picked(year))

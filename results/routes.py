@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, get_template_attribute
+from flask import Blueprint, render_template, request, get_template_attribute, jsonify
 
 from db.conn import Conn
 from helper import func_find, CURRENT_YEAR
@@ -8,16 +8,23 @@ from tournament.tournament import Tournament
 
 results_mod = Blueprint("results", __name__, template_folder='templates', static_folder='static')   # Register blueprint
 
+""" LIVE ROUTES """
 # Root of Results Module
 @results_mod.route("/")
 @results_mod.route("/live")
 def results_live():
-    # TODO: Live Results. Should be fun lol
-    tournament = Tournament(year=CURRENT_YEAR)
-    tournament.calculate_standings()
+    tournament = Tournament()
+    tournament.calculate_live_standings()
+    if request.args.get("refresh") is not None:    # If refresh
+        standings_macro = get_template_attribute("standings.macro.html", "standings_table")
+        leaderboard_macro = get_template_attribute("standings.macro.html", "leaderboard_table")
+        return jsonify([standings_macro(tournament.picksets), leaderboard_macro(tournament.players)])
 
     return render_template('standings-live.html', tournament=tournament)
 
+
+
+""" PAST ROUTES """
 
 # Past Standings
 @results_mod.route("/<int:year>/<tid>")
@@ -52,6 +59,7 @@ def get_pickset_modal(year, tid):
     # Get Pickset
     pickset = Pickset(psid=psid)
     pickset.fill_picks(separate=False, conn=conn)
+    pickset.fill_tournament_history(year, conn=conn)
 
     # Get Tournament results for each picked player
     for player in pickset.picks:

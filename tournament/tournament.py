@@ -1,7 +1,7 @@
 from pprint import pprint
-
+from datetime import datetime
 from db.db_helper import filter_conn
-from helper import func_find, CURRENT_YEAR, get_json
+from helper import func_find, CURRENT_YEAR, get_json, NOW
 from picksets.pickset import Pickset
 from picksets.picksets_db import get_all_picks
 from players.player import Player
@@ -9,9 +9,10 @@ from players.player import Player
 
 class Tournament:
     # Golf Channel URL
-    LEADERBOARD_URL = "https://www.golfchannel.com/api/v2/events/%d/leaderboard" # Parameters: tournament_id
+    LEADERBOARD_URL = "https://www.golfchannel.com/api/v2/events/%d/leaderboard" # Parameters: int[tournament_id]
+    EVENTS_URL = "https://www.golfchannel.com/api/v2/tours/1/events/%d" # Parameters: int[year]
 
-    def __init__(self, tid=None, year=None, tournament_name=None):
+    def __init__(self, tid=None, year=CURRENT_YEAR, tournament_name=None):
         self.tid = tid
         self.year = year
         self.name = tournament_name
@@ -85,18 +86,21 @@ class Tournament:
         return True
 
     """ API FILLS """
-    def api_fill(self, tid='live', year=CURRENT_YEAR):
-        self.tid = tid
-        self.year = year
+    @staticmethod
+    def api_get_live():
+        events = get_json(Tournament.EVENTS_URL % CURRENT_YEAR)
+        current_tournament = func_find(events, lambda e: NOW < datetime.strptime(e['endDate'], "%Y-%m-%dT%H:%M:%S"))    # Finds first event with end date after now
+        return get_json(Tournament.LEADERBOARD_URL % current_tournament['key'])
 
-    ### CALCULATIONS ###
-    def calculate_standings(self, conn=None):
+
+    """ CALCULATIONS """
+    def calculate_live_standings(self, conn=None):
         conn = filter_conn(conn)
         self.picksets = get_all_picks(self.year, conn=conn) # Load DB Picks
 
         point_template = get_json('tournament/data/point-template.json')  # Load Point Template Data
 
-        api_tournament = get_json(Tournament.LEADERBOARD_URL % 17893)['result'] # Get Tournament From API
+        api_tournament = self.api_get_live()['result'] # Get Tournament From API
         leaderboard = api_tournament['golfers']
         self.players = [Player(pid=pl['golferId'],
                                name=pl['firstName'] + " " + pl['lastName'],
@@ -116,6 +120,22 @@ class Tournament:
                     pickset.points += match.points
 
         self.picksets.sort(key=lambda x: x.points, reverse=True)    # Sort Standings
+        self.rank()
+
+    def rank(self): # Give Picksets their positions after calculating standings
+        n = len(self.picksets)
+        pos = 1
+        for i in range(n):
+            points = self.picksets[i].points
+            tie = False
+            if i == 0 and points == self.picksets[i + 1].points:
+                tie = True
+            elif points == self.picksets[i - 1].points:
+                tie = True
+            if not tie:
+                pos = i + 1
+
+            self.picksets[i].pos = pos
 
     """ MERGES """
     def merge_all_picks(self, all_picks):

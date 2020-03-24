@@ -5166,4 +5166,8 @@ main {
   display: none;
 }
 
+label.checkbox {
+  cursor: pointer;
+}
+
 /*# sourceMappingURL=poolwide-picks.css.map */

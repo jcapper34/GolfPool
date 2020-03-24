@@ -28,18 +28,19 @@ def picks_make_alias():
 def picks_change_alias():
     return redirect(url_for('picks.picks_change'))
 
-@app.route("/tournament/live")
+@app.route("/standings/live")
 def results_live_alias():
     return redirect(url_for('results.results_live'))
 
-# TODO: Past Results alias
-
+@app.route("/standings/<int:year>/<tid>")
+def results_past_alias(year, tid):
+    return redirect(url_for('results.results_past', year=year, tid=tid))
 
 """ HELPERS """
 @app.route("/api-retriever", methods=['POST'])
 def api_retriever():
     url = request.form.get("url")
-    if urlparse(url).netloc == 'www.golfchannel.com':
+    if urlparse(url).netloc == 'www.golfchannel.com':   # Ensures that request goes to api
         return jsonify(http_get(url).json())
 
     return jsonify({})

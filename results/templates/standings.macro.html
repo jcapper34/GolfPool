@@ -1,3 +1,4 @@
+{# TODO: Mobile Standings Menu #}
 {% macro standings_menu(current_tid, year) %}
     {% set menu = { "014": "Masters",
                 "033": "PGA Championship",
@@ -20,7 +21,7 @@
         <div id="standings-menu-items">
             <ul class="menu-list">
                 <p class="menu-label">Dynamic Results</p>
-                <li><a class="{% if current_tid == 'live' %}is-active{% endif %}" href="{{ url_for('results.results_live') }}">Live Standings</a></li>
+                <li><a class="{% if current_tid is none %}is-active{% endif %}" href="{{ url_for('results.results_live') }}">Live Standings</a></li>
             </ul>
             <p class="menu-label">Final Results</p>
             <ul class="menu-list">
@@ -33,17 +34,17 @@
 {% endmacro %}
 
 
-{% macro standings_header(tournament_name, year) %}
+{% macro standings_header(tournament_name, year, add_refresh=False) %}
     <div class="level">
         <div class="level-left" style="padding: 10px">
             <div>
                 <h1 class="title" style="margin-bottom: 5px">
                 {{ tournament_name }} - {{ year }}
-                {% if is_live %}
-                <a id="refresh-standings"><span class="icon"><i class="fas fa-sync"></i></span></a>
+                {% if add_refresh %}
+                <a id="refresh-standings" onclick="standings_refresh()"><span class="icon"><i class="fas fa-sync"></i></span></a>
                 {% endif %}
                 </h1>
-                {% if is_live %}<p>Note: Results are approximately 5 min behind realtime</p>{% endif %}
+                {% if add_refresh %}<p>Note: Results are approximately 5 min behind realtime</p>{% endif %}
             </div>
         </div>
         <div class="level-right">
