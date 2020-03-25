@@ -4,7 +4,9 @@
             console.log(message);
         }
         function toggle_mobile_nav() {
-            $("#mobile-nav").fadeToggle().find('section').css("margin-top", $("#top-nav").css("height"));
+            $("#mobile-nav").fadeToggle()
+                .find('section')
+                .css("margin-top", $("#top-nav").css("height"));
             $("html, body").toggleClass("disable-scroll");
         }
         function lazy_load(e) {

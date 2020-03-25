@@ -27,8 +27,6 @@ function prompt_pickset_modal(psid, name, pos) {
 
     /* Set modal header */
     modal.find(".modal-card-title").text(pos + " | " + name);
-    // TODO: Modal Loader
-
 
     /* Get modal body */
     $.get(window.location.href+"/get-pickset-modal", {psid:psid}, function(response) {

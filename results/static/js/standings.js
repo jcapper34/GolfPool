@@ -1,10 +1,15 @@
+/* ELEMENT CACHING */
+let tournamentSearchInput = $("#tournament-search");
+let leaderboardTableColumn = $("#leaderboard-table-column");
+let standingsTableColumn = $("#standings-table-column");
+
 /* HTML Inserts */
 const ripple_html = "<div class='lds-ripple'><div></div><div></div></div>";
 
 /* Standings Header */
-// TOD): Standings Search
-function standings_search() {
-    const val = $("#tournament-search").val().toLowerCase();
+
+function tournament_search() {
+    const val = tournamentSearchInput.val().toLowerCase().trim();
     const size = val.length;
     $(".td-name").each(function(){
         const name = $(this).text().toLowerCase();
@@ -16,7 +21,6 @@ function standings_search() {
         }
     });
 }
-$("#tournament-search").keyup(standings_search);
 
 /* Standings Tables */
 function attach_filter_checkbox() {    // Must be re-attached after refresh
@@ -78,17 +82,8 @@ function attach_filter_checkbox() {    // Must be re-attached after refresh
 
 // TODO: Mobile Switch Table
 function switch_table(e) {
-    let label = e.parent().find("label");
-    if(!e.prop('checked')) {
-        label.text("Leaderboard");
-        $("#leaderboard-table-column").show();
-        $("#tournament-table-column").hide();
-    }
-    else {
-        label.text("Standings");
-        $("#leaderboard-table-column").hide();
-        $("#tournament-table-column").show();
-    }
+    leaderboardTableColumn.toggle();
+    standingsTableColumn.toggle();
 
 }
 // TODO: Mobile Toggle Slider
@@ -115,8 +110,8 @@ function standings_refresh() {
     });
 
     // Retrieve Standings
-    let standings_table = $("#standings-table-column").html(ripple_html);
-    let leaderboard_table = $("#leaderboard-table-column").html(ripple_html);
+    let standings_table = standingsTableColumn.html(ripple_html);
+    let leaderboard_table = leaderboardTableColumn.html(ripple_html);
 
     // Get new standings from Server
     $.get(window.location.pathname,{refresh: true},function(r) {
@@ -167,8 +162,9 @@ function standings_cookie() {
 
 /* On startup */
 $(document).ready(function() {
-    $(".filter-checkbox").prop("checked", false);
-    // standings_search();
+    $(".filter-checkbox").prop("checked", false);   //Uncheck all player filters
+
+    tournament_search();
     // standings_cookie();
     attach_prompt_modal();
     attach_filter_checkbox();

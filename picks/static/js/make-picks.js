@@ -346,6 +346,13 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
     return api_list.concat(newPlayers);
 }
 
+
+function get_previous_golf_rankings() {
+    $.get('/picks/player-history', function(response) {
+        out(response);
+    });
+}
+
 $(document).ready(function() {
     // Do effects for starting state
     $(".main-level-box").each(function() {
@@ -356,4 +363,5 @@ $(document).ready(function() {
     // Retrieve API Data
     set_OWGR();
     get_api_players();
+    get_previous_golf_rankings();
 });

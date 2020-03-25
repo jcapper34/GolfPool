@@ -7,6 +7,7 @@ from picksets.pickset import Pickset
 from picksets.picksets_db import get_all_picks, get_login, get_most_picked
 from players.players_db import get_levels
 from players.player import Player
+from tournament.tournament import Tournament
 
 picks_mod = Blueprint("picks", __name__, template_folder='templates', static_folder='static')   # Register Blueprint
 
@@ -24,6 +25,12 @@ def picks_index():
 @picks_mod.route("/make")
 def picks_make():
     return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % 19, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
+
+@picks_mod.route("/player-history")
+def picks_get_player_history():
+    tournament = Tournament()
+    tournament.fill_db_rankings(2019, 'cumulative')
+    return jsonify([(pl.id, pl.pos) for pl in tournament.players])
 
 # Make Picks Submission
 @picks_mod.route("/submit", methods=['POST'])
@@ -146,5 +153,4 @@ def picks_poolwide(year=CURRENT_YEAR):
 @picks_mod.route("/most-picked/<int:year>")
 def picks_most(year=CURRENT_YEAR):
     most_picked_macro = get_template_attribute("poolwide/poolwide-picks.macro.html", "most_picked_tab")
-
     return most_picked_macro(get_most_picked(year))
