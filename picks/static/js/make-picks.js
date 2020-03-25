@@ -347,9 +347,20 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
 }
 
 
-function get_previous_golf_rankings() {
-    $.get('/picks/player-history', function(response) {
-        out(response);
+function set_season_history() {
+    $.get('/picks/season-history', function(response) {
+        $(".player-column").each(function() {
+            const pid = $(this).data('pid');
+            let season_history = {};
+            for(const i in response) {
+                const year_history = response[i];
+                if(year_history[1].hasOwnProperty(pid))
+                    season_history[year_history[0]] = year_history[1][pid];
+                else
+                    season_history[year_history[0]] = null;
+            }
+            $(this).data('season_history', JSON.stringify(season_history));
+        });
     });
 }
 
@@ -363,5 +374,5 @@ $(document).ready(function() {
     // Retrieve API Data
     set_OWGR();
     get_api_players();
-    get_previous_golf_rankings();
+    set_season_history();
 });

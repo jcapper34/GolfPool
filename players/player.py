@@ -1,7 +1,8 @@
 from db.conn import Conn
 from db.db_helper import filter_conn
-from helper import func_find
+from helper import func_find, CURRENT_YEAR
 from picksets import pickset
+
 
 class Player:
     # From PGA Tour Website
@@ -31,12 +32,14 @@ class Player:
         self.tournament_data = None
         self.current_tournament_data = None
 
+        self.season_history = None
+
         # Picks
         self.picked_by = None
         self.num_picked = kwargs.get("num_picked")
 
         # Photo
-        self.photo_url = Player.PGA_PHOTO_URL % self.tour_id if self.tour_id is not None else None
+        self.photo_url = Player.PGA_PHOTO_URL % self.tour_id if kwargs.get('photo_url') is None else kwargs.get('photo_url')
 
 
     # Parameters: pid, year

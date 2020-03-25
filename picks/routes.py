@@ -26,11 +26,16 @@ def picks_index():
 def picks_make():
     return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % 19, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
 
-@picks_mod.route("/player-history")
-def picks_get_player_history():
+@picks_mod.route("/season-history")
+def picks_get_season_history():
     tournament = Tournament()
-    tournament.fill_db_rankings(2019, 'cumulative')
-    return jsonify([(pl.id, pl.pos) for pl in tournament.players])
+    conn = Conn()
+    season_history = []
+    for year in range(2016, CURRENT_YEAR):
+        tournament.fill_db_rankings(year, 'cumulative', conn=conn)
+        season_history.append((year, {pl.id:pl.pos for pl in tournament.players}))
+
+    return jsonify(season_history)
 
 # Make Picks Submission
 @picks_mod.route("/submit", methods=['POST'])

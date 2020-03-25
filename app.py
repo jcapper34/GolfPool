@@ -5,6 +5,7 @@ from requests import get as http_get
 import picks
 import results
 from db.db_config import USE_LOCAL
+from test import test_graph
 
 app = Flask(__name__)   # Creates app
 
@@ -37,6 +38,13 @@ def results_live_alias():
 @app.route("/standings/<int:year>/<tid>")
 def results_past_alias(year, tid):
     return redirect(url_for('results.results_past', year=year, tid=tid))
+
+
+@app.route('/test')
+def test_page():
+    test_graph()
+    return ""
+
 
 """ HELPERS """
 @app.route("/api-retriever", methods=['POST'])

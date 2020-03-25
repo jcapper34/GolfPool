@@ -15,8 +15,8 @@
 {% macro pickset_modal(pickset) %}
     <div class="tabs is-centered">
         <ul>
-            <li onclick="pickset_switch_tabs($(this))" class="is-active"><a>Current Tournament</a></li>
-            <li onclick="pickset_switch_tabs($(this))"><a>Tournament History</a></li>
+            <li data-index="0" onclick="pickset_switch_tabs($(this))" class="is-active"><a>Current Tournament</a></li>
+            <li data-index="1" onclick="pickset_switch_tabs($(this))"><a>Tournament History</a></li>
         </ul>
     </div>
     {# CURRENT TOURNAMENT SECTION #}
@@ -53,6 +53,9 @@
                 <td class="has-text-centered">{{ result.points }}</td>
             </tr>
             {% endfor %}
+            {% if not pickset.tournament_history %}
+            <tr><td colspan="3">No history to show</td></tr>
+            {% endif %}
         </table>
     </section>
 {% endmacro %}

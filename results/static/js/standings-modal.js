@@ -95,8 +95,7 @@ function pickset_switch_tabs(li_element) {
     tabs.find("li").removeClass("is-active");
     li_element.addClass('is-active');
 
-    out(li_element.parent().index(li_element));
-    if(li_element.parent().find('li').index(li_element) === 0) {    // A complex way to figure out which tab to open
+    if(li_element.data('index') === 0) {    // figure out which tab to open
         $("#current-tournament-section").show();
         $("#tournament-history-section").hide();
     }
