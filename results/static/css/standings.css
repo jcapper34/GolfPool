@@ -6781,12 +6781,4 @@ body.modal-open {
   text-align: center;
 }
 
-.collapse-header {
-  cursor: pointer;
-}
-
-.collapse-header.collapsed + .collapse-wrapper {
-  display: none;
-}
-
 /*# sourceMappingURL=standings.css.map */

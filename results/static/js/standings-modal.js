@@ -7,6 +7,10 @@ function attach_prompt_modal() {    // Must be re-attached after refresh
         let row = $(this).closest("tr");
         prompt_pickset_modal(row.data("psid"), row.find(".td-name").text(), row.find(".td-pos").text());
     });
+    $(".player-row").click(function() {
+        let row = $(this);
+        prompt_player_modal(row.data('pid'), row.find('.td-name').text(), row.find('.td-pos').text());
+    });
 }
 
 function close_modal() {
@@ -22,6 +26,7 @@ $(document).keyup(function(e) {
 
 /* Pickset Modal */
 function prompt_pickset_modal(psid, name, pos) {
+    /* Open Modal */
     modal.addClass("is-active modal-open");
     modalCardBody.html(ripple_html);
 
@@ -37,15 +42,15 @@ function prompt_pickset_modal(psid, name, pos) {
 }
 
 function organize_table(isChecked) {
-    let table = $('#current-tournament-section').find('.table');
+    let tbody = $('#current-tournament-section').find('.table').find('tbody');
     if(isChecked)
-        separate_picks_table(table);
+        separate_picks_table(tbody);
     else
-        combine_picks_table(table);
+        combine_picks_table(tbody);
 }
 
-function separate_picks_table(table) {
-    let rows = table.find(".pick-row").detach();
+function separate_picks_table(tbody) {
+    let rows = tbody.find(".pick-row").detach();
     let categories = {
         'Scoring Points': [],
         'Level 1': [],
@@ -65,20 +70,20 @@ function separate_picks_table(table) {
 
     /* Add to DOM */
     for(const title in categories) {
-        table.append("<tr><th class='has-text-centered' colspan='4'>" + title + "</th></tr>");
-        table.append(categories[title]);
+        tbody.append("<tr><th class='has-text-centered' colspan='4'>" + title + "</th></tr>");
+        tbody.append(categories[title]);
     }
 }
 
-function combine_picks_table(table) {
+function combine_picks_table(tbody) {
     let rows = $('.pick-row').detach();
-    table.empty();
+    tbody.empty();
     let added = [];
     rows.each(function() {
         const row = $(this);
         const pid = row.data('pid');
         if(!added.includes(pid))
-            table.append(row);
+            tbody.append(row);
         added.push(pid);
     });
 }
@@ -90,8 +95,30 @@ function pickset_switch_tabs(li_element) {
     tabs.find("li").removeClass("is-active");
     li_element.addClass('is-active');
 
-    $("#current-tournament-section").toggle();
-    $("#tournament-history-section").toggle();
+    out(li_element.parent().index(li_element));
+    if(li_element.parent().find('li').index(li_element) === 0) {    // A complex way to figure out which tab to open
+        $("#current-tournament-section").show();
+        $("#tournament-history-section").hide();
+    }
+    else {
+        $("#tournament-history-section").show();
+        $("#current-tournament-section").hide();
+    }
 }
 
 /* Player Modal */
+function prompt_player_modal(pid, name, pos) {
+    /* Open Modal */
+    modal.addClass("is-active modal-open");
+    modalCardBody.html(ripple_html);
+
+    /* Set modal header */
+    modal.find(".modal-card-title").text(pos + " | " + name);
+
+    /* Get modal body */
+    $.get(window.location.href+"/get-player-modal", {pid:pid}, function(response) {
+        modalCardBody.html(response);
+    }).fail(function() {
+        window.alert("Server Error: Could not load info");
+    });
+}

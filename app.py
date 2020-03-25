@@ -1,7 +1,9 @@
-from flask import Flask, render_template, redirect, url_for, request, jsonify
-import picks, results
 from urllib.parse import urlparse
+from flask import Flask, render_template, redirect, url_for, request, jsonify
 from requests import get as http_get
+
+import picks
+import results
 from db.db_config import USE_LOCAL
 
 app = Flask(__name__)   # Creates app
@@ -63,4 +65,4 @@ def is_local():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run()   # Run

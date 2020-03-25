@@ -14,12 +14,16 @@ def splash(obj):
 
     pprint(obj)
 
-def func_find(obj, func, limit=1):
+def func_find(obj, func, limit=1, get_index=False):
     found = []
     num_found = 0
-    for thing in obj:
+    for i in range(len(obj)):
+        thing = obj[i]
         if func(thing):
-            found.append(thing)
+            if get_index:
+                found.append(i)
+            else:
+                found.append(thing)
             num_found += 1
             if num_found == limit:
                 break

@@ -4,6 +4,7 @@ from db.conn import Conn
 from helper import func_find, CURRENT_YEAR
 from picksets.pickset import Pickset
 from picksets.picksets_db import get_all_picks
+from players.player import Player
 from tournament.tournament import Tournament
 
 results_mod = Blueprint("results", __name__, template_folder='templates', static_folder='static')   # Register blueprint
@@ -45,7 +46,7 @@ def results_past(year, tid):
     return render_template('standings-past.html', tournament=tournament)
 
 
-# Past Standings
+# Past Standings Pickset Modal
 @results_mod.route("/<int:year>/<tid>/get-pickset-modal")
 def get_pickset_modal(year, tid):
     psid = request.args.get("psid")
@@ -74,3 +75,19 @@ def get_pickset_modal(year, tid):
 
     pickset_modal = get_template_attribute("modal.macro.html", "pickset_modal")
     return pickset_modal(pickset)
+
+@results_mod.route("/<int:year>/<tid>/get-player-modal")
+def get_player_modal(year, tid):
+    pid = request.args.get("pid")
+
+    conn = Conn()
+
+    player = Player(pid=pid)
+    player.fill_tournament_data(tid=tid, year=year, conn=conn)
+
+    player.photo_url = player.PGA_PHOTO_URL % player.tournament_data[0]['tour_id']  # Set photo by using tour_id of one row
+
+    player.fill_who_picked(year, conn=conn)
+
+    player_modal = get_template_attribute("modal.macro.html", "player_modal")
+    return player_modal(player)

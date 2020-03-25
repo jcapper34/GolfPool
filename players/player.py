@@ -1,5 +1,6 @@
 from db.conn import Conn
 from db.db_helper import filter_conn
+from helper import func_find
 from picksets import pickset
 
 class Player:
@@ -27,6 +28,9 @@ class Player:
         self.thru = kwargs.get("thru")
         self.holes = kwargs.get("holes")
 
+        self.tournament_data = None
+        self.current_tournament_data = None
+
         # Picks
         self.picked_by = None
         self.num_picked = kwargs.get("num_picked")
@@ -44,26 +48,27 @@ class Player:
                         ORDER BY name"""
 
     def fill_who_picked(self, year, conn=None):
-        """
-        :param year:
-        :param conn:
-        :return:
-        """
-
         conn = filter_conn(conn)
 
         results = conn.exec_fetch(self.GET_WHO_PICKED_QUERY, (self.id, year))
 
         self.picked_by = [pickset.Pickset(psid=row['psid'], name=row['name']) for row in results]
 
+        self.num_picked = len(self.picked_by)
 
-    def fill_tournament_data(self, tid, year):
-        pass
+    # Parameters: pid, year
+    # Returns: pos, score, points, tid, thru
+    GET_TOURNAMENT_DATA_QUERY = """
+    SELECT position AS pos, score AS total, points, tournament_id AS tid, 18 AS thru, player_tour_id AS tour_id FROM event_leaderboard_xref 
+        WHERE player_id = %s AND season_year=%s
+    """
+    def fill_tournament_data(self, tid, year, conn=None):
+        conn = filter_conn(conn)
 
-    def fill_tournament_history(self, year, conn=None):
-        pass
+        self.tournament_data = conn.exec_fetch(Player.GET_TOURNAMENT_DATA_QUERY, (self.id, year))
+        self.tournament_data = list(self.tournament_data)
 
-
+        self.current_tournament_data = func_find(self.tournament_data, lambda t: t['tid'] == tid)
 
     """ Overrides """
     def __str__(self):

@@ -11,6 +11,7 @@
 </div>
 {% endmacro %}
 
+
 {% macro pickset_modal(pickset) %}
     <div class="tabs is-centered">
         <ul>
@@ -53,5 +54,60 @@
             </tr>
             {% endfor %}
         </table>
+    </section>
+{% endmacro %}
+
+
+{% macro player_modal(player) %}
+    <div class="media">
+        <figure class="image media-left is-128x128">   {# Todo: Lazy load #}
+            <img src="{{ player.photo_url }}">
+        </figure>
+        <div class="media-content">
+            <table class="table is-fullwidth is-striped stats-table">
+                <tr class="hide"></tr>
+                <tr><th>Position</th><th>Score</th></tr>
+                <tr>
+                    <td>{% if player.current_tournament_data.pos is none %}-{% else %}{{ player.current_tournament_data.pos }}{% endif %}</td>
+                    <td>
+                         {# Show Total #}
+                        {% if player.current_tournament_data.total < 0 %}{{ player.current_tournament_data.total }}
+                        {% elif player.current_tournament_data.total > 0 %}+{{ player.current_tournament_data.total }}
+                        {% else %}E{% endif %}
+                    </td>
+                </tr>
+                <tr><th>Thru</th><th>Points</th></tr>
+                <tr>
+                    <td>
+                         {# Show Thru #}
+                        {% if player.current_tournament_data.thru is none %}-
+                        {% elif player.current_tournament_data.thru == 18 %}F
+                        {% else %}{{ player.current_tournament_data.thru }}
+                        {% endif %}
+                    </td>
+                    <td>{% if player.current_tournament_data.points is none %}0{% else %}{{ player.current_tournament_data.points }}{% endif %}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <hr>
+    <section class="who-picked-section">
+        {% if player.num_picked == 0 %}
+            <h2 class="title is-5">Player was not picked</h2>
+        {% else %}
+
+        {% from "helper.macro.html" import collapse_header %}
+        <div class="collapse-wrapper">
+            {{ collapse_header("Picked by " + player.num_picked|string + " Person(s)", collapsed=player.num_picked > 5, text_size=5) }}
+            <div class="collapse-body">
+                <table id="picked-by-table" class="table is-fullwidth">
+                    {% for ps in player.picked_by %}
+                    <tr><td>{{ ps.name }}</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        <hr>
     </section>
 {% endmacro %}

@@ -86,14 +86,6 @@ function switch_table(e) {
     standingsTableColumn.toggle();
 
 }
-// TODO: Mobile Toggle Slider
-function toggle_slider(e) {
-    let icon = e.find(".icon i");
-    e.next().closest(".collapse-wrapper").stop().slideToggle(function() {
-        icon.toggleClass("fa-angle-down");
-        icon.toggleClass("fa-angle-up");
-    });
-}
 
 
 /* Live Standings */

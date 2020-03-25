@@ -1,0 +1,35 @@
+{% macro collapse_header(text, text_size=4, collapsed=False) %}
+    <div class="collapse-header level is-mobile {% if collapsed %}collapsed{% endif %}" onclick="toggle_slider($(this))">
+        <div class="level-left">
+            <h3 class="title is-{{ text_size }}">{{ text }}</h3>
+        </div>
+        <div class="level-right">
+            <span class="icon">
+                {% if collapse %}
+                <i class="fas fa-angle-down is-size-{{ text_size }}"></i>
+                {% else %}
+                <i class="fas fa-angle-up is-size-{{ text_size }}"></i>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    <script>
+    function toggle_slider(e) {
+        let icon = e.find(".icon").find("i");
+        let collapseBody = e.closest('.collapse-wrapper').find(".collapse-body");
+        collapseBody.stop().slideToggle(function() {
+            icon.toggleClass("fa-angle-down");
+            icon.toggleClass("fa-angle-up");
+        });
+    }
+    </script>
+    <style>
+    .collapse-header{
+        cursor: pointer;
+    }
+
+    .collapse-header.collapsed + .collapse-body {
+        display: none;
+    }
+    </style>
+{% endmacro %}
