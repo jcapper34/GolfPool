@@ -61,10 +61,11 @@ function submit_change_picks(form) {
 }
 
 function revert_picks() {
+    out(initialMainLevels);
     /* Revert main levels */
     $(".player-checkbox").each(function() {
         let checkbox = $(this);
-        const pid = checkbox.val().split("*")[1];
+        const pid = parseInt(checkbox.val().split("*")[1]);
         checkbox.prop('checked', initialMainLevels.includes(pid));  //Will check if included in picks
 
         // Manually need to call effects
@@ -72,5 +73,6 @@ function revert_picks() {
     });
 }
 
-
-revert_picks(); // Ensures form starts with current picks
+$(document).ready(function() {
+    revert_picks(); // Ensures form starts with current picks
+});

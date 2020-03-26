@@ -31,7 +31,7 @@ params: level_players, pickset, year, OWGR_RANKINGS
             {# Levels 1-3 Section #}
             {% set num_picks = [3,3,2] %}
             {% for n in num_picks %}
-                {{ mp_macs.main_level_field(loop.index, n, level_players[loop.index0], picks=pickset.picks[loop.index0]) }}
+                {{ mp_macs.main_level_field(loop.index, n, level_players[loop.index0]) }}
             {% endfor %}
 
             {# Levels 4 Section #}
@@ -62,7 +62,7 @@ const OWGR_URL = '{{ OWGR_URL }}';
 
 {# Initial Picks #}
 const initialMainLevels = {{ (pickset.picks[0]|map(attribute='id')|list + pickset.picks[1]|map(attribute='id')|list + pickset.picks[2]|map(attribute='id')|list)|tojson }};
-
+const API_PLAYERS_URL = "{{ API_PLAYERS_URL }}";
 {#const initialLevel4 = {{ pickset.picks[0]|map(attribute='id')|tojson }};#}
 </script>
 <script src="/picks/static/js/make-picks.js"></script>

@@ -93,7 +93,8 @@ def picks_change():
                            level_players=get_levels(CURRENT_YEAR, conn=conn),
                            pickset=pickset,
                            year=CURRENT_YEAR,
-                           OWGR_URL=Player.STATS_URL % 19
+                           OWGR_URL=Player.STATS_URL % 19,
+                            API_PLAYERS_URL=Player.GOLFERS_URL
                            )
 
 # Change Picks Login

@@ -39,7 +39,7 @@
     </div>
 {% endmacro %}
 
-{% macro main_level_field(level, picks_allowed, players, picks=()) %}
+{% macro main_level_field(level, picks_allowed, players) %}
     <div class="box pick-box main-level-box" data-allowed="{{ picks_allowed }}" data-level="{{ level }}">
 
         {# Pickbox Header #}
@@ -52,13 +52,12 @@
         </div>
         <p class="section-description">Pick {{ picks_allowed }} players from the list below by clicking on their name. Check the checkbox on the right to see photos and rankings.</p>
         <hr>
-
         {# Pickbox body #}
         <div class="columns is-multiline">
             {% for player in players|sort(attribute="name") %}
                 <div class="column is-half player-column" data-pid="{{ player.id }}">
                     <label>
-                        <input class="player-checkbox" type="checkbox" value="{{ player.name }}*{{ player.id }}" name="level-{{ player.level }}"  {% if player in picks %}checked{% endif %}> {# Check if it was picked #}
+                        <input class="player-checkbox" type="checkbox" value="{{ player.name }}*{{ player.id }}" name="level-{{ player.level }}"> {# Check if it was picked #}
                         <span class="button">{{ player.name }}</span>
                     </label>
                     <div class="box player-details">
