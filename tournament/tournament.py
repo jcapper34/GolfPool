@@ -135,7 +135,7 @@ class Tournament:
         for i in range(n):
             points = self.picksets[i].points
             tie = False
-            if i == 0 and points == self.picksets[i + 1].points:
+            if i == 0 and n > 1 and points == self.picksets[i + 1].points:
                 tie = True
             elif points == self.picksets[i - 1].points:
                 tie = True
