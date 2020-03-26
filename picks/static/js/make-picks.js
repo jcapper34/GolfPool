@@ -360,6 +360,7 @@ function set_season_history() {
                     season_history[year_history[0]] = null;
             }
             $(this).data('season_history', JSON.stringify(season_history));
+            $(this).find(".pos-2019").text(season_history[2019]);
         });
     });
 }
