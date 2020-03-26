@@ -3,7 +3,7 @@ from os import environ
 from helper import RUNNING_LOCALLY
 
 USE_LOCAL = RUNNING_LOCALLY    # Will be true if running locally
-# USE_LOCAL = False   # Uncomment if you want to use the remote DB locally
+USE_LOCAL = False   # Uncomment if you want to use the remote DB locally
 
 LOCAL_DB_CREDENTIALS = {
             "dbname": 'postgres',

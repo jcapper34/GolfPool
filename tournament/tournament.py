@@ -12,10 +12,11 @@ class Tournament:
     LEADERBOARD_URL = "https://www.golfchannel.com/api/v2/events/%d/leaderboard" # Parameters: int[tournament_id]
     EVENTS_URL = "https://www.golfchannel.com/api/v2/tours/1/events/%d" # Parameters: int[year]
 
-    def __init__(self, tid=None, year=CURRENT_YEAR, tournament_name=None):
+    def __init__(self, tid=None, year=CURRENT_YEAR, tournament_name=None, channel_tid=None):
         self.tid = tid
         self.year = year
         self.name = tournament_name
+        self.channel_tid = channel_tid
 
         self.players = []
         self.picksets = []
@@ -93,14 +94,15 @@ class Tournament:
         return get_json(Tournament.LEADERBOARD_URL % current_tournament['key'])
 
 
-    """ CALCULATIONS """
-    def calculate_live_standings(self, conn=None):
-        conn = filter_conn(conn)
-        self.picksets = get_all_picks(self.year, conn=conn) # Load DB Picks
+    def fill_api_leaderboard(self, live=True, channel_tid=None):
+        channel_tid = channel_tid if channel_tid is not None else self.channel_tid
+        if live:
+            api_tournament = self.api_get_live()['result'] # Get Tournament From API
+        else:
+            api_tournament = get_json(Tournament.LEADERBOARD_URL % channel_tid)['result'] # Get Tournament From API
 
         point_template = get_json('tournament/data/point-template.json')  # Load Point Template Data
 
-        api_tournament = self.api_get_live()['result'] # Get Tournament From API
         leaderboard = api_tournament['golfers']
         self.players = [Player(pid=pl['golferId'],
                                name=pl['firstName'] + " " + pl['lastName'],
@@ -110,6 +112,11 @@ class Tournament:
                                ) for pl in leaderboard] # Create Player objects of leaderboard
 
         self.name = api_tournament.get("eventName")
+
+    """ CALCULATIONS """
+    def calculate_api_standings(self, conn=None):
+        conn = filter_conn(conn)
+        self.picksets = get_all_picks(self.year, conn=conn) # Load DB Picks
 
         for pickset in self.picksets:
             if pickset.points is None:

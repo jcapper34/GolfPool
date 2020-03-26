@@ -15,7 +15,8 @@ results_mod = Blueprint("results", __name__, template_folder='templates', static
 @results_mod.route("/live")
 def results_live():
     tournament = Tournament()
-    tournament.calculate_live_standings()
+    tournament.fill_api_leaderboard()
+    tournament.calculate_api_standings()
     if request.args.get("refresh") is not None:    # If refresh
         standings_macro = get_template_attribute("standings.macro.html", "standings_table")
         leaderboard_macro = get_template_attribute("standings.macro.html", "leaderboard_table")

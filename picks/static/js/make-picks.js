@@ -349,18 +349,24 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
 
 function set_season_history() {
     $.get('/picks/season-history', function(response) {
+        $(".pool-ranking-column").attr("rowspan", response.length); //Set height of table
+
         $(".player-column").each(function() {
             const pid = $(this).data('pid');
-            let season_history = {};
-            for(const i in response) {
+            let posColumn = $(this).find('.pos-history');
+            for(let i = 0; i < response.length; i++) {  // Get ranking from each year
                 const year_history = response[i];
+                const year = year_history[0];
+                let pos = null;
                 if(year_history[1].hasOwnProperty(pid))
-                    season_history[year_history[0]] = year_history[1][pid];
+                    pos = year_history[1][pid];
+
+                if(i === 0)
+                    posColumn.text([year, pos].join(": "));
                 else
-                    season_history[year_history[0]] = null;
+                    posColumn.closest('table').append("<tr><td>" + [year, pos].join(": ") + "</td></tr>")
             }
-            $(this).data('season_history', JSON.stringify(season_history));
-            $(this).find(".pos-2019").text(season_history[2019]);
+
         });
     });
 }
