@@ -37,8 +37,12 @@ class Tournament:
       GROUP BY pid, pl.name)
       SELECT * FROM leaderboard WHERE points > 0
                           """
-    def fill_db_rankings(self, year, tid, conn=None):
+    def fill_db_rankings(self, year=None, tid=None, conn=None):
         conn = filter_conn(conn)
+
+        # Redefine variables
+        if year is None: year = self.year
+        if tid is None: tid = self.tid
         if tid == 'cumulative': tid = None
 
         raw_players = conn.exec_fetch(Tournament.GET_DB_RANKINGS_QUERY, (year, tid))
@@ -74,8 +78,12 @@ class Tournament:
               GROUP BY ps.id, name
               ORDER BY SUM(esx.points) DESC
     """
-    def fill_db_standings(self, year, tid, conn=None):
+    def fill_db_standings(self, year=None, tid=None, conn=None):
         conn = filter_conn(conn)
+
+        # Redefine variables
+        if year is None: year = self.year
+        if tid is None: tid = self.tid
         if tid == 'cumulative': tid = None
 
         results = conn.exec_fetch(Tournament.GET_DB_STANDINGS_QUERY, (year, tid))

@@ -1,4 +1,10 @@
 /*
+ELEMENT CACHING
+*/
+let generalInputs = $(".general-input");
+let playerCheckboxes = $(".player-checkbox");
+
+/*
 ENTIRE FORM
  */
 
@@ -25,7 +31,6 @@ function check_entire_form(checkGeneral) {
 
     if(checkGeneral) {
         // Checking general fields
-        const generalInputs = $(".general-input");
         for (let i = 0; i < generalInputs.length; i++) {
             const success = general_field_checker(generalInputs.eq(i));
             if (success === undefined || !success)
@@ -118,7 +123,7 @@ function clear_general_flags(elementSelector) {
 MAIN LEVEL FIELDS
  */
 
-$(".player-checkbox").change(function() {
+playerCheckboxes.change(function() {
     select_player($(this));
 });
 

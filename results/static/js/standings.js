@@ -1,19 +1,23 @@
-/* ELEMENT CACHING */
+/*
+ELEMENT CACHING
+*/
 let tournamentSearchInput = $("#tournament-search");
+let refreshButton = $("#refresh-standings").find("i");
+
+let standingsTables = $("#standings-tables");
 let leaderboardTableColumn = $("#leaderboard-table-column");
 let standingsTableColumn = $("#standings-table-column");
+let standingsLoaderBox = $("#standings-loader-box");
 
-/* HTML Inserts */
+/*
+HTML Inserts
+*/
 const ripple_html = "<div class='lds-ripple'><div></div><div></div></div>";
 
 
-/* Mobile Menu */
-function toggle_mobile_menu() {
-
-}
-
-
-/* Standings Header */
+/*
+Standings Header
+*/
 function tournament_search() {
     const val = tournamentSearchInput.val().toLowerCase().trim();
     const size = val.length;
@@ -28,7 +32,9 @@ function tournament_search() {
     });
 }
 
-/* Standings Tables */
+/*
+Standings Tables
+*/
 function attach_filter_checkbox() {    // Must be re-attached after refresh
     const filter_checkbox = function(e, picks) {
         if (e.prop("checked") === true) {
@@ -93,36 +99,38 @@ function switch_table(e) {
 }
 
 
-/* Live Standings */
+/*
+Live Standings
+*/
 function standings_refresh() {
+    standingsLoaderBox.show();  // Show loader
+    standingsTables.hide();
+
     // Spin link
-    let button = $("#refresh-standings").find("i");
     $({deg: 0}).animate({deg: 360}, {
         duration: 1000,
         step: function(now) {
-            button.css({
+            refreshButton.css({
                 transform: 'rotate(' + now + 'deg)'
             });
         }
     });
 
-    // Retrieve Standings
-    let standings_table = standingsTableColumn.html(ripple_html);
-    let leaderboard_table = leaderboardTableColumn.html(ripple_html);
-
     // Get new standings from Server
     $.get(window.location.pathname,{refresh: true},function(r) {
-        standings_table.html(r[0]);   // Put standings table
-        leaderboard_table.html(r[1]);   // Put leaderboard table
+        standingsTableColumn.html(r[0]);   // Put standings table
+        leaderboardTableColumn.html(r[1]);   // Put leaderboard table
 
         // standings_cookie();
         attach_prompt_modal();
         attach_filter_checkbox();
-        // switch_table($("#table-switch"));
     }).fail(function(e) {
             console.log(e);
             window.alert("Unable to refresh. Please try again later");
-        });
+    }).always(function() {
+       standingsTables.show();
+       standingsLoaderBox.hide();
+    });
 }
 
 // TODO: Live Standings Cookies
@@ -157,7 +165,9 @@ function standings_cookie() {
 }
 
 
-/* On startup */
+/*
+On startup
+*/
 $(document).ready(function() {
     $(".filter-checkbox").prop("checked", false);   //Uncheck all player filters
 
