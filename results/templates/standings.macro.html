@@ -1,5 +1,5 @@
 {# TODO: Mobile Standings Menu #}
-{% macro standings_menu(current_tid, year) %}
+{% macro standings_menu(current_tid, current_year, years) %}    {# current_tid and current_year are used for highlighting #}
     {% set menu = { "014": "Masters",
                 "033": "PGA Championship",
                 "026": "US Open",
@@ -24,11 +24,18 @@
                 <li><a class="{% if current_tid is none %}is-active{% endif %}" href="{{ url_for('results.results_live') }}">Live Standings</a></li>
             </ul>
             <p class="menu-label">Final Results</p>
-            <ul class="menu-list">
-                {% for tid in menu %}
-                    <li><a class="{% if tid == current_tid %}is-active{% endif %}" href="{{ url_for('results.results_past', tid=tid, year=year) }}">{{ menu[tid] }}</a></li>
-                {% endfor %}
-            </ul>
+                <ul class="menu-list">
+                    <li>
+                    {% for year in years %}
+                    <a style="cursor:default">{{ year }}</a>
+                    <ul class="collapse-">
+                       {% for tid in menu %}
+                        <li><a class="{% if tid==current_tid and year==current_year %}is-active{% endif %}" href="{{ url_for('results.results_past', tid=tid, year=year) }}">{{ menu[tid] }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    {% endfor %}
+                    </li>
+                </ul>
         </div>
     </div>
 {% endmacro %}

@@ -6627,10 +6627,40 @@ body.has-spaced-navbar-fixed-bottom {
   font-size: 1.5rem;
 }
 
+/* Standings Menu */
+#standings-menu {
+  margin: 10px 10px 0 10px;
+  padding: 5px 5px 0 5px;
+  top: 10px;
+}
+
+#standings-menu-header {
+  margin-bottom: 5px;
+}
+
 #standings-menu:hover .collapse-arrow {
   display: block;
 }
 
+@media only screen and (min-width: 769px) {
+  #standings-menu {
+    padding: 20px;
+    position: sticky;
+    position: -webkit-sticky;
+    height: 400px;
+    overflow: scroll;
+    border-right: 1px solid lightgray;
+  }
+
+  #standings-menu-items {
+    display: initial !important;
+  }
+
+  #standings-menu-header {
+    display: none;
+  }
+}
+/* Tables */
 .shrink {
   width: 0 !important;
   height: 0 !important;
@@ -6649,35 +6679,13 @@ body.has-spaced-navbar-fixed-bottom {
   text-align: center;
 }
 
-#standings-menu {
-  margin: 10px 10px 0 10px;
-  padding: 5px 5px 0 5px;
-  top: 10px;
-}
-
-#standings-menu-header {
-  margin-bottom: 5px;
-}
-
 .switch-box {
   text-align: right;
   padding: 0 0 10px 0;
 }
 
 @media only screen and (min-width: 769px) {
-  #standings-menu {
-    height: 96vh;
-    padding: 20px;
-    position: sticky;
-    position: -webkit-sticky;
-    border-right: 1px solid lightgray;
-  }
-
-  #standings-menu-items {
-    display: initial !important;
-  }
-
-  #standings-menu-header, .switch-box {
+  .switch-box {
     display: none;
   }
 
@@ -6706,10 +6714,6 @@ body.has-spaced-navbar-fixed-bottom {
   text-align: center !important;
 }
 
-#favorites-table {
-  display: none;
-}
-
 #standings-tables {
   position: relative;
   min-height: 300px;
@@ -6718,32 +6722,6 @@ body.has-spaced-navbar-fixed-bottom {
 #refresh-standings {
   font-size: 16px;
   vertical-align: middle;
-}
-
-.td-star, .th-star {
-  padding: 0;
-  width: 30px;
-  display: none;
-}
-
-.favorite-checkbox {
-  display: none;
-}
-
-.favorite-checkbox + i {
-  color: lightgrey;
-}
-
-.favorite-checkbox:checked + i {
-  color: #ffd700;
-}
-
-.is-favorite {
-  background: lightgrey;
-}
-
-.is-favorite:hover {
-  background: lightgrey !important;
 }
 
 /* MODALS */

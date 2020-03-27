@@ -6,8 +6,14 @@ let standingsTableColumn = $("#standings-table-column");
 /* HTML Inserts */
 const ripple_html = "<div class='lds-ripple'><div></div><div></div></div>";
 
-/* Standings Header */
 
+/* Mobile Menu */
+function toggle_mobile_menu() {
+
+}
+
+
+/* Standings Header */
 function tournament_search() {
     const val = tournamentSearchInput.val().toLowerCase().trim();
     const size = val.length;
@@ -80,7 +86,6 @@ function attach_filter_checkbox() {    // Must be re-attached after refresh
     });
 }
 
-// TODO: Mobile Switch Table
 function switch_table(e) {
     leaderboardTableColumn.toggle();
     standingsTableColumn.toggle();

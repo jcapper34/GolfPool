@@ -22,7 +22,7 @@ def results_live():
         leaderboard_macro = get_template_attribute("standings.macro.html", "leaderboard_table")
         return jsonify([standings_macro(tournament.picksets), leaderboard_macro(tournament.players)])
 
-    return render_template('standings-live.html', tournament=tournament)
+    return render_template('standings-live.html', tournament=tournament, event_years=Tournament.get_event_years())
 
 
 
@@ -44,7 +44,7 @@ def results_past(year, tid):
     all_picks = get_all_picks(year, conn=conn)
     tournament.merge_all_picks(all_picks)
 
-    return render_template('standings-past.html', tournament=tournament)
+    return render_template('standings-past.html', tournament=tournament, event_years=Tournament.get_event_years())
 
 
 # Past Standings Pickset Modal
@@ -85,9 +85,6 @@ def get_player_modal(year, tid):
 
     player = Player(pid=pid)
     player.fill_tournament_data(tid=tid, year=year, conn=conn)
-
-    player.photo_url = player.PGA_PHOTO_URL % player.tournament_data[0]['tour_id']  # Set photo by using tour_id of one row
-
     player.fill_who_picked(year, conn=conn)
 
     player_modal = get_template_attribute("modal.macro.html", "player_modal")

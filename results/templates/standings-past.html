@@ -1,6 +1,6 @@
 {#
 params:
-- menu
+- event_years
 - tournament
 #}
 {% extends "base.html" %}
@@ -20,7 +20,7 @@ params:
     {% import 'standings.macro.html' as smac %}
     <div id="main-columns" class="columns">
         <div class="column is-2">
-            {{ smac.standings_menu(tournament.tid, tournament.year) }}
+            {{ smac.standings_menu(tournament.tid, tournament.year, event_years) }}
         </div>
         <section id="standings-main-section" class="section column">
             {{ smac.standings_header(tournament.name, tournament.year) }}

@@ -106,7 +106,7 @@ class Tournament:
         leaderboard = api_tournament['golfers']
         self.players = [Player(pid=pl['golferId'],
                                name=pl['firstName'] + " " + pl['lastName'],
-                               pos=pl['position'],
+                               pos=pl['position'] if pl['position'] != 'T999' else None,
                                points=point_template[str(pl['sortHelp'])] if pl['sortHelp'] <= 20 else 0,
                                total=pl['overallPar']
                                ) for pl in leaderboard] # Create Player objects of leaderboard
@@ -143,6 +143,12 @@ class Tournament:
                 pos = i + 1
 
             self.picksets[i].pos = pos
+
+    @staticmethod
+    def get_event_years(conn=None): # Used to get all season years that have been stored in DB
+        conn = filter_conn(conn)
+        return [r[0] for r in conn.exec_fetch("SELECT DISTINCT season_year from event_leaderboard_xref ORDER BY season_year DESC")]
+
 
     """ MERGES """
     def merge_all_picks(self, all_picks):

@@ -61,7 +61,6 @@ function submit_change_picks(form) {
 }
 
 function revert_picks() {
-    out(initialMainLevels);
     /* Revert main levels */
     $(".player-checkbox").each(function() {
         let checkbox = $(this);
@@ -71,6 +70,12 @@ function revert_picks() {
         // Manually need to call effects
         select_player(checkbox);
     });
+
+    // Remove then add level 4
+    $("#level-4-picks").find("tr").each(function() {
+       remove_level_4($(this));
+    });
+    for(let i = 0; i < 2; i++) {add_level_4(initialLevel4Names[i], initialLevel4Ids[i]);}   // Revert Level 4s
 }
 
 $(document).ready(function() {

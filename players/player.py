@@ -60,10 +60,11 @@ class Player:
         self.num_picked = len(self.picked_by)
 
     # Parameters: pid, year
-    # Returns: pos, score, points, tid, thru
+    # Returns: pos, score, points, tid, thru, photo_url
     GET_TOURNAMENT_DATA_QUERY = """
-    SELECT position AS pos, score AS total, points, tournament_id AS tid, 18 AS thru, player_tour_id AS tour_id FROM event_leaderboard_xref 
-        WHERE player_id = %s AND season_year=%s
+    SELECT position AS pos, score AS total, points, tournament_id AS tid, 18 AS thru, p.photo_url FROM event_leaderboard_xref AS elx
+        JOIN player p on elx.player_id = p.id
+        WHERE p.id = %s AND elx.season_year=%s
     """
     def fill_tournament_data(self, tid, year, conn=None):
         conn = filter_conn(conn)
@@ -72,6 +73,7 @@ class Player:
         self.tournament_data = list(self.tournament_data)
 
         self.current_tournament_data = func_find(self.tournament_data, lambda t: t['tid'] == tid)
+        self.photo_url = self.tournament_data[0]['photo_url']
 
     """ Overrides """
     def __str__(self):

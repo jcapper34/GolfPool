@@ -17,7 +17,7 @@ Params:
 {% block body %}
 <div class="columns">
     {# Main Picks Container #}
-    <div class="column">
+    <div class="column container">
     <form id="make-picks-form" method="post" action="{{ url_for('picks.picks_submit') }}"  onsubmit="return submit_make_picks()">
         {# General Information Section #}
         {{ mp_macs.general_section() }}

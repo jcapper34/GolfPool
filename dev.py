@@ -3,7 +3,7 @@ from pprint import pprint
 import requests
 
 from db.db_helper import filter_conn
-from helper import CURRENT_YEAR, func_find, splash
+from helper import CURRENT_YEAR, func_find, splash, get_json
 from db.conn import Conn
 from tournament.tournament import Tournament
 
@@ -85,32 +85,54 @@ def insert_levels(year=CURRENT_YEAR):
     conn.commit()
 
 
-def db_upload_leaderboard(year, tid, channel_tid, conn=None):
+def db_upload_leaderboard_individual(tournament, conn=None):
     conn = filter_conn(conn)
 
-    tournament = Tournament(year=year, channel_tid=channel_tid, tid=tid)
     tournament.fill_api_leaderboard(live=False)
 
+    conn.exec('INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING', (tournament.year,))  # Insert season
 
-    splash(tournament.players)
-
-    player_names = [pl['name'] for pl in conn.exec_fetch("SELECT * FROM player")]
-    print(len(player_names))
+    conn.exec("DELETE FROM event_leaderboard_xref CASCADE WHERE tournament_id=%s AND season_year=%s", (tournament.tid, tournament.year))
+    conn.exec('INSERT INTO event (tournament_id, season_year) VALUES (%s, %s) ON CONFLICT DO NOTHING',
+              (tournament.tid, tournament.year))  # Insert season
 
     leaderboard_insert_query = "INSERT INTO event_leaderboard_xref (tournament_id, season_year, position, score, points, player_id) VALUES "
 
-    print("Updating missing channel_ids")
     for player in tournament.players:
-        # if player.name in player_names:
-        #     conn.exec("UPDATE player SET id = %s WHERE name=%s", (player.id, player.name))
-        values_query = conn.cur.mogrify(" (%s,%s,%s,%s,%s,%s,%s),", (tid, year, player.pos, player.total, player.points, player.id))
+        conn.exec("INSERT INTO player (id, name) VALUES (%s,%s) ON CONFLICT DO NOTHING", (player.id, player.name))
+        values_query = conn.cur.mogrify(" (%s,%s,%s,%s,%s,%s),",
+                                        (tournament.tid, tournament.year, player.pos, player.total, player.points, player.id))
         leaderboard_insert_query += values_query.decode()
 
-    print("Inserting leaderboard: %s - %d" % (tournament.name, tournament.year))
-    conn.exec(leaderboard_insert_query[:-1])
+    conn.exec(leaderboard_insert_query[:-1] + " ON CONFLICT DO NOTHING")
 
     conn.commit()
 
+    print("Inserted leaderboard: %s - %d" % (tournament.name, tournament.year))
+
+def db_upload_leaderboard(year, conn=None):
+    conn = filter_conn(conn)
+
+    api_events = get_json("https://www.golfchannel.com/api/v2/tours/1/events/%d" % year)
+    major_results = [Tournament(year=year, channel_tid=e['key'], tournament_name=e['name']) for e in func_find(api_events, lambda event: event['major'], limit=4)]
+
+    for major in major_results:
+        lower_name = major.name.lower()
+        if 'masters' in lower_name:
+            major.tid = '014'
+        elif 'us' or 'u.s.' in lower_name:
+            major.tid = '026'
+        elif 'open' in lower_name:
+            major.tid = '100'
+        elif 'championship' in lower_name:
+            major.tid = '033'
+
+        db_upload_leaderboard_individual(major, conn=conn)
+
+
 if __name__ == "__main__":
     con = Conn()
-    db_upload_leaderboard(year=2015, channel_tid=16380, tid="014", conn=con)
+    y = 2015
+    for channel_tid, tid in [(16468, '026'),(16615, '100'),(16428, '033'), (16380, '014')]:
+        db_upload_leaderboard_individual(Tournament(year=y, channel_tid=channel_tid, tid=tid), conn=con)
+

@@ -245,9 +245,7 @@ function show_player_suggestions(fieldElement, suggestions) {
     });
 }
 
-function add_level_4(tdElement) {
-    const name = tdElement.text();
-    const pid = tdElement.data('pid');
+function add_level_4(name, pid) {
 
     /* Reset inputs */
     $("#suggestions-box").addClass('hide');
@@ -269,11 +267,10 @@ function add_level_4(tdElement) {
     }
 }
 
-function remove_level_4(tdElement) {
-    tdElement.closest("tr").remove();
-    $("#level-4-text").prop("disabled", false);
+function remove_level_4(trElement) {
+    // out(trElement);
+    trElement.remove();
 }
-
 function check_all_level_4() {
     const level4Inputs = $("input[name='level-4']");
     if(level4Inputs.length !== 2 || level4Inputs.eq(0).val() == level4Inputs.eq(1).val())   // Check if correct number and the picks don't match
@@ -346,7 +343,6 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
     return api_list.concat(newPlayers);
 }
 
-
 function set_season_history() {
     $.get('/picks/season-history', function(response) {
         $(".pool-ranking-column").attr("rowspan", response.length); //Set height of table
@@ -357,7 +353,7 @@ function set_season_history() {
             for(let i = 0; i < response.length; i++) {  // Get ranking from each year
                 const year_history = response[i];
                 const year = year_history[0];
-                let pos = null;
+                let pos = '-';
                 if(year_history[1].hasOwnProperty(pid))
                     pos = year_history[1][pid];
 

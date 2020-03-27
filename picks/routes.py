@@ -31,7 +31,7 @@ def picks_get_season_history():
     tournament = Tournament()
     conn = Conn()
     season_history = []
-    for year in range(2016, CURRENT_YEAR):
+    for year in range(2015, CURRENT_YEAR):
         tournament.fill_db_rankings(year, 'cumulative', conn=conn)
         season_history.append((year, {pl.id:pl.pos for pl in tournament.players}))
 

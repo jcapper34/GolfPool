@@ -62,8 +62,11 @@ const OWGR_URL = '{{ OWGR_URL }}';
 
 {# Initial Picks #}
 const initialMainLevels = {{ (pickset.picks[0]|map(attribute='id')|list + pickset.picks[1]|map(attribute='id')|list + pickset.picks[2]|map(attribute='id')|list)|tojson }};
+const initialLevel4Ids = {{ pickset.picks[3]|map(attribute='id')|list|tojson }};
+const initialLevel4Names = {{ pickset.picks[3]|map(attribute='name')|list|tojson }};
+
+
 const API_PLAYERS_URL = "{{ API_PLAYERS_URL }}";
-{#const initialLevel4 = {{ pickset.picks[0]|map(attribute='id')|tojson }};#}
 </script>
 <script src="/picks/static/js/make-picks.js"></script>
 <script src="/picks/static/js/change-picks.js"></script>
