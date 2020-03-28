@@ -15,7 +15,7 @@ results_mod = Blueprint("results", __name__, template_folder='templates', static
 @results_mod.route("/")
 @results_mod.route("/live")
 def results_live():
-    tournament = Tournament(year=CURRENT_YEAR)
+    tournament = Tournament(year=2019, channel_tid=17893)
     tournament.fill_api_leaderboard()
     tournament.calculate_api_standings()
     if request.args.get("refresh") is not None:    # If refresh
@@ -71,15 +71,25 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
     return pickset_modal(pickset)
 
 
+@results_mod.route("/get-player-modal")
+@results_mod.route("/live/get-player-modal")
 @results_mod.route("/<int:year>/<tid>/get-player-modal")
-def get_player_modal(year, tid):
-    pid = request.args.get("pid")
+def get_player_modal(year=2019, tid=None):
+    pid = int(request.args.get("pid"))
+    channel_tid = request.args.get("channel_tid")
 
     conn = Conn()
 
     player = Player(pid=pid)
     player.fill_tournament_data(tid=tid, year=year, conn=conn)
-    player.fill_who_picked(year, conn=conn)
+    player.fill_who_picked(year=year, conn=conn)
+
+    if tid is None:
+        tournament = Tournament(year=year, channel_tid=int(channel_tid))
+        tournament.fill_api_leaderboard()
+        leaderboard_player = func_find(tournament.players, lambda pl: pl.id == player.id)
+        player.current_tournament_data = leaderboard_player
+
 
     player_modal = get_template_attribute("modal.macro.html", "player_modal")
     return player_modal(player)
