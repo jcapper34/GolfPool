@@ -15,7 +15,7 @@ results_mod = Blueprint("results", __name__, template_folder='templates', static
 @results_mod.route("/")
 @results_mod.route("/live")
 def results_live():
-    tournament = Tournament(year=2019, channel_tid=17893)
+    tournament = Tournament(year=CURRENT_YEAR)
     tournament.fill_api_leaderboard()
     tournament.calculate_api_standings()
     if request.args.get("refresh") is not None:    # If refresh
@@ -74,7 +74,7 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
 @results_mod.route("/get-player-modal")
 @results_mod.route("/live/get-player-modal")
 @results_mod.route("/<int:year>/<tid>/get-player-modal")
-def get_player_modal(year=2019, tid=None):
+def get_player_modal(year=CURRENT_YEAR, tid=None):
     pid = int(request.args.get("pid"))
     channel_tid = request.args.get("channel_tid")
 

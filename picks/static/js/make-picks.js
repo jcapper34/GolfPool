@@ -70,8 +70,23 @@ function general_field_checker(elementSelector) {
     return success;
 }
 
+$(".general-input[name='name']").keyup(function() {
+    let e = $(this);
+    const val = e.val();
+    if(val === '')
+        return;
+
+    let words = val.split(" ");
+    for(let i = 0; i < words.length; i++) {
+        if(words[i].length > 0)
+            words[i] = words[i][0].toUpperCase() + words[i].substring(1);
+    }
+    e.val(words.join(" "));
+});
+
 function check_name_input(elementSelector) {
     const val = elementSelector.val();
+
     if(val === '') {
         return clear_general_flags(elementSelector);
     }
@@ -276,6 +291,7 @@ function remove_level_4(trElement) {
     // out(trElement);
     trElement.remove();
 }
+
 function check_all_level_4() {
     const level4Inputs = $("input[name='level-4']");
     if(level4Inputs.length !== 2 || level4Inputs.eq(0).val() == level4Inputs.eq(1).val())   // Check if correct number and the picks don't match
@@ -350,6 +366,7 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
 
 function set_season_history() {
     $.get('/picks/season-history', function(response) {
+        out(response);
         $(".pool-ranking-column").attr("rowspan", response.length); //Set height of table
 
         $(".player-column").each(function() {

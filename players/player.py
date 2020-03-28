@@ -26,7 +26,11 @@ class Player:
         self.points = kwargs.get("points")
         self.total = kwargs.get("total")
         self.pos = kwargs.get("pos")
+        if self.pos == 'T999':
+            self.pos = None
         self.thru = kwargs.get("thru")
+        if self is None or self.thru == 18:
+            self.thru = 'F'
         self.holes = kwargs.get("holes")
 
         self.tournament_data = None
@@ -39,7 +43,9 @@ class Player:
         self.num_picked = kwargs.get("num_picked")
 
         # Photo
-        self.photo_url = Player.PGA_PHOTO_URL % self.tour_id if kwargs.get('photo_url') is None else kwargs.get('photo_url')
+        self.photo_url = kwargs.get('photo_url')
+        if self.photo_url is None:
+            self.photo_url = Player.PGA_PHOTO_URL % self.tour_id
 
 
     # Parameters: pid, year

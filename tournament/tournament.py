@@ -40,7 +40,8 @@ class Tournament:
     def fill_db_rankings(self, conn=None):
         conn = filter_conn(conn)
 
-        raw_players = conn.exec_fetch(Tournament.GET_DB_RANKINGS_QUERY, (self.year, self.tid))
+        raw_players = conn.exec_fetch(Tournament.GET_DB_RANKINGS_QUERY, (self.year, self.tid if self.tid != 'cumulative' else None))
+
         if not raw_players:
             return False
 
@@ -75,7 +76,7 @@ class Tournament:
     def fill_db_standings(self, conn=None):
         conn = filter_conn(conn)
 
-        results = conn.exec_fetch(Tournament.GET_DB_STANDINGS_QUERY, (self.year, self.tid))
+        results = conn.exec_fetch(Tournament.GET_DB_STANDINGS_QUERY, (self.year, self.tid if self.tid != 'cumulative' else None))
         if not results:
             return False
 
@@ -102,7 +103,7 @@ class Tournament:
         leaderboard = api_tournament['golfers']
         self.players = [Player(pid=pl['golferId'],
                                name=pl['firstName'] + " " + pl['lastName'],
-                               pos=pl['position'] if pl['position'] != 'T999' else None,
+                               pos=pl['position'],
                                points=point_template[str(pl['sortHelp'])] if pl['sortHelp'] <= 20 else 0,
                                total=pl['overallPar']
                                ) for pl in leaderboard] # Create Player objects of leaderboard
