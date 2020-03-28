@@ -34,10 +34,11 @@ function prompt_pickset_modal(psid, name, pos) {
     modal.find(".modal-card-title").text(pos + " | " + name);
 
     /* Get modal body */
-    $.get(window.location.href+"/get-pickset-modal", {psid:psid}, function(response) {
+    $.get(window.location.href+"/get-pickset-modal", {psid:psid, channel_tid:channelTid}, function(response) {
         modalCardBody.html(response);
     }).fail(function() {
         window.alert("Server Error: Could not load info");
+        modalCardBody.empty();
     });
 }
 

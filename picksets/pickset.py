@@ -1,6 +1,6 @@
 from db.conn import Conn
 from db.db_helper import filter_conn
-from helper import CURRENT_YEAR
+from helper import CURRENT_YEAR, func_find
 from mailer.postman import Postman
 from players import player
 from typing import List
@@ -180,7 +180,7 @@ class Pickset:
         if not results:
             return []
 
-        self.picks = [player.Player(row['pid'], row['name'], level=row['level'], tour_id=row['tour_id']) for row in results]
+        self.picks = [player.Player(row['pid'], name=row['name'], level=row['level'], tour_id=row['tour_id']) for row in results]
         if separate:
             self.picks = level_separate(self.picks)
 
@@ -208,6 +208,14 @@ class Pickset:
     def get_pids(self):
         return [p.id for level_players in self.picks for p in level_players]
 
+    def merge_tournament(self, tournament):
+        for golfer in self.picks:
+            pl = func_find(tournament.players, lambda p: p.id == golfer.id)
+            if pl is None:  # If not found
+                golfer.points = 0
+                continue
+
+            golfer.merge(pl)
 
     """ Overrides """
     def __str__(self):

@@ -75,6 +75,13 @@ class Player:
         self.current_tournament_data = func_find(self.tournament_data, lambda t: t['tid'] == tid)
         self.photo_url = self.tournament_data[0]['photo_url']
 
+
+    def merge(self, player):
+        for key, val in vars(self).items():
+            if val is None and getattr(player, key) is not None:
+                setattr(self, key, getattr(player, key))
+
+
     """ Overrides """
     def __str__(self):
         return "Player: id=%s, name='%s'" % (self.id, self.name)

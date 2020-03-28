@@ -9536,7 +9536,7 @@ label.panel-block:hover {
     padding: 20px;
     position: sticky;
     position: -webkit-sticky;
-    height: 400px;
+    height: 500px;
     overflow: scroll;
     border-right: 1px solid lightgray;
   }

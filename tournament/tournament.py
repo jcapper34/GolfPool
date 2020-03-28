@@ -123,7 +123,7 @@ class Tournament:
                 match = func_find(self.players, func=lambda x: x.id == picked_player.id)
                 if match is not None:
                     pickset.points += match.points
-                    picked_player = match
+                    picked_player.merge(match)
 
         self.picksets.sort(key=lambda x: x.points, reverse=True)    # Sort Standings
         self.rank()

@@ -15,7 +15,7 @@ results_mod = Blueprint("results", __name__, template_folder='templates', static
 @results_mod.route("/")
 @results_mod.route("/live")
 def results_live():
-    tournament = Tournament()
+    tournament = Tournament(year=CURRENT_YEAR)
     tournament.fill_api_leaderboard()
     tournament.calculate_api_standings()
     if request.args.get("refresh") is not None:    # If refresh
@@ -48,33 +48,24 @@ def results_past(year, tid):
 
 
 # Past Standings Pickset Modal
+@results_mod.route("/get-pickset-modal")
+@results_mod.route("/live/get-pickset-modal")
 @results_mod.route("/<int:year>/<tid>/get-pickset-modal")
-def get_pickset_modal(year=None, tid=None):
+def get_pickset_modal(year=CURRENT_YEAR, tid=None):
     conn = Conn()
 
-    psid = request.args.get("psid")
+    pickset = Pickset(psid=request.args.get("psid"))
+    pickset.fill_picks(separate=False, conn=conn)       # Get pickset from DB
+    pickset.fill_tournament_history(year, conn=conn)    # Get tournament history from DB
 
     tournament = Tournament(year=year, tid=tid)
+    if tid is None:
+        tournament.channel_tid = int(request.args.get("channel_tid"))
+        tournament.fill_api_leaderboard()
+    else:
+        tournament.fill_db_rankings(conn=conn)  # Get Standings from DB
 
-    # Get Standings from DB
-    tournament.fill_db_rankings(conn=conn)
-
-    # Get pickset from DB
-    pickset = Pickset(psid=psid)
-    pickset.fill_picks(separate=False, conn=conn)
-
-    # Get Tournament results for each picked player
-    for player in pickset.picks:
-        pl = func_find(tournament.players, lambda p: p.id == player.id)
-        if pl is None:  # If not found
-            player.points = 0
-            continue
-
-        player.pos = pl.pos
-        player.points = pl.points
-        player.total = pl.total
-
-    pickset.fill_tournament_history(year, conn=conn)
+    pickset.merge_tournament(tournament)
 
     pickset_modal = get_template_attribute("modal.macro.html", "pickset_modal")
     return pickset_modal(pickset)

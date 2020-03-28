@@ -9,7 +9,7 @@ params:
 {% block hero_title %} Standings {% endblock %}
 
 {% block add_head %}
-<link rel="stylesheet" href="/results/static/css/standings.min.css">
+<link rel="stylesheet" href="/results/static/css/standings.min.css?v=1.0">
 {% endblock %}
 
 
@@ -38,6 +38,9 @@ params:
 {% endblock %}
 
 {% block add_below %}
+<script>
+const channelTid = null;
+</script>
 <script src="/results/static/js/standings.js"></script>
 <script src="/results/static/js/standings-modal.js"></script>
 {% endblock %}
