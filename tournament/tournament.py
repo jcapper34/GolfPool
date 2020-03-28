@@ -37,15 +37,10 @@ class Tournament:
       GROUP BY pid, pl.name)
       SELECT * FROM leaderboard WHERE points > 0
                           """
-    def fill_db_rankings(self, year=None, tid=None, conn=None):
+    def fill_db_rankings(self, conn=None):
         conn = filter_conn(conn)
 
-        # Redefine variables
-        if year is None: year = self.year
-        if tid is None: tid = self.tid
-        if tid == 'cumulative': tid = None
-
-        raw_players = conn.exec_fetch(Tournament.GET_DB_RANKINGS_QUERY, (year, tid))
+        raw_players = conn.exec_fetch(Tournament.GET_DB_RANKINGS_QUERY, (self.year, self.tid))
         if not raw_players:
             return False
 
@@ -56,12 +51,11 @@ class Tournament:
             "014": "The Masters",
             "026": "U.S Open",
             "100": "British Open",
-            "033": "PGA Championship"
+            "033": "PGA Championship",
+            'cumulative': 'Cumulative'
         }
 
-        self.tid = "cumulative" if tid is None else tid
-        self.name = "Cumulative" if tid is None else tournament_names[tid]
-        self.year = year
+        self.name = tournament_names[self.tid]
 
         return True
 
@@ -78,15 +72,10 @@ class Tournament:
               GROUP BY ps.id, name
               ORDER BY SUM(esx.points) DESC
     """
-    def fill_db_standings(self, year=None, tid=None, conn=None):
+    def fill_db_standings(self, conn=None):
         conn = filter_conn(conn)
 
-        # Redefine variables
-        if year is None: year = self.year
-        if tid is None: tid = self.tid
-        if tid == 'cumulative': tid = None
-
-        results = conn.exec_fetch(Tournament.GET_DB_STANDINGS_QUERY, (year, tid))
+        results = conn.exec_fetch(Tournament.GET_DB_STANDINGS_QUERY, (self.year, self.tid))
         if not results:
             return False
 
@@ -102,12 +91,11 @@ class Tournament:
         return get_json(Tournament.LEADERBOARD_URL % current_tournament['key'])
 
 
-    def fill_api_leaderboard(self, live=True, channel_tid=None):
-        channel_tid = channel_tid if channel_tid is not None else self.channel_tid
-        if live:
+    def fill_api_leaderboard(self):
+        if self.channel_tid is None: # If live is requested
             api_tournament = self.api_get_live()['result'] # Get Tournament From API
         else:
-            api_tournament = get_json(Tournament.LEADERBOARD_URL % channel_tid)['result'] # Get Tournament From API
+            api_tournament = get_json(Tournament.LEADERBOARD_URL % self.channel_tid)['result'] # Get Tournament From API
 
         point_template = get_json('tournament/data/point-template.json')  # Load Point Template Data
 
@@ -122,9 +110,11 @@ class Tournament:
         self.name = api_tournament.get("eventName")
 
     """ CALCULATIONS """
-    def calculate_api_standings(self, conn=None):
+    def calculate_api_standings(self, get_picks=True, conn=None):
         conn = filter_conn(conn)
-        self.picksets = get_all_picks(self.year, conn=conn) # Load DB Picks
+
+        if get_picks:
+            self.picksets = get_all_picks(self.year, conn=conn) # Load DB Picks
 
         for pickset in self.picksets:
             if pickset.points is None:
@@ -133,6 +123,7 @@ class Tournament:
                 match = func_find(self.players, func=lambda x: x.id == picked_player.id)
                 if match is not None:
                     pickset.points += match.points
+                    picked_player = match
 
         self.picksets.sort(key=lambda x: x.points, reverse=True)    # Sort Standings
         self.rank()

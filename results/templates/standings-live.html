@@ -39,6 +39,9 @@ params:
 {% endblock %}
 
 {% block add_below %}
+<script>
+const channelTid = {{ tournament.channel_tid }};
+</script>
 <script src="/results/static/js/standings.js"></script>
 <script src="/results/static/js/standings-modal.js"></script>
 {% endblock %}

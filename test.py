@@ -11,10 +11,10 @@ from mailer.postman import Postman
 
 def test_graph():
     conn = Conn()
-    tournament = Tournament()
     players_history = []
     for year in range(2016, 2020):
-        tournament.fill_db_rankings(year, 'cumulative', conn=conn)
+        tournament = Tournament(year=year, tid='cumulative')
+        tournament.fill_db_rankings(conn=conn)
         player_data = func_find(tournament.players, lambda pl: pl.id == 11111)
         players_history.append(player_data.pos if player_data is not None else None)
 

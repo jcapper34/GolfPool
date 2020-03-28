@@ -27,7 +27,7 @@ GET_ALL_PICKS_QUERY = """
                         WHERE ps.season_year = %s
                         ORDER BY psname, level, pl.name
                         """
-def get_all_picks(year, separate=False, conn=None):
+def get_all_picks(year=CURRENT_YEAR, separate=False, conn=None):
     conn = filter_conn(conn)
 
     results = conn.exec_fetch(GET_ALL_PICKS_QUERY, (year,))

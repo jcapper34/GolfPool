@@ -88,7 +88,7 @@ def insert_levels(year=CURRENT_YEAR):
 def db_upload_leaderboard_individual(tournament, conn=None):
     conn = filter_conn(conn)
 
-    tournament.fill_api_leaderboard(live=False)
+    tournament.fill_api_leaderboard()
 
     conn.exec('INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING', (tournament.year,))  # Insert season
 

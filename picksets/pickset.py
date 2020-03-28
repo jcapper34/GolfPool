@@ -130,6 +130,7 @@ class Pickset:
         return self.id
 
     def db_insert_picks(self, conn=None):
+        # Redefine Variables
         conn = filter_conn(conn)
 
         query = "INSERT INTO picks_xref (player_id, pickset_id) VALUES"
@@ -171,7 +172,7 @@ class Pickset:
             ON pl.id = lx.player_id AND ps.season_year = lx.season_year
           WHERE ps.id = %s ORDER BY lx.level
                       """
-    def fill_picks(self, separate=True, conn=None):
+    def fill_picks(self, psid=None, separate=True, conn=None):
         conn = filter_conn(conn)
 
         results = conn.exec_fetch(Pickset.GET_PICKS_QUERY, (self.id,))

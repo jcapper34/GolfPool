@@ -10,6 +10,7 @@ from tournament.tournament import Tournament
 results_mod = Blueprint("results", __name__, template_folder='templates', static_folder='static')   # Register blueprint
 
 """ LIVE ROUTES """
+
 # Root of Results Module
 @results_mod.route("/")
 @results_mod.route("/live")
@@ -25,7 +26,6 @@ def results_live():
     return render_template('standings-live.html', tournament=tournament, event_years=Tournament.get_event_years())
 
 
-
 """ PAST ROUTES """
 
 # Past Standings
@@ -34,11 +34,11 @@ def results_past(year, tid):
     conn = Conn()
 
     # Get Database Standings
-    tournament = Tournament()
-    if not tournament.fill_db_rankings(year, tid, conn=conn):   # If tournament not found in DB
+    tournament = Tournament(year=year, tid=tid)
+    if not tournament.fill_db_rankings(conn=conn):   # If tournament not found in DB
         return render_template("locked-page.html", title='Golf Pool | Locked Tournament')
 
-    tournament.fill_db_standings(year, tid, conn=conn)
+    tournament.fill_db_standings(conn=conn)
 
     # Merge all picks with tournament
     all_picks = get_all_picks(year, conn=conn)
@@ -49,19 +49,19 @@ def results_past(year, tid):
 
 # Past Standings Pickset Modal
 @results_mod.route("/<int:year>/<tid>/get-pickset-modal")
-def get_pickset_modal(year, tid):
-    psid = request.args.get("psid")
-
+def get_pickset_modal(year=None, tid=None):
     conn = Conn()
 
-    # Get Database Standings
-    tournament = Tournament()
-    tournament.fill_db_rankings(year, tid, conn=conn)
+    psid = request.args.get("psid")
 
-    # Get Pickset
+    tournament = Tournament(year=year, tid=tid)
+
+    # Get Standings from DB
+    tournament.fill_db_rankings(conn=conn)
+
+    # Get pickset from DB
     pickset = Pickset(psid=psid)
     pickset.fill_picks(separate=False, conn=conn)
-    pickset.fill_tournament_history(year, conn=conn)
 
     # Get Tournament results for each picked player
     for player in pickset.picks:
@@ -74,8 +74,11 @@ def get_pickset_modal(year, tid):
         player.points = pl.points
         player.total = pl.total
 
+    pickset.fill_tournament_history(year, conn=conn)
+
     pickset_modal = get_template_attribute("modal.macro.html", "pickset_modal")
     return pickset_modal(pickset)
+
 
 @results_mod.route("/<int:year>/<tid>/get-player-modal")
 def get_player_modal(year, tid):
