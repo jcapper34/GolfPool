@@ -15,7 +15,7 @@ class Player:
     STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/2020"   # Parameters: Stat Number
     GOLFERS_URL = "https://www.golfchannel.com/api/search/objectGolferVerbose?full=true"
 
-    def __init__(self, pid, **kwargs):
+    def __init__(self, pid=None, **kwargs):
         # General
         self.id = pid
         self.name = kwargs.get("name")

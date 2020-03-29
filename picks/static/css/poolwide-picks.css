@@ -9456,6 +9456,43 @@ label.panel-block:hover {
   z-index: 20;
 }
 
+/* Custom Burger */
+.burger {
+  display: block;
+  position: relative;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+@media only screen and (min-width: 769px) {
+  .burger {
+    display: none;
+  }
+}
+.burger span {
+  display: block;
+  position: absolute;
+  background-color: black;
+  border-radius: 2px;
+  left: 40%;
+  width: 30%;
+  height: 2%;
+}
+
+.burger span:nth-child(1) {
+  top: 35%;
+}
+
+.burger span:nth-child(2) {
+  top: 49%;
+}
+
+.burger span:nth-child(3) {
+  bottom: 35%;
+}
+
 #picks-table th, #picks-table td {
   text-align: center;
   min-width: 200px;

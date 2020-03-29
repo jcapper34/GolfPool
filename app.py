@@ -42,8 +42,7 @@ def results_past_alias(year, tid):
 
 @app.route('/test')
 def test_page():
-    test_graph()
-    return ""
+    return render_template('test.html')
 
 
 """ HELPERS """
