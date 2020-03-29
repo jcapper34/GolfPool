@@ -70,7 +70,7 @@ GET_MOST_PICKED_QUERY = """
 def get_most_picked(year, conn=None):
     conn = filter_conn(conn)
     results = conn.exec_fetch(GET_MOST_PICKED_QUERY, (year,))
-    return [Player(row['id'], row['name'], level=row['lev'], num_picked=row['num_picked']) for row in results]
+    return [Player(row['id'], name=row['name'], level=row['lev'], num_picked=row['num_picked']) for row in results]
 
 # Parameters: email, pin, year
 # Returns: ps.id
