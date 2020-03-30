@@ -10,11 +10,8 @@
                 <h4 class="subtitle">Menu</h4>
             </div>
             <div class="level-right">
-                <div class="burger" onclick="toggle_mobile_standings_menu($(this))">
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                </div>
+                {% from 'helper.macro.html' import menu_burger %}
+                {{ menu_burger("toggle_mobile_standings_menu($(this))") }}
             </div>
         </div>
         <div id="standings-menu-items">

@@ -33,3 +33,11 @@
     }
     </style>
 {% endmacro %}
+
+{% macro menu_burger(on_click) %}
+    <div class="burger" onclick="{{ on_click }}">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+    </div>
+{% endmacro %}

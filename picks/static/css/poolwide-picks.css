@@ -9442,16 +9442,16 @@ label.panel-block:hover {
 }
 
 #top-nav {
-  z-index: 30;
+  z-index: 50;
 }
 
 #mobile-nav {
   display: none;
   position: fixed;
   top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
+  right: -100vw;
+  height: 100vh;
+  width: 100vw;
   background: white;
   z-index: 20;
 }
@@ -9463,10 +9463,11 @@ label.panel-block:hover {
   width: 3.25rem;
   height: 3.25rem;
   margin-left: auto;
+  z-index: 600;
   cursor: pointer;
 }
 
-@media only screen and (min-width: 769px) {
+@media only screen and (min-width: 1024px) {
   .burger {
     display: none;
   }
