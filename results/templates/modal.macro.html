@@ -67,6 +67,7 @@
             <img src="{{ player.photo_url }}">
         </figure>
         <div class="media-content">
+        {% if player.current_tournament_data is not none %}
             <table class="table is-fullwidth is-striped stats-table">
                 <tr class="hide"></tr>
                 <tr><th>Position</th><th>Score</th></tr>
@@ -91,6 +92,7 @@
                     <td>{% if player.current_tournament_data.points is none %}0{% else %}{{ player.current_tournament_data.points }}{% endif %}</td>
                 </tr>
             </table>
+        {% endif %}
         </div>
     </div>
     <hr>

@@ -15,6 +15,11 @@ HTML Inserts
 const ripple_html = "<div class='lds-ripple'><div></div><div></div></div>";
 
 
+function toggle_mobile_standings_menu(burger) {
+    $('#standings-menu-items').stop().slideToggle();
+    burger.toggleClass("menu-open");
+}
+
 /*
 Standings Header
 */

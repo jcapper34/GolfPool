@@ -9402,9 +9402,11 @@ label.panel-block:hover {
   left: 35%;
   width: 30%;
   height: 2%;
+  transition: transform 0.2s, opacity 0.2s;
 }
 
 .burger span:nth-child(1) {
+  transform-origin: 0 0;
   top: 35%;
 }
 
@@ -9413,7 +9415,23 @@ label.panel-block:hover {
 }
 
 .burger span:nth-child(3) {
+  transform-origin: 0 100%;
   bottom: 35%;
+}
+
+/* Burger with Menu Open */
+.burger.menu-open span:nth-child(1) {
+  width: 41%;
+  transform: rotate(45deg);
+}
+
+.burger.menu-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.burger.menu-open span:nth-child(3) {
+  width: 41%;
+  transform: rotate(-45deg);
 }
 
 /* Ring */
