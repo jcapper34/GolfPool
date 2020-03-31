@@ -31,15 +31,17 @@
 
 
 <body style="margin-bottom:15px">
-<div class="hero page-title-hero">
-  <div class="hero-body">
-    <div class="container">
-      <h1 class="title">{% block hero_title %}{% endblock %}</h1>
-    </div>
-  </div>
-    {% block hero_foot %}{% endblock %}
-</div>
-{% block body %}{% endblock %}
-{% block add_below %}{% endblock %}
+    <main>
+        <div class="hero page-title-hero">
+          <div class="hero-body">
+            <div class="container">
+              <h1 class="title">{% block hero_title %}{% endblock %}</h1>
+            </div>
+          </div>
+            {% block hero_foot %}{% endblock %}
+        </div>
+        {% block body %}{% endblock %}
+        {% block add_below %}{% endblock %}
+    </main>
 </body>
 </html>

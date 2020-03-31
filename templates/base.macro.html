@@ -11,7 +11,9 @@
 
             let burger = topNav.find('.burger');
             burger.toggleClass('menu-open');
-            $("html, body").toggleClass("disable-scroll");
+
+            let htmlBody = $("html, body");
+            htmlBody.toggleClass("disable-scroll");
 
             let start = -100;
             let end = 0;
@@ -22,16 +24,19 @@
             }
             mobileNav.css("right", start+'vw').show();
 
+            let mainSection = $("main");
             $({r: start}).animate({r: end}, {
                 duration: 500,
                 step: function(now) {
-                    mobileNav.css({
-                        right: now+'vw'
-                    });
+                    mobileNav.css("right", now+'vw');
+                    const blurFactor = (1-(Math.abs(now)/50));
+                    mainSection.css("filter", "blur(" + blurFactor + "rem)");
                 },
                 complete: function() {
-                    if(!burger.hasClass('menu-open'))
+                    if(!burger.hasClass('menu-open')) {
                         mobileNav.hide();
+                        mainSection.css('filter', 'blur(0)');
+                    }
                 }
             });
         }
