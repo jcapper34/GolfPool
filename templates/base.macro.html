@@ -29,7 +29,7 @@
                 duration: 500,
                 step: function(now) {
                     mobileNav.css("right", now+'vw');
-                    const blurFactor = (1-(Math.abs(now)/50));
+                    const blurFactor = (1-(Math.abs(now)/100))*0.75;
                     mainSection.css("filter", "blur(" + blurFactor + "rem)");
                 },
                 complete: function() {
