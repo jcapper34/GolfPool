@@ -47,7 +47,10 @@
                 <a id="refresh-standings" onclick="standings_refresh()"><span class="icon"><i class="fas fa-sync"></i></span></a>
                 {% endif %}
                 </h1>
-                {% if add_refresh %}<p>Note: Results are approximately 5 min behind realtime</p>{% endif %}
+                {% if add_refresh %}
+                    <p>Note: Results are approximately 5 min behind realtime</p>
+                    <p>Results were last updated at <span id="refresh-time"></span></p>
+                {% endif %}
             </div>
         </div>
         <div class="level-right">
@@ -71,17 +74,21 @@
                 <tr><th class="th-pos">Position</th><th>Name</th><th class="th-points">Points</th><th class="th-filter">Filter</th></tr>
             </thead>
             <tbody id="standings-body">
-                {% for pickset in picksets %}
-                    <tr class="pickset-row" data-psid="{{ pickset.id }}" data-picks='{{ pickset.picks|map(attribute='id')|list|tojson }}'> {# TODO: put picks in data-picks #}
-                        <td class="td-pos">
-                        {{ pickset.pos }}
-                        </td>
-                        <td class="td-name">{{ pickset.name }}</td>
-                        <td class="td-points">{{ pickset.points }}</td>
-                        <td class="td-filter is-narrow"><input type="checkbox" class="filter-checkbox"> </td>
-                        {# TODO: "Favorite person" functionality #}
-                    </tr>
-                {% endfor %}
+                {% if picksets %}
+                    {% for pickset in picksets %}
+                        <tr class="pickset-row" data-psid="{{ pickset.id }}" data-picks='{{ pickset.picks|map(attribute='id')|list|tojson }}'> {# TODO: put picks in data-picks #}
+                            <td class="td-pos">
+                            {{ pickset.pos }}
+                            </td>
+                            <td class="td-name">{{ pickset.name }}</td>
+                            <td class="td-points">{{ pickset.points }}</td>
+                            <td class="td-filter is-narrow"><input type="checkbox" class="filter-checkbox"> </td>
+                            {# TODO: "Favorite person" functionality #}
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td class="has-text-centered" colspan="4">No results to show</td></tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
@@ -94,17 +101,21 @@
                 <tr><th class="th-pos">Position</th><th>Name</th><th class="th-points">Points</th></tr>
             </thead>
             <tbody id="leaderboard-body">
-            {% for player in players %}
-                <tr data-pid="{{ player.id }}" class="animated player-row {% if player.pos|replace("T","")|int > 20 and players[loop.index0-1].pos|replace("T","")|int <= 20 %}row-bordered{% endif %}"> {# Shows ties #}
-                    {% if player.pos is none %}
-                    <td class="td-pos">-</td>
-                    {% else %}
-                    <td class="td-pos">{{ player.pos }}</td>
-                    {% endif %}
-                    <td class="td-name">{{ player.name }}</td>
-                    <td class="td-points">{{ player.points }}</td>
-                </tr>
-            {% endfor %}
+            {% if players %}
+                {% for player in players %}
+                    <tr data-pid="{{ player.id }}" class="animated player-row {% if player.pos|replace("T","")|int > 20 and players[loop.index0-1].pos|replace("T","")|int <= 20 %}row-bordered{% endif %}"> {# Shows ties #}
+                        {% if player.pos is none %}
+                        <td class="td-pos">-</td>
+                        {% else %}
+                        <td class="td-pos">{{ player.pos }}</td>
+                        {% endif %}
+                        <td class="td-name">{{ player.name }}</td>
+                        <td class="td-points">{{ player.points }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td class="has-text-centered" colspan="4">No results to show</td></tr>
+            {% endif %}
             </tbody>
         </table>
     </div>
