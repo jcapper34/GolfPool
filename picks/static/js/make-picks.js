@@ -18,13 +18,24 @@ function submit_make_picks() {
             }
         });
 
-        return window.confirm("Are you sure you would like to submit? You can change your picks later by using your PIN");
+        let confirmMessage = "Are you sure you would like to submit? You can change your picks later by using your PIN\n\n";
+        confirmMessage += "Your Picks are:\n\n";
+        for(let level = 1; level <= 4; level++) {
+            confirmMessage += 'Level ' + level + '\n';
+            let selector = "input[name='level-" + level + "']";
+            if(level !== 4)
+                selector += ":checked";
+            $(selector).each(function () {
+                confirmMessage += $(this).val().split('*')[0] + '\n';
+            });
+            confirmMessage += '\n';
+        }
+        return window.confirm(confirmMessage);
 
     }
-
     window.alert("Please complete entire form and/or fix errors before submitting");
     return false;
-};
+}
 
 function check_entire_form(checkGeneral) {
     let valid = true;

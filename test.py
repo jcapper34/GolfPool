@@ -1,6 +1,6 @@
 from pprint import pprint
 
-from helper import func_find
+from helper import func_find, splash
 from mailer.test_mailer import test_picks_send
 from picksets.picksets_test import *
 from players.players_test import *
@@ -22,12 +22,11 @@ def test_graph():
 
 
 
-
-
 if __name__ == '__main__':
     # conn = Conn()
     # test_fill_db_rankings(conn=conn)
     # test_fill_db_standings(conn=conn)
-    # tournament = Tournament(year=2019)
-    # tournament.api_get_live()
-    test_graph()
+    tournament = Tournament(year=2019, tid='cumulative')
+    tournament.fill_db_rankings()
+    tournament.calculate_api_standings()
+    splash(tournament.picksets)

@@ -7,6 +7,13 @@ from helper import CURRENT_YEAR, func_find, splash, get_json
 from db.conn import Conn
 from tournament.tournament import Tournament
 
+"""
+Channel TIDS
+- 2019 Masters: 17893
+- 2019 US Open: 17902
+"""
+
+
 
 def insert_levels(year=CURRENT_YEAR):
     levels = (
@@ -85,7 +92,7 @@ def insert_levels(year=CURRENT_YEAR):
     conn.commit()
 
 
-def db_upload_leaderboard_individual(tournament, conn=None):
+def db_upload_leaderboard_individual(tournament, do_commit=True, conn=None):
     conn = filter_conn(conn)
 
     tournament.fill_api_leaderboard()
@@ -106,33 +113,52 @@ def db_upload_leaderboard_individual(tournament, conn=None):
 
     conn.exec(leaderboard_insert_query[:-1] + " ON CONFLICT DO NOTHING")
 
-    conn.commit()
+    if do_commit:
+        conn.commit()
 
     print("Inserted leaderboard: %s - %d" % (tournament.name, tournament.year))
 
 def db_upload_leaderboard(year, conn=None):
     conn = filter_conn(conn)
 
-    api_events = get_json("https://www.golfchannel.com/api/v2/tours/1/events/%d" % year)
-    major_results = [Tournament(year=year, channel_tid=e['key'], tournament_name=e['name']) for e in func_find(api_events, lambda event: event['major'], limit=4)]
+    for i in range(1, 4):
+        api_events = get_json("https://www.golfchannel.com/api/v2/tours/%d/events/%d" % (i,year))
+        try:
+            major_results = [Tournament(year=year, channel_tid=e['key'], tournament_name=e['name'])
+                         for e in func_find(api_events, lambda event: event['major'] and 'players' not in event['name'], limit=4)]
+        except TypeError:
+            print("NONE")
+        print([m.name for m in major_results])
+    return
+
+    assert len(major_results) == 4
+    assert all(['players' not in m.name.lower() for m in major_results])
 
     for major in major_results:
         lower_name = major.name.lower()
         if 'masters' in lower_name:
             major.tid = '014'
-        elif 'us' or 'u.s.' in lower_name:
+        elif 'us open' in lower_name or 'u.s. open' in lower_name:
             major.tid = '026'
-        elif 'open' in lower_name:
+        elif 'the open' in lower_name:
             major.tid = '100'
         elif 'championship' in lower_name:
             major.tid = '033'
+        else:
+            raise AttributeError("Can't find tid for %s" % major.name)
 
-        db_upload_leaderboard_individual(major, conn=conn)
+        db_upload_leaderboard_individual(major, do_commit=False, conn=conn)
 
+    conn.commit()
 
 if __name__ == "__main__":
     con = Conn()
-    y = 2015
-    for channel_tid, tid in [(16468, '026'),(16615, '100'),(16428, '033'), (16380, '014')]:
-        db_upload_leaderboard_individual(Tournament(year=y, channel_tid=channel_tid, tid=tid), conn=con)
+    # y = 2015
+    # for channel_tid, tid in [(16468, '026'),(16615, '100'),(16428, '033'), (16380, '014')]:
+    #     db_upload_leaderboard_individual(Tournament(year=y, channel_tid=channel_tid, tid=tid), conn=con)
+    for y in range(2015, 2020):
+        try:
+            db_upload_leaderboard(y, conn=con)
+        except AssertionError:
+            print("Unable to get all majors for %d" % y)
 
