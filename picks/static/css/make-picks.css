@@ -9387,7 +9387,6 @@ label.panel-block:hover {
   width: 3.25rem;
   height: 3.25rem;
   margin-left: auto;
-  z-index: 600;
   cursor: pointer;
 }
 

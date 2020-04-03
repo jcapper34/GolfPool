@@ -99,7 +99,7 @@ class Tournament:
         else:
             api_tournament = get_json(Tournament.LEADERBOARD_URL % self.channel_tid)['result'] # Get Tournament From API
 
-        point_template = get_json('../tournament/data/point-template.json')  # Load Point Template Data
+        point_template = get_json('tournament/data/point-template.json')  # Load Point Template Data
 
         leaderboard = api_tournament['golfers']
         self.channel_tid = api_tournament.get('eventKey')
