@@ -26,7 +26,7 @@
 
             let mainSection = $("main");
             $({r: start}).animate({r: end}, {
-                duration: 500,
+                duration: 300,
                 step: function(now) {
                     mobileNav.css("right", now+'vw');
                     const blurFactor = (1-(Math.abs(now)/100))*0.75;
