@@ -2,6 +2,7 @@
 params:
 - event_years
 - tournament
+- user_psid
 #}
 {% extends "base.html" %}
 
@@ -29,7 +30,7 @@ params:
             <div id="standings-tables">
                 <div class="columns">
                     <div id="standings-table-column" class="column is-half">
-                    {{ smac.standings_table(tournament.picksets) }}
+                    {{ smac.standings_table(tournament.picksets, user_psid) }}
                     </div>
                     <div id="leaderboard-table-column" class="column is-half">
                     {{ smac.leaderboard_table(tournament.players) }}

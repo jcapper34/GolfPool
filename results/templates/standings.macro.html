@@ -67,7 +67,7 @@
 
 
 {# Tables #}
-{% macro standings_table(picksets) %}
+{% macro standings_table(picksets, user_psid) %}
     <table id="standings-table" class="table is-fullwidth is-hoverable">
         <thead>
             <tr><th class="th-pos">Position</th><th>Name</th><th class="th-points">Points</th><th class="th-filter">Filter</th></tr>
@@ -75,7 +75,7 @@
         <tbody id="standings-body">
             {% if picksets %}
                 {% for pickset in picksets %}
-                    <tr class="pickset-row" data-psid="{{ pickset.id }}" data-picks='{{ pickset.picks|map(attribute='id')|list|tojson }}'> {# TODO: put picks in data-picks #}
+                    <tr class="pickset-row {% if pickset.id == user_psid %}is-selected{% endif %}" data-psid="{{ pickset.id }}" data-picks='{{ pickset.picks|map(attribute='id')|list|tojson }}'>
                         <td class="td-pos">
                         {{ pickset.pos }}
                         </td>

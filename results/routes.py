@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, get_template_attribute, jsonify
+from flask import Blueprint, render_template, request, get_template_attribute, jsonify, session
 
 from db.conn import Conn
 from helper import func_find, CURRENT_YEAR
@@ -23,7 +23,7 @@ def results_live():
         leaderboard_macro = get_template_attribute("standings.macro.html", "leaderboard_table")
         return jsonify([standings_macro(tournament.picksets), leaderboard_macro(tournament.players)])
 
-    return render_template('standings-live.html', tournament=tournament, event_years=Tournament.get_event_years())
+    return render_template('standings-live.html', tournament=tournament, event_years=Tournament.get_event_years(), user_psid=session.get("psid"))
 
 
 """ PAST ROUTES """
@@ -44,7 +44,7 @@ def results_past(year, tid):
     all_picks = get_all_picks(year, conn=conn)
     tournament.merge_all_picks(all_picks)
 
-    return render_template('standings-past.html', tournament=tournament, event_years=Tournament.get_event_years())
+    return render_template('standings-past.html', tournament=tournament, event_years=Tournament.get_event_years(), user_psid=session.get("psid"))
 
 
 # Past Standings Pickset Modal

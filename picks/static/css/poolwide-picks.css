@@ -9542,11 +9542,6 @@ main {
   color: black;
 }
 
-.table-wrap {
-  overflow-x: scroll;
-  -webkit-overflow-scrolling: touch;
-}
-
 #most-picked-section td, #most-picked-section th {
   width: 50%;
 }

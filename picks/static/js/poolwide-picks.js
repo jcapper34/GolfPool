@@ -2,38 +2,41 @@
 Parameters:
 - year
  */
+let allPicksSection = $("#all-picks-section");
+let mostPickedSection = $("#most-picked-section");
+let picksTabs = $('#picks-tabs');
 
 function prompt_picks_table(li_element) {
     // Highlight selected tab
-    $('#picks-tabs').find('li').removeClass('is-active');
+    picksTabs.find('li').removeClass('is-active');
     li_element.addClass('is-active');
 
-    $("#most-picked-section").addClass('hide');
-    $("#all-picks-section").removeClass('hide');
+    mostPickedSection.addClass('hide');
+    allPicksSection.removeClass('hide');
 }
 
-var mostPickedLoaded = false;
+let mostPickedLoaded = false;
 function prompt_most_picked(li_element) {
-    animate_progress();
 
     // Highlight selected tab
-    $('#picks-tabs').find('li').removeClass('is-active');
+    picksTabs.find('li').removeClass('is-active');
     li_element.addClass('is-active');
 
-    let mostPickedSection = $("#most-picked-section");
     mostPickedSection.removeClass('hide');
-    $("#all-picks-section").addClass('hide');
+    allPicksSection.addClass('hide');
 
     if(!mostPickedLoaded) { // If not yet loaded
         $.get('/picks/most-picked/'+year, function(htmlResponse) {
             mostPickedSection.html(htmlResponse);
             animate_progress();
+            mostPickedLoaded = true;
         });
-    }
+    } else
+        animate_progress();
 }
 
 function organize_most_picked() {
-    let mostPickedTableBody = $("#most-picked-section").find("tbody");
+    let mostPickedTableBody = mostPickedSection.find("tbody");
 
     if($("#organize-most-picked").prop("checked")) {
         // Separate rows into an array
