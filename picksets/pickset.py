@@ -52,7 +52,7 @@ class Pickset:
         # Get main levels
         self.picks = Pickset.extract_form_picks(form_picks)
 
-        if not self.validate_picks():   # Make sure picks are valid
+        if not self.validate_picks(conn):   # Make sure picks are valid
             return False
 
         self.db_update_picks(conn=conn)
@@ -78,7 +78,7 @@ class Pickset:
 
         return picks
 
-    def validate_picks(self):
+    def validate_picks(self, conn):
         if len(self.picks) != len(Pickset.PICKS_ALLOWED):  ## Check for correct number of levels
             return False
 
@@ -86,6 +86,13 @@ class Pickset:
             level_players = self.picks[i]
             if len(level_players) != Pickset.PICKS_ALLOWED[i]:
                 return False
+
+        """ Ensure that level 4 players are not in levels 1-3 """
+        results = conn.exec_fetch("SELECT player_id FROM level_xref WHERE season_year=%s", (CURRENT_YEAR,))
+        level_pids = [x[0] for x in results]
+        if any([p.id in level_pids for p in self.picks[3]]):
+            return False
+
         return True
 
     """ 
@@ -108,12 +115,6 @@ class Pickset:
     def db_inserts(self, year=CURRENT_YEAR, conn=None):
         conn = filter_conn(conn)   # Make connection
 
-        """ Ensure that level 4 players are not in levels 1-3 """
-        results = conn.exec_fetch("SELECT player_id FROM level_xref WHERE season_year=%s", (CURRENT_YEAR,))
-        level_pids = [x[0] for x in results]
-        if any([p.id in level_pids for p in self.picks[3]]):
-            return False
-
         """ Insert participant if doesn't exist """
         results = conn.exec_fetch(Pickset.INSERT_PARTICIPANT_QUERY, (self.name, self.email, self.pin))
         partid = results[0][0]
@@ -133,15 +134,18 @@ class Pickset:
         # Redefine Variables
         conn = filter_conn(conn)
 
-        query = "INSERT INTO picks_xref (player_id, pickset_id) VALUES"
-        for level_players in self.picks:
-            for picked_player in level_players:
-                # Create new db player if doesn't exist
-                conn.exec("INSERT INTO player (id, name) VALUES (%s, %s) ON CONFLICT DO NOTHING", (picked_player.id, picked_player.name))
+        picks = self.picks
+        if isinstance(picks[0], List):  # Un-separate picks if they are separated
+            picks = [pl for level_players in self.picks for pl in level_players]
 
-                # Add to picks insert query
-                s = conn.cur.mogrify(" (%s, %s),", (picked_player.id, self.id)).decode("utf-8")
-                query = ''.join((query, s))
+        query = "INSERT INTO picks_xref (player_id, pickset_id) VALUES"
+        for picked_player in picks:
+            # Create new db player if doesn't exist
+            conn.exec("INSERT INTO player (id, name) VALUES (%s, %s) ON CONFLICT DO NOTHING", (picked_player.id, picked_player.name))
+
+            # Add to picks insert query
+            s = conn.cur.mogrify(" (%s, %s),", (picked_player.id, self.id)).decode("utf-8")
+            query = ''.join((query, s))
 
         conn.exec(query[:-1])  # DB picks insert
 

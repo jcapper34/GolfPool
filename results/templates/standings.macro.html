@@ -100,7 +100,7 @@
         <tbody id="leaderboard-body">
         {% if players %}
             {% for player in players %}
-                <tr data-pid="{{ player.id }}" class="animated player-row {% if player.pos|replace("T","")|int > 20 and players[loop.index0-1].pos|replace("T","")|int <= 20 %}row-bordered{% endif %}"> {# Shows ties #}
+                <tr data-pid="{{ player.id }}" class="animated player-row {#{% if player.pos|replace("T","")|int > 20 and players[loop.index0-1].pos|replace("T","")|int <= 20 %}row-bordered{% endif %}}#}"> {# Shows ties #}
                     {% if player.pos is none %}
                     <td class="td-pos">-</td>
                     {% else %}

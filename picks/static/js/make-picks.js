@@ -291,7 +291,7 @@ function add_level_4(name, pid) {
             textInput.prop('disabled', true);
         picksTable.append("<tr>" +
             "<td>" + name + "</td>" +
-            "<td><a onclick='remove_level_4($(this))'><i class='fa fa-times'></i></td>" +
+            "<td><a onclick='remove_level_4($(this).closest(\"tr\"))'><i class='fa fa-times'></i></td>" +
             "<td class='hide'><input type='hidden' name='level-4' value='" + [name, pid].join('*') + "'></td>" +
             "</tr>"
         );  //If changing, make sure to change macro as well
@@ -299,13 +299,12 @@ function add_level_4(name, pid) {
 }
 
 function remove_level_4(trElement) {
-    // out(trElement);
     trElement.remove();
 }
 
 function check_all_level_4() {
     const level4Inputs = $("input[name='level-4']");
-    if(level4Inputs.length !== 2 || level4Inputs.eq(0).val() == level4Inputs.eq(1).val())   // Check if correct number and the picks don't match
+    if(level4Inputs.length !== 2 || level4Inputs.eq(0).val() === level4Inputs.eq(1).val())   // Check if correct number and the picks don't match
         return false;
 
     let valid = true;
@@ -343,9 +342,11 @@ function toggle_show_pin(button) {
 PAGE STARTUP
 */
 
+let OWGR_rankings;
 function set_OWGR() {
-    $.post('/api-retriever', {url: OWGR_URL}, function (OWGR_rankings) {
-            for(const i in OWGR_rankings) {  // Update player details
+    $.post('/api-retriever', {url: OWGR_URL}, function (response) {
+        OWGR_rankings = response;
+        for(const i in OWGR_rankings) {  // Update player details
                 const player = OWGR_rankings[i];
                 let playerColumn = $(".player-column[data-pid='" + player.golferId + "']");
                 playerColumn.find('.owgr-rank').text(player.currentRank);   // Show OWGR Rank

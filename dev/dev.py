@@ -11,6 +11,11 @@ from tournament.tournament import Tournament
 Channel TIDS
 - 2019 Masters: 17893
 - 2019 US Open: 17902
+
+- 2017 Masters: 16936  
+- 2017 US Open: 16946  
+- 2017 The Open: 16953    
+- 2017 PGA Championship: 16957  
 """
 
 
@@ -121,18 +126,17 @@ def db_upload_leaderboard_individual(tournament, do_commit=True, conn=None):
 def db_upload_leaderboard(year, conn=None):
     conn = filter_conn(conn)
 
-    for i in range(1, 4):
-        api_events = get_json("https://www.golfchannel.com/api/v2/tours/%d/events/%d" % (i,year))
-        try:
-            major_results = [Tournament(year=year, channel_tid=e['key'], tournament_name=e['name'])
-                         for e in func_find(api_events, lambda event: event['major'] and 'players' not in event['name'], limit=4)]
-        except TypeError:
-            print("NONE")
-        print([m.name for m in major_results])
-    return
+    api_events = get_json("https://www.golfchannel.com/api/v2/tours/%d/events/%d" % (1,year))
 
+    major_results = [Tournament(year=year, channel_tid=e['key'], tournament_name=e['name'])
+                     for e in func_find(api_events, lambda event: event['major'] and 'players' not in event['name'], limit=4)]
+
+
+    print([(m.channel_tid, m.name) for m in major_results])
     assert len(major_results) == 4
     assert all(['players' not in m.name.lower() for m in major_results])
+
+    return
 
     for major in major_results:
         lower_name = major.name.lower()
@@ -151,14 +155,34 @@ def db_upload_leaderboard(year, conn=None):
 
     conn.commit()
 
+
+def db_upload_standings_individual(tournament, conn=None):
+    conn = filter_conn(conn)
+
+    tournament.fill_api_leaderboard()
+    tournament.calculate_api_standings(get_picks=True, conn=conn)
+
+    conn.exec('INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING', (tournament.year,))  # Insert season
+
+    conn.exec("DELETE FROM event_standings_xref CASCADE WHERE tournament_id=%s AND season_year=%s", (tournament.tid, tournament.year))
+    conn.exec('INSERT INTO event (tournament_id, season_year) VALUES (%s, %s) ON CONFLICT DO NOTHING',
+              (tournament.tid, tournament.year))  # Insert season
+
+    standings_insert_query = "INSERT INTO event_standings_xref (tournament_id, season_year, pickset_id, position, points) VALUES "
+
+    for pickset in tournament.picksets:
+        values_query = conn.cur.mogrify(" (%s,%s,%s,%s,%s),",
+                                        (tournament.tid, tournament.year, pickset.id, pickset.pos, pickset.points))
+        standings_insert_query += values_query.decode()
+
+    conn.exec(standings_insert_query[:-1] + " ON CONFLICT DO NOTHING")
+
+    conn.commit()
+
+
 if __name__ == "__main__":
     con = Conn()
-    # y = 2015
-    # for channel_tid, tid in [(16468, '026'),(16615, '100'),(16428, '033'), (16380, '014')]:
-    #     db_upload_leaderboard_individual(Tournament(year=y, channel_tid=channel_tid, tid=tid), conn=con)
-    for y in range(2015, 2020):
-        try:
-            db_upload_leaderboard(y, conn=con)
-        except AssertionError:
-            print("Unable to get all majors for %d" % y)
+    for channel_tid, tid in [(16936, '014'), (16953, '100'), (16946, '026'), (16957, '033')]:
+        tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2017)
+        db_upload_standings_individual(tournament, conn=con)
 

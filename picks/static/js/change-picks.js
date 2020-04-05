@@ -79,5 +79,7 @@ function revert_picks() {
 }
 
 $(document).ready(function() {
-    revert_picks(); // Ensures form starts with current picks
+    try {
+        revert_picks(); // Ensures form starts with current picks
+    } catch (e) {}
 });

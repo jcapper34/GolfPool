@@ -1,22 +1,23 @@
 import xlrd
 
 from db.conn import Conn
-from helper import func_find, get_json
+from helper import func_find, get_json, splash
 from picksets.pickset import Pickset
 from picksets.picksets_db import get_all_picks
 from players.player import Player
 from players.players_helper import level_separate
 
 
-def xl_parse_picks(file_name, year):
+def xl_parse_picks(file_name, year, delete_first=False):
     conn = Conn()
+    if delete_first:
+        conn.exec("DELETE FROM pickset WHERE season_year=%s", (year,))
+
     api_players = list(get_json(Player.GOLFERS_URL)['items'].values())
     all_players = [Player(**pl) for pl in conn.exec_fetch("SELECT id as pid, name FROM player")]
 
     wb = xlrd.open_workbook(file_name)
     sheet = wb.sheet_by_index(0)
-
-    print(sheet.merged_cells)
 
     rows_gen = sheet.get_rows()
     next(rows_gen)  # Skip first row
@@ -39,14 +40,12 @@ def xl_parse_picks(file_name, year):
                     print("Doesn't exist", name)
                     continue
 
-            pickset.picks.append(Player(name=name))
-
-        # pickset.picks = level_separate(pickset.picks[])
-        # pickset.db_inserts(year, conn=conn)
+            pickset.picks.append(Player(name=name, pid=match.id))
+        pickset.db_inserts(year, conn=conn)
 
 
 
 
 
 if __name__ == "__main__":
-    xl_parse_picks('xlsx/picks-2017.xlsx', 2017)
+    xl_parse_picks('xlsx/picks-2017.xlsx', 2017, delete_first=True)
