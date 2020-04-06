@@ -9349,6 +9349,13 @@ label.panel-block:hover {
   color: white !important;
 }
 
+.absolutely-centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .loader {
   width: 100%;
   height: 100%;

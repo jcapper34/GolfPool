@@ -28,7 +28,7 @@ $(document).keyup(function(e) {
 function prompt_pickset_modal(psid, name, pos) {
     /* Open Modal */
     modal.addClass("is-active modal-open");
-    modalCardBody.html(ripple_html);
+    modalCardBody.html(circle_html);
 
     /* Set modal header */
     modal.find(".modal-card-title").text(pos + " | " + name);
@@ -110,7 +110,7 @@ function pickset_switch_tabs(li_element) {
 function prompt_player_modal(pid, name, pos) {
     /* Open Modal */
     modal.addClass("is-active modal-open");
-    modalCardBody.html(ripple_html);
+    modalCardBody.html(circle_html);
 
     /* Set modal header */
     modal.find(".modal-card-title").text(pos + " | " + name);

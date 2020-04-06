@@ -7,8 +7,9 @@ let standingsMainSection = $("#standings-main-section");
 /*
 HTML Inserts
 */
-const ripple_html = "<div class='lds-ripple'><div></div><div></div></div>";
-
+const ripple_html = "<div class='lds-ripple absolutely-centered'><div></div><div></div></div>";
+const roller_html = "<div class=\"lds-roller absolutely-centered\"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>";
+const circle_html = " <div class=\"lds-circle absolutely-centered\"><div></div></div>";
 
 function toggle_mobile_standings_menu(burger) {
     $('#standings-menu-items').stop().slideToggle();
@@ -19,7 +20,7 @@ let standings_xhr = null;
 function switch_tournament(a_element) {
     let menuLinks = $("#standings-menu-items").find("a");
     const newHref = a_element.data('href');
-    if(menuLinks.filter('.is-active').data('href') === newHref)  // Pages aren't changing
+    if(a_element.hasClass('is-active'))  // Pages aren't changing
         return;
 
     if(standings_xhr !== null) // Abort current request
@@ -31,10 +32,10 @@ function switch_tournament(a_element) {
     menuLinks.removeClass('is-active');
     a_element.addClass('is-active');
 
-    standingsMainSection.html(ripple_html); // Put loader
+    standingsMainSection.html(roller_html); // Put loader
 
     // Get standings section by ajax
-    standings_xhr = $.get(a_element.data("href"), {main_section_only: true}, function(response) {
+    standings_xhr = $.get(newHref, {main_section_only: true}, function(response) {
         standingsMainSection.html(response);
 
         // Re-attach handlers
