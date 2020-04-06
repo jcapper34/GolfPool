@@ -15,11 +15,15 @@ function toggle_mobile_standings_menu(burger) {
     burger.toggleClass("menu-open");
 }
 
+let standings_xhr = null;
 function switch_tournament(a_element) {
     let menuLinks = $("#standings-menu-items").find("a");
     const newHref = a_element.data('href');
     if(menuLinks.filter('.is-active').data('href') === newHref)  // Pages aren't changing
         return;
+
+    if(standings_xhr !== null) // Abort current request
+        standings_xhr.abort();
 
     window.history.pushState("", "", newHref);  //Change page url
 
@@ -30,7 +34,7 @@ function switch_tournament(a_element) {
     standingsMainSection.html(ripple_html); // Put loader
 
     // Get standings section by ajax
-    $.get(a_element.data("href"), {main_section_only: true}, function(response) {
+    standings_xhr = $.get(a_element.data("href"), {main_section_only: true}, function(response) {
         standingsMainSection.html(response);
 
         // Re-attach handlers
