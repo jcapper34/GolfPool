@@ -38,7 +38,7 @@ function prompt_pickset_modal(psid, name, pos) {
         modalCardBody.html(response);
     }).fail(function() {
         window.alert("Server Error: Could not load info");
-        modalCardBody.empty();
+        close_modal();
     });
 }
 
@@ -120,5 +120,6 @@ function prompt_player_modal(pid, name, pos) {
         modalCardBody.html(response);
     }).fail(function() {
         window.alert("Server Error: Could not load info");
+        close_modal();
     });
 }

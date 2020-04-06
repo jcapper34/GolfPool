@@ -6,7 +6,7 @@ params:
 #}
 {% extends "base.html" %}
 
-{% block title %} Standings | {{ tournament.name }} {{ tournament.year }}{% endblock %}
+{% block title %}Golf Pool | Standings{% endblock %}
 {% block hero_title %} Standings {% endblock %}
 
 {% block add_head %}
@@ -24,19 +24,7 @@ params:
             {{ smac.standings_menu(tournament.tid, tournament.year, event_years) }}
         </div>
         <section id="standings-main-section" class="section column">
-            {{ smac.standings_header(tournament.name, tournament.year) }}
-
-            {# Tables #}
-            <div id="standings-tables">
-                <div class="columns">
-                    <div id="standings-table-column" class="column is-half">
-                    {{ smac.standings_table(tournament.picksets, user_psid) }}
-                    </div>
-                    <div id="leaderboard-table-column" class="column is-half">
-                    {{ smac.leaderboard_table(tournament.players) }}
-                    </div>
-                </div>
-            </div>
+            {{ smac.standings_main_section(tournament, user_psid, add_refresh=False) }}
         </section>
     </div>
 
@@ -48,4 +36,5 @@ const channelTid = null;
 </script>
 <script src="/results/static/js/standings.js"></script>
 <script src="/results/static/js/standings-modal.js"></script>
+<script src="/results/static/js/standings-live.js"></script>
 {% endblock %}

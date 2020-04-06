@@ -17,16 +17,16 @@
         <div id="standings-menu-items">
             <ul class="menu-list">
                 <p class="menu-label">Dynamic Results</p>
-                <li><a class="{% if current_tid is none %}is-active{% endif %}" href="{{ url_for('results.results_live') }}">Live Standings</a></li>
+                <li><a onclick="switch_tournament($(this))" class="{% if current_tid is none %}is-active{% endif %}" data-href="{{ url_for('results.results_live') }}">Live Standings</a></li>
             </ul>
             <p class="menu-label">Final Results</p>
                 <ul class="menu-list">
                     <li>
                     {% for year in years %}
-                    <a href="{{ url_for('results.results_past', tid='cumulative', year=year) }}">{{ year }}</a>
+                    <a onclick="switch_tournament($(this))" data-href="{{ url_for('results.results_past', tid='cumulative', year=year) }}">{{ year }}</a>
                     <ul class="collapse-">
                        {% for tid in menu %}
-                        <li><a class="{% if tid==current_tid and year==current_year %}is-active{% endif %}" href="{{ url_for('results.results_past', tid=tid, year=year) }}">{{ menu[tid] }}</a></li>
+                        <li><a onclick="switch_tournament($(this))" class="{% if tid==current_tid and year==current_year %}is-active{% endif %}" data-href="{{ url_for('results.results_past', tid=tid, year=year) }}">{{ menu[tid] }}</a></li>
                         {% endfor %}
                     </ul>
                     {% endfor %}
@@ -36,6 +36,24 @@
     </div>
 {% endmacro %}
 
+{% macro standings_main_section(tournament, user_psid, add_refresh=False) %}
+    {{ standings_header(tournament.name, tournament.year, add_refresh=add_refresh) }}
+
+     {# Tables #}
+    <div id="standings-tables">
+        <div class="columns">
+            <div id="standings-table-column" class="column is-half">
+            {{ standings_table(tournament.picksets, user_psid) }}
+            </div>
+            <div id="leaderboard-table-column" class="column is-half">
+            {{ leaderboard_table(tournament.players) }}
+            </div>
+        </div>
+    </div>
+    <div id="standings-loader-box">
+        <div class='lds-ripple'><div></div><div></div></div>
+    </div>
+{% endmacro %}
 
 {% macro standings_header(tournament_name, year, add_refresh=False) %}
     <div class="level">

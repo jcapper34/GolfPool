@@ -9606,6 +9606,10 @@ label.panel-block:hover {
   }
 }
 /* Tables */
+#standings-main-section {
+  position: relative;
+}
+
 .shrink {
   width: 0 !important;
   height: 0 !important;
@@ -9675,13 +9679,6 @@ label.panel-block:hover {
   position: relative;
 }
 
-#standings-loader-box > .lds-ripple {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
 /* MODALS */
 @media only screen and (max-width: 769px) {
   .modal-card-body .tabs a {
@@ -9697,7 +9694,7 @@ body.modal-open {
   min-height: 90vh;
 }
 
-.modal-card-body > .lds-ripple {
+.lds-ripple {
   position: absolute;
   top: 50%;
   left: 50%;

@@ -16,6 +16,11 @@ Channel TIDS
 - 2017 US Open: 16946  
 - 2017 The Open: 16953    
 - 2017 PGA Championship: 16957  
+
+- 2016 US Open: 16610
+- 2016 Masters: 16639
+- 2016 The Open: 16615
+- 2016 PGA Championship: 16618
 """
 
 
@@ -182,7 +187,7 @@ def db_upload_standings_individual(tournament, conn=None):
 
 if __name__ == "__main__":
     con = Conn()
-    for channel_tid, tid in [(16936, '014'), (16953, '100'), (16946, '026'), (16957, '033')]:
-        tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2017)
+    for channel_tid, tid in [(16639, '014'), (16615, '100'), (16610, '026'), (16618, '033')]:
+        tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2016)
         db_upload_standings_individual(tournament, conn=con)
 

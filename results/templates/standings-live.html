@@ -6,7 +6,7 @@ params:
 #}
 {% extends "base.html" %}
 
-{% block title %}Live Standings{% endblock %}
+{% block title %}Golf-Pool | Live Standings{% endblock %}
 {% block hero_title %}Standings{% endblock %}
 
 {% block add_head %}
@@ -24,22 +24,7 @@ params:
             {{ smac.standings_menu(tournament.tid, tournament.year, event_years) }}
         </div>
         <section id="standings-main-section" class="section column">
-            {{ smac.standings_header(tournament.name, tournament.year, add_refresh=True) }}
-
-             {# Tables #}
-            <div id="standings-tables">
-                <div class="columns">
-                    <div id="standings-table-column" class="column is-half">
-                    {{ smac.standings_table(tournament.picksets, user_psid) }}
-                    </div>
-                    <div id="leaderboard-table-column" class="column is-half">
-                    {{ smac.leaderboard_table(tournament.players) }}
-                    </div>
-                </div>
-            </div>
-            <div id="standings-loader-box">
-                <div class='lds-ripple'><div></div><div></div></div>
-            </div>
+            {{ smac.standings_main_section(tournament, user_psid, add_refresh=True) }}
         </section>
     </div>
 {% endblock %}

@@ -41,11 +41,8 @@ def xl_parse_picks(file_name, year, delete_first=False):
                     continue
 
             pickset.picks.append(Player(name=name, pid=match.id))
+
         pickset.db_inserts(year, conn=conn)
 
-
-
-
-
 if __name__ == "__main__":
-    xl_parse_picks('xlsx/picks-2017.xlsx', 2017, delete_first=True)
+    xl_parse_picks('xlsx/picks-2016.xlsx', 2016, delete_first=True)

@@ -23,6 +23,10 @@ def results_live():
         leaderboard_macro = get_template_attribute("standings.macro.html", "leaderboard_table")
         return jsonify([standings_macro(tournament.picksets), leaderboard_macro(tournament.players)])
 
+    if request.args.get('main_section_only') is not None:
+        main_section_macro = get_template_attribute("standings.macro.html", "standings_main_section")
+        return main_section_macro(tournament, user_psid=session.get("psid"), add_refresh=True)
+
     return render_template('standings-live.html', tournament=tournament, event_years=Tournament.get_event_years(), user_psid=session.get("psid"))
 
 
@@ -43,6 +47,10 @@ def results_past(year, tid):
     # Merge all picks with tournament
     all_picks = get_all_picks(year, conn=conn)
     tournament.merge_all_picks(all_picks)
+
+    if request.args.get('main_section_only') is not None:   # For quick tab switching
+        main_section_macro = get_template_attribute("standings.macro.html", "standings_main_section")
+        return main_section_macro(tournament, user_psid=session.get("psid"))
 
     return render_template('standings-past.html', tournament=tournament, event_years=Tournament.get_event_years(), user_psid=session.get("psid"))
 

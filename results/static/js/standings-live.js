@@ -1,6 +1,11 @@
-let refreshButton = $("#refresh-standings").find("i");
-
 function standings_refresh() {
+    let refreshButton = $("#refresh-standings").find("i");
+    let standingsTables = $("#standings-tables");
+    let standingsLoaderBox = $("#standings-loader-box");
+    let leaderboardTableColumn = $("#leaderboard-table-column");
+    let standingsTableColumn = $("#standings-table-column");
+
+
     standingsLoaderBox.show();  // Show loader
     standingsTables.hide();
 

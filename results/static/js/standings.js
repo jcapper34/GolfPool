@@ -1,13 +1,8 @@
 /*
 ELEMENT CACHING
 */
-let tournamentSearchInput = $("#tournament-search");
 
-
-let standingsTables = $("#standings-tables");
-let leaderboardTableColumn = $("#leaderboard-table-column");
-let standingsTableColumn = $("#standings-table-column");
-let standingsLoaderBox = $("#standings-loader-box");
+let standingsMainSection = $("#standings-main-section");
 
 /*
 HTML Inserts
@@ -20,11 +15,35 @@ function toggle_mobile_standings_menu(burger) {
     burger.toggleClass("menu-open");
 }
 
+function switch_tournament(a_element) {
+    let menuLinks = $("#standings-menu-items").find("a");
+    const newHref = a_element.data('href');
+    if(menuLinks.filter('.is-active').data('href') === newHref)  // Pages aren't changing
+        return;
+
+    window.history.pushState("", "", newHref);  //Change page url
+
+    // Set open tab to active
+    menuLinks.removeClass('is-active');
+    a_element.addClass('is-active');
+
+    standingsMainSection.html(ripple_html); // Put loader
+
+    // Get standings section by ajax
+    $.get(a_element.data("href"), {main_section_only: true}, function(response) {
+        standingsMainSection.html(response);
+
+        // Re-attach handlers
+        attach_prompt_modal();
+        attach_filter_checkbox();
+    });
+}
+
 /*
 Standings Header
 */
 function tournament_search() {
-    const val = tournamentSearchInput.val().toLowerCase().trim();
+    const val = $("#tournament-search").val().toLowerCase().trim();
     const size = val.length;
     $(".td-name").each(function(){
         const name = $(this).text().toLowerCase();
@@ -98,8 +117,8 @@ function attach_filter_checkbox() {    // Must be re-attached after refresh
 }
 
 function switch_table(e) {
-    leaderboardTableColumn.toggle();
-    standingsTableColumn.toggle();
+    $("#leaderboard-table-column").toggle();
+    $("#standings-table-column").toggle();
 
 }
 

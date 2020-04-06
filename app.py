@@ -70,6 +70,9 @@ def page_not_found(e):
 def is_local():
     return dict(is_local=USE_LOCAL)
 
+def are_levels_defined(players):
+    return any([pl.level != 4 for pl in players])
+app.jinja_env.globals['are_levels_defined'] = are_levels_defined
 
 if __name__ == "__main__":
     app.run()   # Run
