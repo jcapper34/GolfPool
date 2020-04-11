@@ -179,9 +179,9 @@ function main_level_player_details(checkBox) {
         $(this).attr('src', $(this).data('src'));   // Load Image
     });
     if(checkBox.prop('checked'))  //Show Details
-        playerDetailsBox.slideDown();
+        playerDetailsBox.stop().slideDown();
     else  //Hide Details
-        playerDetailsBox.slideUp();
+        playerDetailsBox.stop().slideUp();
 }
 
 function main_level_effects(pickBox) {
@@ -201,6 +201,22 @@ function reset_main_level(pickBox) {
     main_level_effects(pickBox);
 }
 
+function player_checkbox_color_effect() {
+    let label = $(".player-checkbox").parent().find('.button');
+    const finalR = 125;
+    const finalG = 125;
+    const finalB = 125;
+
+    $({percent: 1.0}).animate({percent: 0}, {
+        duration: 1000,
+        step: function(now, fx) {
+            const r = Math.round(now*finalR);
+            const g = Math.round(now*finalG);
+            const b = Math.round(now*finalB);
+            label.css("background-color", "rgb(" + r + ',' + b + ',' + g + ")");
+        }
+    });
+}
 
 /*
 LEVEL 4 Functions

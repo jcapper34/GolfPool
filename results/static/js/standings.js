@@ -7,9 +7,6 @@ let standingsMainSection = $("#standings-main-section");
 /*
 HTML Inserts
 */
-const ripple_html = "<div class='lds-ripple absolutely-centered'><div></div><div></div></div>";
-const roller_html = "<div class=\"lds-roller absolutely-centered\"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>";
-const circle_html = " <div class=\"lds-circle absolutely-centered\"><div></div></div>";
 
 function toggle_mobile_standings_menu(burger) {
     $('#standings-menu-items').stop().slideToggle();

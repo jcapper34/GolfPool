@@ -5,6 +5,7 @@ import requests
 from db.db_helper import filter_conn
 from helper import CURRENT_YEAR, func_find, splash, get_json
 from db.conn import Conn
+from players.player import Player
 from tournament.tournament import Tournament
 
 """
@@ -184,10 +185,24 @@ def db_upload_standings_individual(tournament, conn=None):
 
     conn.commit()
 
+def db_set_photo_urls(conn=None):
+    conn = filter_conn(conn)
+    db_players = conn.exec_fetch("SELECT id, name FROM player WHERE tour_id is NULL")
+    api_players = get_json(Player.ALL_PLAYERS_URL)['plrs']
+
+    for player in db_players:
+        match = func_find(api_players, lambda pl: ' '.join((pl['nameF'], pl['nameL'])).lower() == player['name'].lower())
+        if match is not None:
+            pid = match['pid']
+            conn.exec("UPDATE player SET tour_id = %s, photo_url = %s WHERE id=%s", (pid, Player.PGA_PHOTO_URL % pid, player['id']))
+
+
+    conn.commit()
 
 if __name__ == "__main__":
     con = Conn()
-    for channel_tid, tid in [(16639, '014'), (16615, '100'), (16610, '026'), (16618, '033')]:
-        tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2016)
-        db_upload_standings_individual(tournament, conn=con)
+    # for channel_tid, tid in [(16639, '014'), (16615, '100'), (16610, '026'), (16618, '033')]:
+    #     tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2016)
+    #     db_upload_standings_individual(tournament, conn=con)
+    db_set_photo_urls(con)
 
