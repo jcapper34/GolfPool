@@ -16,7 +16,7 @@ Channel TIDS
 - 2017 Masters: 16936  
 - 2017 US Open: 16946  
 - 2017 The Open: 16953    
-- 2017 PGA Championship: 16957  
+- 2017 PGA Championship: 16957
 
 - 2016 US Open: 16610
 - 2016 Masters: 16639
@@ -34,6 +34,7 @@ def insert_levels(year=CURRENT_YEAR):
          'Brooks Koepka',
          'Justin Thomas',
          'Dustin Johnson',
+         'Bryson DeChambeau',
          'Adam Scott',
          'Patrick Reed',
          'Patrick Cantlay',
@@ -44,7 +45,6 @@ def insert_levels(year=CURRENT_YEAR):
         ),
         (
         'Xander Schauffele',
-        'Bryson DeChambeau',
         'Marc Leishman',
         'Tony Finau',
         'Matt Kuchar',
@@ -200,9 +200,9 @@ def db_set_photo_urls(conn=None):
     conn.commit()
 
 if __name__ == "__main__":
-    con = Conn()
+    # con = Conn()
     # for channel_tid, tid in [(16639, '014'), (16615, '100'), (16610, '026'), (16618, '033')]:
     #     tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2016)
     #     db_upload_standings_individual(tournament, conn=con)
-    db_set_photo_urls(con)
 
+    insert_levels(2020)

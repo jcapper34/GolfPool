@@ -3,8 +3,9 @@ from flask import Blueprint, render_template, request, session, redirect, jsonif
 
 from db.conn import Conn
 from helper import CURRENT_YEAR, splash, RUNNING_LOCALLY
+from mailer.postman import Postman
 from picksets.pickset import Pickset
-from picksets.picksets_db import get_all_picks, get_login, get_most_picked
+from picksets.picksets_db import get_all_picks, get_login, get_most_picked, email_exists
 from players.players_db import get_levels
 from players.player import Player
 from tournament.tournament import Tournament
@@ -111,6 +112,19 @@ def picks_change_login():
         session['psid'] = psid
 
     return jsonify(resp)
+
+@picks_mod.route("/change/forgot-pin", methods=['GET', 'POST'])
+def picks_forgot_pin():
+    if request.method == 'GET':
+        return render_template('change/change-picks-forgot-pin.html', username=request.args.get("username"))
+
+    email = request.form.get('email')
+    if not email_exists(email):
+        return "Email does not exist"
+
+    postman = Postman(recipients=(email,))
+    postman.message_subject += " | Your PIN"
+    postman.message_body = ""
 
 
 # Change Picks Logout

@@ -1,0 +1,29 @@
+{#
+params:
+- username=None
+#}
+{% extends "base.html" %}
+
+{% block title %}Golf Pool | Forgot PIN{% endblock %}
+{% block hero_title %}Forgot PIN{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="box">
+            <form id="change-picks-form">
+                <div class="field">
+                    <label class="label">Email</label>
+                    <div class="control">
+                        <input id="forgot-pin-email" type="email" name="email" class="input" style="text-transform: lowercase" required>
+                    </div>
+                </div>
+                <div class="field is-grouped is-grouped-right">
+                    <div class="control">
+                        <input id="submit-button" class="button is-link" type="button" value="Submit" onclick="submit_login()">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

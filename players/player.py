@@ -13,7 +13,7 @@ class Player:
     # From Golf Channel Website
     STAT_CATEGORIES_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/categories"
     STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/2020"   # Parameters: Stat Number
-    GOLFERS_URL = "https://www.golfchannel.com/api/search/objectGolferVerbose?full=true"
+    GOLFERS_URL = "https://www.golfchannel.com/api/es/fullObject"
 
     def __init__(self, pid=None, **kwargs):
         # General
@@ -92,7 +92,7 @@ class Player:
     def __str__(self):
         return "Player: id=%s, name='%s'" % (self.id, self.name)
 
-    def __hash__(self): # So 'in' keyword can be used
+    def __hash__(self):         # So 'in' keyword can be used
         return int(self.id)
 
     def __eq__(self, other):    # Allows for comparison

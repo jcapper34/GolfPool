@@ -34,7 +34,7 @@ class Pickset:
         # Get main levels
         self.picks = Pickset.extract_form_picks(form_picks)
 
-        if not self.validate_picks():   # Make sure picks are valid
+        if not self.validate_picks(conn):   # Make sure picks are valid
             return False
 
         psid = self.db_inserts(conn=conn)

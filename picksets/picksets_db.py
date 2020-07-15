@@ -80,11 +80,16 @@ GET_LOGIN_QUERY = """
         WHERE pa.email = %s AND pa.pin = %s AND ps.season_year = %s
         LIMIT 1
 """
-def get_login(email, pin):
-    conn = Conn()
+def get_login(email, pin, conn=None):
+    conn = filter_conn(conn)
     result = conn.exec_fetch(GET_LOGIN_QUERY, (email, pin, CURRENT_YEAR))   # Remember to change year
 
     if conn.cur.rowcount == 0:
         return False
 
     return result[0][0]
+
+def email_exists(email, conn=None):
+    conn = filter_conn(conn)
+    #todo
+    return False

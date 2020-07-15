@@ -250,11 +250,12 @@ function create_player_suggestions(input_element) {
 
     let suggestions = [];
     let count = 0;
-
     for(const i in apiPlayers) {
         const player = apiPlayers[i];
-        const playerFirst = player.firstName;
-        const playerLast = player.lastName;
+        // const playerFirst = player.firstName;
+        // const playerLast = player.lastName;
+        const playerFirst = player.name.split(' ')[0];
+        const playerLast = player.name.split(' ')[1];
 
         if ( (nameCheck(playerFirst, val) || nameCheck(playerLast, val) || nameCheck(player.name, val)) && isValid(player.id)){
             suggestions.push([player.id, player.name]); // In the form (pid, name)
@@ -374,8 +375,11 @@ function set_OWGR() {
 var apiPlayers = {};
 function get_api_players() {
     $.post('/api-retriever', {url: API_PLAYERS_URL}, function (response) {
-       apiPlayers = Object.values(response.items);
-       apiPlayers = append_to_api_players(apiPlayers);
+        apiPlayers = Object.values(response.items);
+        apiPlayers = append_to_api_players(apiPlayers);
+    }).fail(function (e) {
+        window.alert("Unable to retrieve player data from server. Please try again later");
+        out(e);
     });
 
 }
@@ -394,7 +398,6 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
 
 function set_season_history() {
     $.get('/picks/season-history', function(response) {
-        out(response);
         $(".pool-ranking-column").attr("rowspan", response.length); //Set height of table
 
         $(".player-column").each(function() {
