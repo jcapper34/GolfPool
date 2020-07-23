@@ -25,7 +25,7 @@ def picks_index():
 # Make Picks Page
 @picks_mod.route("/make")
 def picks_make():
-    return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % 19, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
+    return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % Player.OWGR_STAT_ID, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
 
 @picks_mod.route("/season-history")
 def picks_get_season_history():

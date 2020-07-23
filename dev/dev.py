@@ -60,7 +60,8 @@ def insert_levels(year=CURRENT_YEAR):
         'Sergio Garcia',
         'Jordan Spieth',
         'Jason Day',
-        'Bubba Watson'
+        'Bubba Watson',
+        'Collin Morikawa'
         ),
         (
         'Sungjae Im',
@@ -76,16 +77,19 @@ def insert_levels(year=CURRENT_YEAR):
         'Chez Reavie',
         'Rafa Cabrera Bello',
         'Jazz Janewattananond',
-        'Scottie Scheffler',
         'Brandt Snedeker',
         'Graeme McDowell',
         'Ian Poulter',
         'Phil Mickelson',
         'Keegan Bradley',
+        'Daniel Berger',
+        'Viktor Hovland',
         'Branden Grace',
         'Adam Hadwin',
         )
     )
+    check_levels_good(levels)
+
     conn = Conn()
 
     # Do clean up
@@ -198,6 +202,23 @@ def db_set_photo_urls(conn=None):
 
 
     conn.commit()
+
+
+def check_levels_good(levels):
+    # flattened_levels = [pl for level in levels for pl in level]
+    owgr_data = requests.get(Player.STATS_URL % Player.OWGR_STAT_ID).json()[:100]
+    for player in owgr_data:
+        p_name = player['firstName'] + " " + player['lastName']
+        found = False
+        for level in levels:
+            if func_find(level, lambda pl: p_name == pl):
+                print(p_name, levels.index(level)+1, sep='\t\t')
+                found = True
+
+        if not found:
+            print(p_name, "X", sep='\t\t')
+
+
 
 if __name__ == "__main__":
     # con = Conn()

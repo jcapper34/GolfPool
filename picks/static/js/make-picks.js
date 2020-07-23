@@ -317,6 +317,8 @@ function add_level_4(name, pid) {
 
 function remove_level_4(trElement) {
     trElement.remove();
+    $("#level-4-text").removeAttr('disabled');
+
 }
 
 function check_all_level_4() {
