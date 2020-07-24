@@ -39,11 +39,13 @@
 {% macro standings_main_section(tournament, user_psid, add_refresh=False) %}
     {{ standings_header(tournament.name, tournament.year, add_refresh=add_refresh) }}
 
-     {# Tables #}
+    {# Tables #}
     <div id="standings-tables">
         <div class="columns">
             <div id="standings-table-column" class="column is-half">
-            {{ standings_table(tournament.picksets, user_psid) }}
+                {% if not add_refresh %}    {# TODO: Remove when tournaments start #}
+                {{ standings_table(tournament.picksets, user_psid) }}
+                {% endif %}
             </div>
             <div id="leaderboard-table-column" class="column is-half">
             {{ leaderboard_table(tournament.players) }}
