@@ -256,7 +256,9 @@ function create_player_suggestions(input_element) {
         // const playerLast = player.lastName;
         const playerFirst = player.name.split(' ')[0];
         const playerLast = player.name.split(' ')[1];
-
+        if(playerLast === undefined || playerFirst === undefined) {
+            continue;
+        }
         if ( (nameCheck(playerFirst, val) || nameCheck(playerLast, val) || nameCheck(player.name, val)) && isValid(player.id)){
             suggestions.push([player.id, player.name]); // In the form (pid, name)
             count++;
@@ -393,6 +395,12 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
             name: "Si Woo Kim",
             firstName: 'Si Woo',
             lastName: 'Kim',
+        },
+        {
+            id: 74401,
+            name: "Erik van Rooyen",
+            firstName: 'Erik',
+            lastName: 'van Rooyen',
         }
     ];
     return api_list.concat(newPlayers);

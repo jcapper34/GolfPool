@@ -88,6 +88,11 @@ def insert_levels(year=CURRENT_YEAR):
         'Adam Hadwin',
         )
     )
+    for level in levels:
+        for player in sorted(level):
+            print(player)
+        print()
+    return
     check_levels_good(levels)
 
     conn = Conn()

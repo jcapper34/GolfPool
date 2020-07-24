@@ -18,6 +18,7 @@ def results_live():
     tournament = Tournament(year=CURRENT_YEAR)
     tournament.fill_api_leaderboard()
     tournament.calculate_api_standings()
+
     if request.args.get("refresh") is not None:    # If refresh
         standings_macro = get_template_attribute("standings.macro.html", "standings_table")
         leaderboard_macro = get_template_attribute("standings.macro.html", "leaderboard_table")
