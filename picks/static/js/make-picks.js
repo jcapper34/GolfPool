@@ -252,13 +252,16 @@ function create_player_suggestions(input_element) {
     let count = 0;
     for(const i in apiPlayers) {
         const player = apiPlayers[i];
+        if(player.type !== 'golfer')
+            continue;
+
         // const playerFirst = player.firstName;
         // const playerLast = player.lastName;
         const playerFirst = player.name.split(' ')[0];
         const playerLast = player.name.split(' ')[1];
-        if(playerLast === undefined || playerFirst === undefined) {
-            continue;
-        }
+        // if(playerLast === undefined || playerFirst === undefined) {
+        //     continue;
+        // }
         if ( (nameCheck(playerFirst, val) || nameCheck(playerLast, val) || nameCheck(player.name, val)) && isValid(player.id)){
             suggestions.push([player.id, player.name]); // In the form (pid, name)
             count++;
