@@ -383,7 +383,9 @@ var apiPlayers = {};
 function get_api_players() {
     $.post('/api-retriever', {url: API_PLAYERS_URL}, function (response) {
         apiPlayers = Object.values(response.items);
+        out(apiPlayers.length);
         apiPlayers = append_to_api_players(apiPlayers);
+
     }).fail(function (e) {
         window.alert("Unable to retrieve player data from server. Please try again later");
         out(e);
@@ -398,12 +400,14 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
             name: "Si Woo Kim",
             firstName: 'Si Woo',
             lastName: 'Kim',
+            type: 'golfer'
         },
         {
             id: 74401,
             name: "Erik van Rooyen",
             firstName: 'Erik',
             lastName: 'van Rooyen',
+            type: 'golfer'
         }
     ];
     return api_list.concat(newPlayers);
