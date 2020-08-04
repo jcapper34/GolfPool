@@ -109,7 +109,7 @@ class Tournament:
         self.players = [Player(pid=pl['golferId'],
                                name=pl['firstName'] + " " + pl['lastName'],
                                pos=pl['position'],
-                               points=point_template[str(pl['sortHelp'])] if pl['sortHelp'] <= 20 else 0,
+                               points=point_template[str(pl['sortHelp'])] if pl['sortHelp'] is not None and pl['sortHelp'] <= 20 else 0,
                                total=pl['overallPar']
                                ) for pl in leaderboard] # Create Player objects of leaderboard
 
