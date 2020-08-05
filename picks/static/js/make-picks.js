@@ -408,7 +408,15 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
             firstName: 'Erik',
             lastName: 'van Rooyen',
             type: 'golfer'
-        }
+        },
+        {
+            id: 37873,
+            name: "Cheng Tsung Pan",
+            firstName: 'Cheng Tsung',
+            lastName: 'Pan',
+            type: 'golfer'
+        },
+
     ];
     return api_list.concat(newPlayers);
 }
