@@ -110,9 +110,9 @@ class Tournament:
                                name=pl['firstName'] + " " + pl['lastName'],
                                pos=pl['position'],
                                points=point_template[str(pl['sortHelp'])] if pl['sortHelp'] is not None and pl['sortHelp'] <= 20 else 0,
-                               total=pl['overallPar']
+                               total=pl['overallPar'],
+                               photo_url=pl['imageUrl']
                                ) for pl in leaderboard] # Create Player objects of leaderboard
-
         self.name = api_tournament.get("eventName")
 
     """ CALCULATIONS """
