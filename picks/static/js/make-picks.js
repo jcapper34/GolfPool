@@ -411,7 +411,7 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
         },
         {
             id: 37873,
-            name: "Cheng Tsung Pan",
+            name: "CT Pan",
             firstName: 'Cheng Tsung',
             lastName: 'Pan',
             type: 'golfer'
