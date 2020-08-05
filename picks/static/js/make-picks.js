@@ -416,6 +416,13 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
             lastName: 'Pan',
             type: 'golfer'
         },
+        {
+            id: 56542,
+            name: "Christiaan Bezuidenhout",
+            firstName: 'Christiaan',
+            lastName: 'Bezuidenhout',
+            type: 'golfer'
+        },
 
     ];
     return api_list.concat(newPlayers);
