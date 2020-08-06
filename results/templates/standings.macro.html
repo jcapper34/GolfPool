@@ -43,9 +43,7 @@
     <div id="standings-tables">
         <div class="columns">
             <div id="standings-table-column" class="column is-half">
-                {% if not add_refresh %}    {# TODO: Remove when tournaments start #}
-                    {{ standings_table(tournament.picksets, user_psid) }}
-                {% endif %}
+                {{ standings_table(tournament.picksets, user_psid) }}
             </div>
             <div id="leaderboard-table-column" class="column is-half">
             {{ leaderboard_table(tournament.players) }}
