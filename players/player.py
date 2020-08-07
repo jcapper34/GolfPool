@@ -29,6 +29,7 @@ class Player:
         self.pos = kwargs.get("pos")
         if self.pos == 'T999':
             self.pos = None
+        self.raw_pos = kwargs.get("raw_pos")
         self.thru = kwargs.get("thru")
         if self is None or self.thru == 18:
             self.thru = 'F'
