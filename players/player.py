@@ -29,7 +29,9 @@ class Player:
         self.pos = kwargs.get("pos")
         if self.pos == 'T999':
             self.pos = None
+
         self.raw_pos = kwargs.get("raw_pos")
+
         self.thru = kwargs.get("thru")
         if self is None or self.thru == 18:
             self.thru = 'F'
@@ -48,7 +50,6 @@ class Player:
         self.photo_url = kwargs.get('photo_url')
         if self.photo_url is None:
             self.photo_url = Player.PGA_PHOTO_URL % self.tour_id
-
 
     # Parameters: pid, year
     # Returns: psid, name
