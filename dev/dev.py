@@ -25,6 +25,16 @@ Channel TIDS
 """
 
 
+def get_email_addresses(year):
+    conn = Conn()
+    results = conn.exec_fetch("""
+        SELECT DISTINCT pa.email FROM participant AS pa
+        JOIN pickset ON pa.id = pickset.participant_id
+        WHERE season_year = %s
+        """, (year, ))
+
+    return '; '.join([email for a in results for email in a])
+
 
 def insert_levels(year=CURRENT_YEAR):
     levels = (
@@ -231,4 +241,4 @@ if __name__ == "__main__":
     #     tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2016)
     #     db_upload_standings_individual(tournament, conn=con)
 
-    insert_levels(2020)
+    print(get_email_addresses(2020))

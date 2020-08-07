@@ -25,6 +25,7 @@ def picks_index():
 # Make Picks Page
 @picks_mod.route("/make")
 def picks_make():
+    return render_template('locked-page.html', title="Make Picks")
     return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % Player.OWGR_STAT_ID, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
 
 @picks_mod.route("/season-history")
@@ -80,6 +81,9 @@ def picks_confirmation():
 # Change Picks Page
 @picks_mod.route("/change")
 def picks_change():
+    return render_template('locked-page.html', title="Change Picks")
+
+
     psid = session.get('psid')
     if psid is None: # If not logged in
         return render_template('change/change-picks-login.html')

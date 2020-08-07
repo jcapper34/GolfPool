@@ -96,6 +96,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
         tournament = Tournament(year=year, channel_tid=int(channel_tid))
         tournament.fill_api_leaderboard()
         leaderboard_player = func_find(tournament.players, lambda pl: pl.id == player.id)
+
         player.photo_url = leaderboard_player.photo_url
         player.current_tournament_data = leaderboard_player
     else:

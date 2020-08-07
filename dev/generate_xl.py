@@ -76,10 +76,10 @@ def write_picks_workbook(year, filename):
 
     worksheet_names = {
         "Picks": None,
-        "Masters": "014",
-        "PGA Championship": "033",
-        "US Open": "026",
-        "British Open": "100"
+        # "Masters": "014",
+        # "PGA Championship": "033",
+        # "US Open": "026",
+        # "British Open": "100"
     }
     picksets = get_all_picks(year, separate=False, conn=conn)
 
@@ -90,7 +90,7 @@ def write_picks_workbook(year, filename):
 
 
 if __name__ == "__main__":
-    year = 2019
-    filename = os.path.join('xlsx', 'standings-final-%d.xlsx' % year)
+    year = 2020
+    filename = os.path.join('xlsx', 'picks-%d.xlsx' % year)
 
     write_picks_workbook(year, filename)
