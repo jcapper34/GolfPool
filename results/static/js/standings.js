@@ -15,6 +15,8 @@ function toggle_mobile_standings_menu(burger) {
 
 let standings_xhr = null;
 function switch_tournament(a_element) {
+    toggle_mobile_standings_menu($("#standings-menu-header").find(".burger"));
+
     let menuLinks = $("#standings-menu-items").find("a");
     const newHref = a_element.data('href');
     if(a_element.hasClass('is-active'))  // Pages aren't changing
