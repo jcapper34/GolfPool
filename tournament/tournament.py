@@ -105,12 +105,14 @@ class Tournament:
             point_template = get_json('../tournament/data/point-template.json')  # Load Point Template Data
 
         leaderboard = api_tournament['golfers']
+        pprint(leaderboard)
         self.channel_tid = api_tournament.get('eventKey')
         self.players = [Player(pid=pl['golferId'],
                                name=pl['firstName'] + " " + pl['lastName'],
                                pos=pl['position'],
                                points=point_template[str(pl['sortHelp'])] if pl['sortHelp'] is not None and pl['sortHelp'] <= 20 else 0,
                                total=pl['overallPar'],
+                               thru=pl['thruHole'],
                                photo_url=pl['imageUrl']
                                ) for pl in leaderboard] # Create Player objects of leaderboard
         self.name = api_tournament.get("eventName")
