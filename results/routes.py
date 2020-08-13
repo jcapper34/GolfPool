@@ -41,7 +41,10 @@ def results_past(year, tid):
     # Get Database Standings
     tournament = Tournament(year=year, tid=tid)
     if not tournament.fill_db_rankings(conn=conn):   # If tournament not found in DB
-        return render_template("locked-standings.html", tournament=tournament, event_years=Tournament.get_event_years())
+        if request.args.get('main_section_only') is None:
+            return render_template("locked-standings.html", tournament=tournament, event_years=Tournament.get_event_years())
+        else:
+            return "<p class='has-text-centered'>No results to show</p>"
 
     tournament.fill_db_standings(conn=conn)
 

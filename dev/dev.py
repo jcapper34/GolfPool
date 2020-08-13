@@ -236,9 +236,10 @@ def check_levels_good(levels):
 
 
 if __name__ == "__main__":
-    # con = Conn()
-    # for channel_tid, tid in [(16639, '014'), (16615, '100'), (16610, '026'), (16618, '033')]:
-    #     tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2016)
-    #     db_upload_standings_individual(tournament, conn=con)
+    con = Conn()
+    for channel_tid, tid in [(18496, '033')]:
+        tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2020)
+        db_upload_standings_individual(tournament, conn=con)
+        db_upload_leaderboard_individual(tournament, conn=con)
 
-    print(get_email_addresses(2020))
+

@@ -90,7 +90,7 @@ class Tournament:
     def api_get_live():
         events = get_json(Tournament.EVENTS_URL % CURRENT_YEAR)
         current_tournament = func_find(events, lambda e: NOW < datetime.strptime(e['endDate'], "%Y-%m-%dT%H:%M:%S"))    # Finds first event with end date after now
-        return get_json(Tournament.LEADERBOARD_URL % 18496)
+        return get_json(Tournament.LEADERBOARD_URL % current_tournament['key'])
 
 
     def fill_api_leaderboard(self):
@@ -154,6 +154,7 @@ class Tournament:
     @staticmethod
     def get_event_years(conn=None): # Used to get all season years that have been stored in DB
         conn = filter_conn(conn)
+        # print(conn.exec_fetch("SELECT season_year, tournament_id from event ORDER BY season_year DESC"))
         return [r[0] for r in conn.exec_fetch("SELECT DISTINCT season_year from event_leaderboard_xref ORDER BY season_year DESC")]
 
 
