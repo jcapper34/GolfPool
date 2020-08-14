@@ -28,7 +28,7 @@ def results_live():
         main_section_macro = get_template_attribute("standings.macro.html", "standings_main_section")
         return main_section_macro(tournament, user_psid=session.get("psid"), add_refresh=True)
 
-    return render_template('standings-live.html', tournament=tournament, event_years=Tournament.get_event_years(), user_psid=session.get("psid"))
+    return render_template('standings-live.html', tournament=tournament, passed_events=Tournament.get_passed_events(), user_psid=session.get("psid"))
 
 
 """ PAST ROUTES """
@@ -38,11 +38,13 @@ def results_live():
 def results_past(year, tid):
     conn = Conn()
 
+    passed_events = Tournament.get_passed_events()
+
     # Get Database Standings
     tournament = Tournament(year=year, tid=tid)
     if not tournament.fill_db_rankings(conn=conn):   # If tournament not found in DB
         if request.args.get('main_section_only') is None:
-            return render_template("locked-standings.html", tournament=tournament, event_years=Tournament.get_event_years())
+            return render_template("locked-standings.html", tournament=tournament, passed_events=passed_events)
         else:
             return "<p class='has-text-centered'>No results to show</p>"
 
@@ -56,7 +58,7 @@ def results_past(year, tid):
         main_section_macro = get_template_attribute("standings.macro.html", "standings_main_section")
         return main_section_macro(tournament, user_psid=session.get("psid"))
 
-    return render_template('standings-past.html', tournament=tournament, event_years=Tournament.get_event_years(), user_psid=session.get("psid"))
+    return render_template('standings-past.html', tournament=tournament, passed_events=passed_events, user_psid=session.get("psid"))
 
 
 # Past Standings Pickset Modal

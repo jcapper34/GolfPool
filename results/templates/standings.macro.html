@@ -1,4 +1,4 @@
-{% macro standings_menu(current_tid, current_year, years) %}    {# current_tid and current_year are used for highlighting #}
+{% macro standings_menu(current_tid, current_year, passed_events) %}    {# current_tid and current_year are used for highlighting #}
     {% set menu = { "014": "Masters",
                 "033": "PGA Championship",
                 "026": "US Open",
@@ -22,12 +22,13 @@
             <p class="menu-label">Final Results</p>
                 <ul class="menu-list">
                     <li>
-                    {% for year in years %}
+                    {% for year in passed_events %}
                     <a onclick="switch_tournament($(this))" data-href="{{ url_for('results.results_past', tid='cumulative', year=year) }}">{{ year }}</a>
                     <ul class="collapse-">
-                       {% for tid in menu %}
-                        <li><a onclick="switch_tournament($(this))" class="{% if tid==current_tid and year==current_year %}is-active{% endif %}" data-href="{{ url_for('results.results_past', tid=tid, year=year) }}">{{ menu[tid] }}</a></li>
+                       {% for tourny in passed_events[year] %}
+                        <li><a onclick="switch_tournament($(this))" class="{% if tourny.id==current_tid and year==current_year %}is-active{% endif %}" data-href="{{ url_for('results.results_past', tid=tourny.id, year=year) }}">{{ tourny.name }}</a></li>
                         {% endfor %}
+                        <a onclick="switch_tournament($(this))" data-href="{{ url_for('results.results_past', tid='cumulative', year=year) }}">Cumulative</a>
                     </ul>
                     {% endfor %}
                     </li>

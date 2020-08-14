@@ -23,10 +23,17 @@ def test_graph():
 
 
 if __name__ == '__main__':
+    pass
     # conn = Conn()
-    # test_fill_db_rankings(conn=conn)
-    # test_fill_db_standings(conn=conn)
-    tournament = Tournament(year=2019, tid='cumulative')
-    tournament.fill_db_rankings()
-    tournament.calculate_api_standings()
-    splash(tournament.picksets)
+    # results = conn.exec_fetch("SELECT season_year, tournament_id from event ORDER BY season_year DESC")
+    #
+    # year_tourny = {}
+    # for row in results:
+    #     tournament_id = row[1]
+    #     if year_tourny.get(row[0]) is None:
+    #         year_tourny[row[0]] = [tournament_id]
+    #     else:
+    #         year_tourny[row[0]].append(year_tourny[row[0]])
+    #
+    # print(year_tourny)
+

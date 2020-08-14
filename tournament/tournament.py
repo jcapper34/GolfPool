@@ -152,11 +152,26 @@ class Tournament:
             self.picksets[i].pos = pos
 
     @staticmethod
-    def get_event_years(conn=None): # Used to get all season years that have been stored in DB
+    def get_passed_events(conn=None): # Used to get all season years that have been stored in DB
         conn = filter_conn(conn)
-        # print(conn.exec_fetch("SELECT season_year, tournament_id from event ORDER BY season_year DESC"))
-        return [r[0] for r in conn.exec_fetch("SELECT DISTINCT season_year from event_leaderboard_xref ORDER BY season_year DESC")]
+        results = conn.exec_fetch("""
+        SELECT season_year, tournament.id, tournament.name from event 
+            JOIN tournament ON event.tournament_id = tournament.id
+            ORDER BY season_year DESC
+        """)
 
+        year_tourny = {}
+        for row in results:
+            info = {
+                    'id': row[1],
+                    'name': row[2]
+                }
+            if year_tourny.get(row[0]) is None:
+                year_tourny[row[0]] = [info]
+            else:
+                year_tourny[row[0]].append(info)
+
+        return year_tourny
 
     """ MERGES """
     def merge_all_picks(self, all_picks):
