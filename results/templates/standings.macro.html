@@ -1,9 +1,4 @@
 {% macro standings_menu(current_tid, current_year, passed_events) %}    {# current_tid and current_year are used for highlighting #}
-    {% set menu = { "014": "Masters",
-                "033": "PGA Championship",
-                "026": "US Open",
-                "100": "British Open",
-                "cumulative": "Cumulative"} %}
     <div id="standings-menu" class="menu">
         <div id="standings-menu-header" class="level is-mobile">
             <div class="level-left">
@@ -63,7 +58,7 @@
                 <h1 class="title" style="margin-bottom: 5px">
                 {{ tournament_name }} - {{ year }}
                 {% if add_refresh %}
-                <a id="refresh-standings" onclick="standings_refresh()"><span class="icon"><i class="fas fa-sync"></i></span></a>
+                <a id="refresh-standings" onclick="standingsRefresh()"><span class="icon"><i class="fas fa-sync"></i></span></a>
                 {% endif %}
                 </h1>
                 {% if add_refresh %}
@@ -89,8 +84,9 @@
 {% macro standings_table(picksets, user_psid) %}
     <table id="standings-table" class="table is-fullwidth is-hoverable">
         <thead>
-            <tr><th class="th-pos">Position</th><th>Name</th><th class="th-points">Points</th><th class="th-filter">Filter</th></tr>
+            <tr><th class="th-pos">Position</th><th>Name</th><th class="th-points">Points</th><th class="th-filter">Filter</th><th class="th-star hide">&nbsp;</th></tr>
         </thead>
+        <span id="favorite-standings"></span>
         <tbody id="standings-body">
             {% if picksets %}
                 {% for pickset in picksets %}

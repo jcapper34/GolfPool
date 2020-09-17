@@ -88,9 +88,9 @@ class Tournament:
     """ API FILLS """
     @staticmethod
     def api_get_live():
-        events = get_json(Tournament.EVENTS_URL % CURRENT_YEAR)
-        current_tournament = func_find(events, lambda e: NOW < datetime.strptime(e['endDate'], "%Y-%m-%dT%H:%M:%S"))    # Finds first event with end date after now
-        return get_json(Tournament.LEADERBOARD_URL % current_tournament['key'])
+        # events = get_json(Tournament.EVENTS_URL % CURRENT_YEAR)
+        # current_tournament = func_find(events, lambda e: NOW < datetime.strptime(e['endDate'], "%Y-%m-%dT%H:%M:%S"))    # Finds first event with end date after now
+        return get_json(Tournament.LEADERBOARD_URL % 18501)
 
 
     def fill_api_leaderboard(self):
