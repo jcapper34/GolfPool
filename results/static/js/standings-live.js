@@ -144,7 +144,7 @@ function standingsTrendCookie() {
 
 $(document).ready(function() {
     standingsTrendCookie();
-    show_favorite_picksets();
+//    show_favorite_picksets();
     // window.setTimeout(standings_refresh, 1000*60);    // Refresh standings every 60 seconds
     putTimeStamp();
 });
