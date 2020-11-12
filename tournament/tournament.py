@@ -115,7 +115,9 @@ class Tournament:
                                thru=pl['thruHole'],
                                photo_url=pl['imageUrl']
                                ) for pl in leaderboard] # Create Player objects of leaderboard
+        self.players.sort(key=lambda x: (x is not None, x.points), reverse=True)     # Sort so that None is at the end
         self.name = api_tournament.get("eventName")
+
 
     """ CALCULATIONS """
     def calculate_api_standings(self, get_picks=True, conn=None):
