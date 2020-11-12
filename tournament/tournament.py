@@ -115,7 +115,7 @@ class Tournament:
                                thru=pl['thruHole'],
                                photo_url=pl['imageUrl']
                                ) for pl in leaderboard] # Create Player objects of leaderboard
-        self.players.sort(key=lambda x: (x is not None, x.points), reverse=True)     # Sort so that None is at the end
+        self.players.sort(key=lambda x: (x.raw_pos is None, x.raw_pos))     # Sort so that None is at the end
         self.name = api_tournament.get("eventName")
 
 
