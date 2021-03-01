@@ -167,7 +167,7 @@ def picks_submit_changes():
 # Poolwide Picks Page
 @picks_mod.route("/poolwide")
 @picks_mod.route("/poolwide/<int:year>")
-def picks_poolwide(year=CURRENT_YEAR):
+def picks_poolwide(year=CURRENT_YEAR-1):
     return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))
 
 # Most picked macro
