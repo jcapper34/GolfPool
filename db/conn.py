@@ -5,7 +5,8 @@ from db.db_config import USE_LOCAL, LOCAL_DB_CREDENTIALS, HEROKU_DB_CREDENTIALS
 
 class Conn:
     def __init__(self, use_local=USE_LOCAL):
-        credentials = LOCAL_DB_CREDENTIALS if use_local else HEROKU_DB_CREDENTIALS
+        # credentials = LOCAL_DB_CREDENTIALS if use_local else HEROKU_DB_CREDENTIALS  # Uncomment when local db is installed
+        credentials = HEROKU_DB_CREDENTIALS
         self.conn = psycopg2.connect(**credentials)
         self.new_cursor()
 

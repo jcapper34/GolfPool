@@ -1,6 +1,8 @@
+# Library imports
 from pprint import pprint
 from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for, get_template_attribute
 
+# My function imports
 from db.conn import Conn
 from helper import CURRENT_YEAR, splash, RUNNING_LOCALLY
 from mailer.postman import Postman
@@ -25,7 +27,9 @@ def picks_index():
 # Make Picks Page
 @picks_mod.route("/make")
 def picks_make():
-    return render_template('locked-page.html', title="Make Picks")
+    if not RUNNING_LOCALLY:
+        return render_template('locked-page.html', title="Make Picks")
+
     return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % Player.OWGR_STAT_ID, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
 
 @picks_mod.route("/season-history")
@@ -81,7 +85,8 @@ def picks_confirmation():
 # Change Picks Page
 @picks_mod.route("/change")
 def picks_change():
-    return render_template('locked-page.html', title="Change Picks")
+    if not RUNNING_LOCALLY:
+        return render_template('locked-page.html', title="Change Picks")
 
 
     psid = session.get('psid')
