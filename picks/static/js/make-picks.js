@@ -70,9 +70,12 @@ function general_field_checker(elementSelector) {
     const fieldName = elementSelector.attr("name");
 
     let check_func;
-    if(fieldName === 'name') check_func = check_name_input;
-    else if(fieldName === 'email') check_func = check_email_input;
-    else if(fieldName === 'pin') check_func = check_pin_input;
+    if(fieldName === 'name')
+        check_func = check_name_input;
+    else if(fieldName === 'email')
+        check_func = check_email_input;
+    else if(fieldName === 'pin')
+        check_func = check_pin_input;
 
     const success = check_func(elementSelector);
     if(success !== undefined) {
@@ -223,6 +226,7 @@ LEVEL 4 Functions
 */
 
 function create_player_suggestions(input_element) {
+    const numSuggestions = 5;
     const val = input_element.val().toLowerCase();
     if(val === '') {// If no value, then don't do anything
         $("#suggestions-box").addClass('hide');
@@ -252,23 +256,18 @@ function create_player_suggestions(input_element) {
     let count = 0;
     for(const i in apiPlayers) {
         const player = apiPlayers[i];
-        if(player.type !== 'golfer')
-            continue;
 
-        // const playerFirst = player.firstName;
-        // const playerLast = player.lastName;
         const playerFirst = player.name.split(' ')[0];
         const playerLast = player.name.split(' ')[1];
-        // if(playerLast === undefined || playerFirst === undefined) {
-        //     continue;
-        // }
+
         if ( (nameCheck(playerFirst, val) || nameCheck(playerLast, val) || nameCheck(player.name, val)) && isValid(player.id)){
             suggestions.push([player.id, player.name]); // In the form (pid, name)
             count++;
-            if (count === 5)
+            if (count === numSuggestions)
                 break;
         }
     }
+
     show_player_suggestions(input_element.closest('.level-4-field'), suggestions);
 
 }
@@ -366,6 +365,7 @@ function toggle_show_pin(button) {
 PAGE STARTUP
 */
 
+// OWGR RANKINGS. ONLY USED TO SET RANKINGS OF LEVELS
 let OWGR_rankings;
 function set_OWGR() {
     $.post('/api-retriever', {url: OWGR_URL}, function (response) {
@@ -379,6 +379,7 @@ function set_OWGR() {
     );
 }
 
+
 var apiPlayers = {};
 function get_api_players() {
     $.post('/api-retriever', {url: API_PLAYERS_URL}, function (response) {
@@ -391,6 +392,15 @@ function get_api_players() {
         out(e);
     });
 
+}
+
+function filter_api_players() {
+    let filteredPlayers = [];
+    for(const i in apiPlayers) {
+        if(apiPlayers[i].type === 'golfer')
+            filteredPlayers.push(apiPlayers[i]);
+    }
+    apiPlayers = filteredPlayers;
 }
 
 function append_to_api_players(api_list) {  //Allows me to add popular players that don't show up
@@ -452,6 +462,10 @@ function set_season_history() {
     });
 }
 
+
+/*
+MAIN FUNCTION
+ */
 $(document).ready(function() {
     // Do effects for starting state
     $(".main-level-box").each(function() {
@@ -462,5 +476,6 @@ $(document).ready(function() {
     // Retrieve API Data
     set_OWGR();
     get_api_players();
+    filter_api_players();
     set_season_history();
 });
