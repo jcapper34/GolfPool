@@ -12,8 +12,8 @@ class Player:
 
     # From Golf Channel Website
     STAT_CATEGORIES_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/categories"
-    OWGR_STAT_ID = 19
-    STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/2020"   # Parameters: Stat Number
+    OWGR_STAT_ID = 19   # For OWGR ranking
+    STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/2021"   # Parameters: Stat Number
     GOLFERS_URL = "https://www.golfchannel.com/api/es/fullObject"
 
     def __init__(self, pid=None, **kwargs):

@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, get_template_attribute, jsonify, session
 
+
 from db.conn import Conn
-from helper import func_find, CURRENT_YEAR
+from helper import func_find, CURRENT_YEAR, RUNNING_LOCALLY
 from picksets.pickset import Pickset
 from picksets.picksets_db import get_all_picks
 from players.player import Player
@@ -15,6 +16,9 @@ results_mod = Blueprint("results", __name__, template_folder='templates', static
 @results_mod.route("/")
 @results_mod.route("/live")
 def results_live():
+    if not RUNNING_LOCALLY:
+        return render_template('locked-page.html', title="Make Picks")
+
     tournament = Tournament(year=CURRENT_YEAR)
     tournament.fill_api_leaderboard()
     tournament.calculate_api_standings()
