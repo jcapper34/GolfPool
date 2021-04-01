@@ -45,64 +45,66 @@ def insert_levels(year=CURRENT_YEAR):
          'Justin Thomas',
          'Dustin Johnson',
          'Bryson DeChambeau',
-         'Adam Scott',
          'Patrick Reed',
          'Patrick Cantlay',
          'Webb Simpson',
-         'Tommy Fleetwood',
-         'Tiger Woods',
-         'Justin Rose'
-        ),
-        (
-        'Xander Schauffele',
-        'Marc Leishman',
-        'Tony Finau',
-        'Matt Kuchar',
-        'Gary Woodland',
-        'Louis Oosthuizen',
-        'Shane Lowry',
-        'Tyrrell Hatton',
-        'Hideki Matsuyama',
-        'Paul Casey',
-        'Matthew Fitzpatrick',
-        'Rickie Fowler',
-        'Henrik Stenson',
-        'Sergio Garcia',
-        'Jordan Spieth',
-        'Jason Day',
-        'Bubba Watson',
-        'Collin Morikawa'
+         'Collin Morikawa',
+         'Xander Schauffele',
+         'Tyrrell Hatton',
+         'Tony Finau'
         ),
         (
         'Sungjae Im',
-        'Bernd Wiesberger',
-        'Francesco Molinari',
-        'Abraham Ancer',
-        'Kevin Na',
-        'Lee Westwood',
-        'Danny Willett',
-        'Billy Horschel',
-        'Cameron Smith',
-        'Kevin Kisner',
-        'Chez Reavie',
-        'Rafa Cabrera Bello',
-        'Jazz Janewattananond',
-        'Brandt Snedeker',
-        'Graeme McDowell',
-        'Ian Poulter',
-        'Phil Mickelson',
-        'Keegan Bradley',
-        'Daniel Berger',
         'Viktor Hovland',
-        'Branden Grace',
-        'Adam Hadwin',
+        'Daniel Berger',
+        'Matthew Fitzpatrick',
+        'Billy Horschel',
+        'Paul Casey',
+        'Lee Westwood',
+        'Harris English',
+        'Scottie Scheffler',
+        'Matthew Wolff',
+        'Tommy Fleetwood',
+        'Hideki Matsuyama',
+        'Ryan Palmer',
+        'Louis Oosthuizen',
+        'Adam Scott',
+        'Justin Rose',
+
+        ),
+        (
+        'Kevin Na',
+        'Abraham Ancer',
+        'Joaquin Niemann',
+        'Victor Perez',
+        'Cameron Smith',
+        'Jason Kokrak',
+        'Christiaan Bezuidenhout',
+        'Kevin Kisner',
+        'Max Homa',
+        'Marc Leishman',
+        'Sergio Garcia',
+        'Corey Conners',
+        'Henrik Stenson',
+        'Matt Kuchar',
+        'Jason Day',
+        'Shane Lowry',
+        'Jordan Spieth',
+        'Gary Woodland',
+        'Bubba Watson',
+        'Bernd Wiesberger',
+        'Phil Mickelson',
+        'Rickie Fowler',
+        'Danny Willett',
+        'Ian Poulter',
+        'Si Woo Kim'
+
         )
     )
     for level in levels:
         for player in sorted(level):
             print(player)
         print()
-    return
     check_levels_good(levels)
 
     conn = Conn()
@@ -147,6 +149,7 @@ def db_upload_leaderboard_individual(tournament, do_commit=True, conn=None):
         conn.commit()
 
     print("Inserted leaderboard: %s - %d" % (tournament.name, tournament.year))
+
 
 def db_upload_leaderboard(year, conn=None):
     conn = filter_conn(conn)
@@ -204,6 +207,7 @@ def db_upload_standings_individual(tournament, conn=None):
 
     conn.commit()
 
+
 def db_set_photo_urls(conn=None):
     conn = filter_conn(conn)
     db_players = conn.exec_fetch("SELECT id, name FROM player WHERE tour_id is NULL")
@@ -222,24 +226,24 @@ def db_set_photo_urls(conn=None):
 def check_levels_good(levels):
     # flattened_levels = [pl for level in levels for pl in level]
     owgr_data = requests.get(Player.STATS_URL % Player.OWGR_STAT_ID).json()[:100]
-    for player in owgr_data:
+    for i, player in enumerate(owgr_data, start=1):
         p_name = player['firstName'] + " " + player['lastName']
         found = False
         for level in levels:
             if func_find(level, lambda pl: p_name == pl):
-                print(p_name, levels.index(level)+1, sep='\t\t')
+                print(i, p_name, levels.index(level)+1, sep='\t\t')
                 found = True
 
         if not found:
-            print(p_name, "X", sep='\t\t')
-
+            print(i, p_name, "X", sep='\t\t')
 
 
 if __name__ == "__main__":
-    con = Conn()
-    for channel_tid, tid in [(18496, '033')]:
-        tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2020)
-        db_upload_standings_individual(tournament, conn=con)
-        db_upload_leaderboard_individual(tournament, conn=con)
+    insert_levels(CURRENT_YEAR)
+
+    # for channel_tid, tid in [(18496, '033'), (18501, '026')]:
+    #     tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2021)
+    #     db_upload_standings_individual(tournament, conn=con)
+    #     db_upload_leaderboard_individual(tournament, conn=con)
 
 
