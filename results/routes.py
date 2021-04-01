@@ -17,8 +17,7 @@ results_mod = Blueprint("results", __name__, template_folder='templates', static
 @results_mod.route("/live")
 def results_live():
     if not RUNNING_LOCALLY:
-        locked_page = get_template_attribute("helper.macro.html", "locked")
-        return locked_page()
+        return render_template('locked-page.html', title="Make Picks")
 
     tournament = Tournament(year=CURRENT_YEAR)
     tournament.fill_api_leaderboard()
@@ -30,6 +29,9 @@ def results_live():
         return jsonify([standings_macro(tournament.picksets), leaderboard_macro(tournament.players)])
 
     if request.args.get('main_section_only') is not None:
+        if not RUNNING_LOCALLY:
+            locked_page = get_template_attribute("helper.macro.html", "locked")
+            return locked_page()
         main_section_macro = get_template_attribute("standings.macro.html", "standings_main_section")
         return main_section_macro(tournament, user_psid=session.get("psid"), add_refresh=True)
 
