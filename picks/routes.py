@@ -127,7 +127,7 @@ def picks_forgot_pin():
 
     postman = Postman(recipients=(email,))
     postman.message_subject += " | Your PIN"
-    postman.message_body = "The PIN for %s is %s\n\n" % (email, pin)
+    postman.message_body = "The PIN for %s is %s\n\n" % (email, pin[0])
 
     postman.send_message()
 
