@@ -1,6 +1,7 @@
 /*
 FOR LOGIN
  */
+
 function submit_login() {
     let button = $("#submit-button");
     const email = $("#login-email").val();

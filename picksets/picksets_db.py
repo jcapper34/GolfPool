@@ -89,7 +89,9 @@ def get_login(email, pin, conn=None):
 
     return result[0][0]
 
-def email_exists(email, conn=None):
+EMAIL_EXISTS_QUERY = "SELECT pin FROM participant WHERE email=%s LIMIT 1"
+def get_email_pin(email, conn=None):
     conn = filter_conn(conn)
-    #todo
-    return False
+    result = conn.exec_fetch(EMAIL_EXISTS_QUERY, (email, ), fetchall=False)
+
+    return result

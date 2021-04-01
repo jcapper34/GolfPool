@@ -7,7 +7,7 @@ from db.conn import Conn
 from helper import CURRENT_YEAR, splash, RUNNING_LOCALLY
 from mailer.postman import Postman
 from picksets.pickset import Pickset
-from picksets.picksets_db import get_all_picks, get_login, get_most_picked, email_exists
+from picksets.picksets_db import get_all_picks, get_login, get_most_picked, get_email_pin
 from players.players_db import get_levels
 from players.player import Player
 from tournament.tournament import Tournament
@@ -121,12 +121,17 @@ def picks_forgot_pin():
         return render_template('change/change-picks-forgot-pin.html', username=request.args.get("username"))
 
     email = request.form.get('email')
-    if not email_exists(email):
+    pin = get_email_pin(email)
+    if pin is None:
         return "Email does not exist"
 
     postman = Postman(recipients=(email,))
     postman.message_subject += " | Your PIN"
-    postman.message_body = ""
+    postman.message_body = "The PIN for %s is %s\n\n" % (email, pin)
+
+    postman.send_message()
+
+    return "Your PIN has been sent to your email"
 
 
 # Change Picks Logout

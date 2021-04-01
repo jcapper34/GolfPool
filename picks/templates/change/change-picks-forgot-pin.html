@@ -19,11 +19,25 @@ params:
                 </div>
                 <div class="field is-grouped is-grouped-right">
                     <div class="control">
-                        <input id="submit-button" class="button is-link" type="button" value="Submit" onclick="submit_login()">
+                        <input id="submit-button" class="button is-link" type="button" value="Submit" onclick="submit_forgot_pin($('#forgot-pin-email').val())">
                     </div>
                 </div>
             </form>
         </div>
     </div>
+
+    <script>
+    function submit_forgot_pin(email) {
+        if(email === "")
+            return;
+
+        $.post("/picks/change/forgot-pin", {email:email}, function(response) {
+            window.alert(response);
+        }).fail(function() {
+            window.alert("Server Error: Please try again later");
+        })
+
+    }
+    </script>
 
 {% endblock %}
