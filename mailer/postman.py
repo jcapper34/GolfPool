@@ -12,7 +12,7 @@ class Postman:
     # SENDER_PASSWORD = 'GolfPoolEmail1' # This is for browser
     SENDER_PASSWORD = 'tvdectelmfbjkfwr'
 
-    def __init__(self, recipients, message_subject="%d Golf Pool" % CURRENT_YEAR, message_body=None):   # Recipients needs to be list or tuple
+    def __init__(self, recipients, message_subject="Golf Pool %d" % CURRENT_YEAR, message_body=None):   # Recipients needs to be list or tuple
         self.recipients = recipients
         self.message_subject = message_subject
         self.message_body = message_body
