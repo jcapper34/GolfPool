@@ -31,11 +31,16 @@ params:
         if(email === "")
             return;
 
+        let submitButton = $("#submit-forgot-pin-button");
+        submitButton.addClass('is-loading');
+
         $.post("/picks/change/forgot-pin", {email:email}, function(response) {
             window.alert(response);
         }).fail(function() {
             window.alert("Server Error: Please try again later");
-        })
+        }).done(function() {
+            submitButton.removeClass('is-loading');
+        });
 
     }
     </script>
