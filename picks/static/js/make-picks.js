@@ -385,6 +385,7 @@ function get_api_players() {
     $.post('/api-retriever', {url: API_PLAYERS_URL}, function (response) {
         apiPlayers = Object.values(response.items);
         apiPlayers = append_to_api_players(apiPlayers);
+        filter_api_players();
 
     }).fail(function (e) {
         window.alert("Unable to retrieve player data from server. Please try again later");
@@ -432,13 +433,13 @@ function append_to_api_players(api_list) {  //Allows me to add popular players t
         //     lastName: 'Bezuidenhout',
         //     type: 'golfer'
         // },
-        {
-            id: 37455,
-            name: "Dylan Fritelli",
-            firstName: 'Dylan',
-            lastName: 'Fritelli',
-            type: 'golfer'
-        },
+        // {
+        //     id: 37455,
+        //     name: "Dylan Frittelli",
+        //     firstName: 'Dylan',
+        //     lastName: 'Frittelli',
+        //     type: 'golfer'
+        // },
 
     ];
     return api_list.concat(newPlayers);
@@ -482,6 +483,5 @@ $(document).ready(function() {
     // Retrieve API Data
     set_OWGR();
     get_api_players();
-    filter_api_players();
     set_season_history();
 });
