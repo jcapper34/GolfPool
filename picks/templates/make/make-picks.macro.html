@@ -40,79 +40,83 @@
 {% endmacro %}
 
 {% macro main_level_field(level, picks_allowed, players) %}
-    <div class="box pick-box main-level-box" data-allowed="{{ picks_allowed }}" data-level="{{ level }}">
+    <section class="section">
+        <div class="box pick-box main-level-box" data-allowed="{{ picks_allowed }}" data-level="{{ level }}">
 
-        {# Pickbox Header #}
-        <div class="level is-mobile" style="margin-bottom: 5px">
-            <div class="level-left"><h2 class="title">Level {{ level }}</h2>&nbsp;(<span class="num-picked">0</span>/{{ picks_allowed }})</div>
-            <div class="level-right">
-                <label class="level-item">Show Details &nbsp;<input class="show-details" type="checkbox" onchange="main_level_player_details($(this))"></label>
-                <a class="level-item icon reset-level" onclick="reset_main_level($(this).closest('.pick-box'))"><i class="fas fa-eraser"></i></a>
+            {# Pickbox Header #}
+            <div class="level is-mobile" style="margin-bottom: 5px">
+                <div class="level-left"><h2 class="title">Level {{ level }}</h2>&nbsp;(<span class="num-picked">0</span>/{{ picks_allowed }})</div>
+                <div class="level-right">
+                    <label class="level-item">Show Details &nbsp;<input class="show-details" type="checkbox" onchange="main_level_player_details($(this))"></label>
+                    <a class="level-item icon reset-level" onclick="reset_main_level($(this).closest('.pick-box'))"><i class="fas fa-eraser"></i></a>
+                </div>
             </div>
-        </div>
-        <p class="section-description">Pick {{ picks_allowed }} players from the list below by clicking on their name. Check the checkbox on the right to see photos and rankings.</p>
-        <hr>
-        {# Pickbox body #}
-        <div class="columns is-multiline">
-            {% for player in players|sort(attribute="name") %}
-                <div class="column is-half player-column" data-pid="{{ player.id }}">
-                    <label>
-                        <input class="player-checkbox" type="checkbox" value="{{ player.name }}*{{ player.id }}" name="level-{{ player.level }}"> {# Check if it was picked #}
-                        <span class="button">{{ player.name }}</span>
-                    </label>
-                    <div class="box player-details">
-                        <div class="media">
-                                <figure class="media-left image is-128x128">
-                                    <img alt="{{ player.name }} Photo" data-src="{{ player.photo_url }}">
-                                </figure>
-                            <div class="media-content">
-                                <table class="table is-fullwidth">
-                                    <tr><th>World Golf Ranking</th><td class="owgr-rank">-</td></tr>
-                                    <tr><th class="pool-ranking-column">Pool Ranking</th><td class="pos-history">-</td></tr>
-                                </table>
+            <p class="section-description">Pick {{ picks_allowed }} players from the list below by clicking on their name. Check the checkbox on the right to see photos and rankings.</p>
+            <hr>
+            {# Pickbox body #}
+            <div class="columns is-multiline">
+                {% for player in players|sort(attribute="name") %}
+                    <div class="column is-half player-column" data-pid="{{ player.id }}">
+                        <label>
+                            <input class="player-checkbox" type="checkbox" value="{{ player.name }}*{{ player.id }}" name="level-{{ player.level }}"> {# Check if it was picked #}
+                            <span class="button">{{ player.name }}</span>
+                        </label>
+                        <div class="box player-details">
+                            <div class="media">
+                                    <figure class="media-left image is-128x128">
+                                        <img alt="{{ player.name }} Photo" data-src="{{ player.photo_url }}">
+                                    </figure>
+                                <div class="media-content">
+                                    <table class="table is-fullwidth">
+                                        <tr><th>World Golf Ranking</th><td class="owgr-rank">-</td></tr>
+                                        <tr><th class="pool-ranking-column">Pool Ranking</th><td class="pos-history">-</td></tr>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
-    </div>
+    </section>
 {% endmacro %}
 
 {# LEVEL 4 STUFF #}
 {% macro level_4_section(values=()) %}
-    <div class="box pick-box">
-        <div class="level is-mobile" style="margin-bottom: 5px">
-            <div class="level-left"><h2 class="title">Level 4</h2>&nbsp;(<span class="num-picked">0</span>/2)</div>
-        </div>
-        <p class="section-description">Two Picks. Picks must be players not listed in levels 1-3 above. Start typing in a player's name until it shows up below, then click to add. If for some reason the player you want doesn't show up, please email j.capper2@gmail.com</p>
-        <hr>
-        <div class="level-4-field field" data-tooltip="Note: This player may not play in the Masters">
-            <div class="control">
-                <input id="level-4-text" onkeyup="create_player_suggestions($(this))" class="input" autocomplete="off" data-original="{{ value }}" required {% if values %}disabled{% endif %}> {# If values are given, then they are changing picks #}
-                <div id="suggestions-box" class="box hide">
-                    <table>
-                        {% for i in range(5) %}
-                        <tr class="hide level-4-option">
-                            <td class="level-4-option-name" data-pid="" onclick="add_level_4($(this).text(), $(this).data('pid'))"></td>
-                            <td style="has-text-centered"></td>
-                        </tr>
-                        {% endfor %}
-                    </table>
+    <section class="section">
+        <div class="box pick-box">
+            <div class="level is-mobile" style="margin-bottom: 5px">
+                <div class="level-left"><h2 class="title">Level 4</h2>&nbsp;(<span class="num-picked">0</span>/2)</div>
+            </div>
+            <p class="section-description">Two Picks. Picks must be players not listed in levels 1-3 above. Start typing in a player's name until it shows up below, then click to add. If for some reason the player you want doesn't show up, please email j.capper2@gmail.com</p>
+            <hr>
+            <div class="level-4-field field" data-tooltip="Note: This player may not play in the Masters">
+                <div class="control">
+                    <input id="level-4-text" onkeyup="create_player_suggestions($(this))" class="input" autocomplete="off" data-original="{{ value }}" required {% if values %}disabled{% endif %}> {# If values are given, then they are changing picks #}
+                    <div id="suggestions-box" class="box hide">
+                        <table>
+                            {% for i in range(5) %}
+                            <tr class="hide level-4-option">
+                                <td class="level-4-option-name" data-pid="" onclick="add_level_4($(this).text(), $(this).data('pid'))"></td>
+                                <td style="has-text-centered"></td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
                 </div>
             </div>
+            <table id="level-4-picks" class="table is-fullwidth">
+                {# For when changing picks #}
+                {% for val in values %}
+                <tr>    {# If changing, make sure to change js as well #}
+                    <td>{{ val.name }}</td>
+                    <td><a onclick="remove_level_4($(this).closest('tr'))"><i class='fa fa-times'></i></a></td>
+                    <td class='hide'><input type='hidden' name='level-4' value='{{ val.name }}*{{ val.id }}'></td>
+                </tr>
+                {% endfor %}
+            </table>
         </div>
-        <table id="level-4-picks" class="table is-fullwidth">
-            {# For when changing picks #}
-            {% for val in values %}
-            <tr>    {# If changing, make sure to change js as well #}
-                <td>{{ val.name }}</td>
-                <td><a onclick="remove_level_4($(this).closest('tr'))"><i class='fa fa-times'></i></a></td>
-                <td class='hide'><input type='hidden' name='level-4' value='{{ val.name }}*{{ val.id }}'></td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+    </section>
 {% endmacro %}
 
 
