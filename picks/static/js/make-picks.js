@@ -306,7 +306,7 @@ function add_level_4(name, pid) {
     textInput.val('');
 
     let picksTable = $("#level-4-picks");
-    const numPicked = picksTable.find("tr").length;
+    let numPicked = picksTable.find("tr").length;
     if(numPicked < 2 ) {
         if(numPicked === 1)
             textInput.prop('disabled', true);
@@ -316,12 +316,19 @@ function add_level_4(name, pid) {
             "<td class='hide'><input type='hidden' name='level-4' value='" + [name, pid].join('*') + "'></td>" +
             "</tr>"
         );  //If changing, make sure to change macro as well
+        numPicked++;
     }
+    $(".level-4-field").closest(".box").find(".num-picked").text(numPicked); //Update num picked text
 }
 
 function remove_level_4(trElement) {
     trElement.remove();
     $("#level-4-text").removeAttr('disabled');
+
+    // Update num picked text
+    const numPicked = $("#level-4-picks").find("tr").length;
+    $(".level-4-field").closest(".box").find(".num-picked").text(numPicked);
+
 
 }
 
