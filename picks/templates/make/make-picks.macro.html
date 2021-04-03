@@ -40,7 +40,7 @@
 {% endmacro %}
 
 {% macro main_level_field(level, picks_allowed, players) %}
-    <section class="section" style="padding:2rem 1.5rem">
+{#    <section class="section level-section">#}
         <div class="box pick-box main-level-box" data-allowed="{{ picks_allowed }}" data-level="{{ level }}">
 
             {# Pickbox Header #}
@@ -78,12 +78,12 @@
                 {% endfor %}
             </div>
         </div>
-    </section>
+{#    </section>#}
 {% endmacro %}
 
 {# LEVEL 4 STUFF #}
 {% macro level_4_section(values=()) %}
-    <section class="section" style="padding:2rem 1.5rem">
+    <section class="level-section">
         <div class="box pick-box">
             <div class="level is-mobile" style="margin-bottom: 5px">
                 <div class="level-left"><h2 class="title">Level 4</h2>&nbsp;(<span class="num-picked">0</span>/2)</div>
@@ -121,7 +121,7 @@
 
 
 {% macro submit_section() %}
-    <section class="section">
+    <section class="level-section">
         <div class="container">
             <div class="field is-grouped is-grouped-right">
                 <div class="control">
