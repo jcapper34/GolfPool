@@ -254,14 +254,13 @@ function create_player_suggestions(input_element) {
 
     let suggestions = [];
     let count = 0;
-    for(const i in apiPlayers) {
-        const player = apiPlayers[i];
+    for(const i in OWGR_rankings) {
+        const player = OWGR_rankings[i];
 
-        const playerFirst = player.name.split(' ')[0];
-        const playerLast = player.name.split(' ')[1];
+        const playerName = [player.firstName, player.lastName].join(' ');
 
-        if ( (nameCheck(playerFirst, val) || nameCheck(playerLast, val) || nameCheck(player.name, val)) && isValid(player.id)){
-            suggestions.push([player.id, player.name]); // In the form (pid, name)
+        if ( (nameCheck(player.firstName, val) || nameCheck(player.lastName, val) || nameCheck(playerName, val)) && isValid(player.golferId)){
+            suggestions.push([player.golferId, playerName]); // In the form (pid, name)
             count++;
             if (count === numSuggestions)
                 break;
@@ -377,80 +376,79 @@ let OWGR_rankings;
 function set_OWGR() {
     $.post('/api-retriever', {url: OWGR_URL}, function (response) {
         OWGR_rankings = response;
-        for(const i in OWGR_rankings) {  // Update player details
-                const player = OWGR_rankings[i];
-                let playerColumn = $(".player-column[data-pid='" + player.golferId + "']");
-                playerColumn.find('.owgr-rank').text(player.currentRank);   // Show OWGR Rank
-            }
+        for (const i in OWGR_rankings) {  // Update player details
+            const player = OWGR_rankings[i];
+            let playerColumn = $(".player-column[data-pid='" + player.golferId + "']");
+            playerColumn.find('.owgr-rank').text(player.currentRank);   // Show OWGR Rank
         }
-    );
-}
-
-
-var apiPlayers = {};
-function get_api_players() {
-    $.post('/api-retriever', {url: API_PLAYERS_URL}, function (response) {
-        apiPlayers = Object.values(response.items);
-        apiPlayers = append_to_api_players(apiPlayers);
-        filter_api_players();
-
-    }).fail(function (e) {
-        window.alert("Unable to retrieve player data from server. Please try again later");
-        out(e);
     });
-
 }
 
-function filter_api_players() {
-    let filteredPlayers = [];
-    for(const i in apiPlayers) {
-        if(apiPlayers[i].type === 'golfer')
-            filteredPlayers.push(apiPlayers[i]);
-    }
-    apiPlayers = filteredPlayers;
-}
 
-function append_to_api_players(api_list) {  //Allows me to add popular players that don't show up
-    const newPlayers = [
-        // {
-        //     id: 43344,
-        //     name: "Si Woo Kim",
-        //     firstName: 'Si Woo',
-        //     lastName: 'Kim',
-        //     type: 'golfer'
-        // },
-        {
-            id: 74401,
-            name: "Erik van Rooyen",
-            firstName: 'Erik',
-            lastName: 'van Rooyen',
-            type: 'golfer'
-        },
-        {
-            id: 37873,
-            name: "CT Pan",
-            firstName: 'Cheng Tsung',
-            lastName: 'Pan',
-            type: 'golfer'
-        },
-        // {
-        //     id: 56542,
-        //     name: "Christiaan Bezuidenhout",
-        //     firstName: 'Christiaan',
-        //     lastName: 'Bezuidenhout',
-        //     type: 'golfer'
-        // },
-        // {
-        //     id: 37455,
-        //     name: "Dylan Frittelli",
-        //     firstName: 'Dylan',
-        //     lastName: 'Frittelli',
-        //     type: 'golfer'
-        // },
-
-    ];
-    return api_list.concat(newPlayers);
-}
+// var apiPlayers = {};
+// function get_api_players() {
+//     $.post('/api-retriever', {url: API_PLAYERS_URL}, function (response) {
+//         apiPlayers = Object.values(response.items);
+//         apiPlayers = append_to_api_players(apiPlayers);
+//         filter_api_players();
+//
+//     }).fail(function (e) {
+//         window.alert("Unable to retrieve player data from server. Please try again later");
+//         out(e);
+//     });
+//
+// }
+//
+// function filter_api_players() {
+//     let filteredPlayers = [];
+//     for(const i in apiPlayers) {
+//         if(apiPlayers[i].type === 'golfer')
+//             filteredPlayers.push(apiPlayers[i]);
+//     }
+//     apiPlayers = filteredPlayers;
+// }
+//
+// function append_to_api_players(api_list) {  //Allows me to add popular players that don't show up
+//     const newPlayers = [
+//         // {
+//         //     id: 43344,
+//         //     name: "Si Woo Kim",
+//         //     firstName: 'Si Woo',
+//         //     lastName: 'Kim',
+//         //     type: 'golfer'
+//         // },
+//         {
+//             id: 74401,
+//             name: "Erik van Rooyen",
+//             firstName: 'Erik',
+//             lastName: 'van Rooyen',
+//             type: 'golfer'
+//         },
+//         {
+//             id: 37873,
+//             name: "CT Pan",
+//             firstName: 'Cheng Tsung',
+//             lastName: 'Pan',
+//             type: 'golfer'
+//         },
+//         // {
+//         //     id: 56542,
+//         //     name: "Christiaan Bezuidenhout",
+//         //     firstName: 'Christiaan',
+//         //     lastName: 'Bezuidenhout',
+//         //     type: 'golfer'
+//         // },
+//         // {
+//         //     id: 37455,
+//         //     name: "Dylan Frittelli",
+//         //     firstName: 'Dylan',
+//         //     lastName: 'Frittelli',
+//         //     type: 'golfer'
+//         // },
+//
+//     ];
+//     return api_list.concat(newPlayers);
+// }
 
 function set_season_history() {
     $.get('/picks/season-history', function(response) {
@@ -489,6 +487,6 @@ $(document).ready(function() {
 
     // Retrieve API Data
     set_OWGR();
-    get_api_players();
+    // get_api_players();
     set_season_history();
 });
