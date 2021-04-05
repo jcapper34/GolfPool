@@ -19,6 +19,8 @@ function submit_make_picks() {
         });
 
         let confirmMessage = "Are you sure you would like to submit? You can change your picks later by using your PIN\n\n";
+        confirmMessage += "Make sure your email is correct\n";
+        confirmMessage += "Email: " + $('#make-picks-form').find("input[name='email']").val() + '\n\n';
         confirmMessage += "Your Picks are:\n\n";
         for(let level = 1; level <= 4; level++) {
             confirmMessage += 'Level ' + level + '\n';
@@ -383,72 +385,6 @@ function set_OWGR() {
         }
     });
 }
-
-
-// var apiPlayers = {};
-// function get_api_players() {
-//     $.post('/api-retriever', {url: API_PLAYERS_URL}, function (response) {
-//         apiPlayers = Object.values(response.items);
-//         apiPlayers = append_to_api_players(apiPlayers);
-//         filter_api_players();
-//
-//     }).fail(function (e) {
-//         window.alert("Unable to retrieve player data from server. Please try again later");
-//         out(e);
-//     });
-//
-// }
-//
-// function filter_api_players() {
-//     let filteredPlayers = [];
-//     for(const i in apiPlayers) {
-//         if(apiPlayers[i].type === 'golfer')
-//             filteredPlayers.push(apiPlayers[i]);
-//     }
-//     apiPlayers = filteredPlayers;
-// }
-//
-// function append_to_api_players(api_list) {  //Allows me to add popular players that don't show up
-//     const newPlayers = [
-//         // {
-//         //     id: 43344,
-//         //     name: "Si Woo Kim",
-//         //     firstName: 'Si Woo',
-//         //     lastName: 'Kim',
-//         //     type: 'golfer'
-//         // },
-//         {
-//             id: 74401,
-//             name: "Erik van Rooyen",
-//             firstName: 'Erik',
-//             lastName: 'van Rooyen',
-//             type: 'golfer'
-//         },
-//         {
-//             id: 37873,
-//             name: "CT Pan",
-//             firstName: 'Cheng Tsung',
-//             lastName: 'Pan',
-//             type: 'golfer'
-//         },
-//         // {
-//         //     id: 56542,
-//         //     name: "Christiaan Bezuidenhout",
-//         //     firstName: 'Christiaan',
-//         //     lastName: 'Bezuidenhout',
-//         //     type: 'golfer'
-//         // },
-//         // {
-//         //     id: 37455,
-//         //     name: "Dylan Frittelli",
-//         //     firstName: 'Dylan',
-//         //     lastName: 'Frittelli',
-//         //     type: 'golfer'
-//         // },
-//
-//     ];
-//     return api_list.concat(newPlayers);
-// }
 
 function set_season_history() {
     $.get('/picks/season-history', function(response) {
