@@ -228,6 +228,12 @@ LEVEL 4 Functions
 */
 
 function create_player_suggestions(input_element) {
+    let level_pids = [];
+
+    $(".player-checkbox").each(function() {
+        level_pids.push(parseInt($(this).val().split('*')[1]));
+    });
+
     const numSuggestions = 5;
     const val = input_element.val().toLowerCase();
     if(val === '') {// If no value, then don't do anything
@@ -257,7 +263,12 @@ function create_player_suggestions(input_element) {
     let suggestions = [];
     let count = 0;
     for(const i in OWGR_rankings) {
+
         const player = OWGR_rankings[i];
+        if(level_pids.includes(player.golferId))
+            continue;
+
+        out(player.golferId);
 
         const playerName = [player.firstName, player.lastName].join(' ');
 
