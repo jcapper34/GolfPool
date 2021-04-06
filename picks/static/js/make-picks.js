@@ -268,8 +268,6 @@ function create_player_suggestions(input_element) {
         if(level_pids.includes(player.golferId))
             continue;
 
-        out(player.golferId);
-
         const playerName = [player.firstName, player.lastName].join(' ');
 
         if ( (nameCheck(player.firstName, val) || nameCheck(player.lastName, val) || nameCheck(playerName, val)) && isValid(player.golferId)){
