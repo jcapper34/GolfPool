@@ -90,7 +90,8 @@ class Pickset:
         """ Ensure that level 4 players are not in levels 1-3 """
         results = conn.exec_fetch("SELECT player_id FROM level_xref WHERE season_year=%s", (CURRENT_YEAR,))
         level_pids = [x[0] for x in results]
-        if any([p.id in level_pids for p in self.picks[3]]):
+
+        if any([int(p.id) in level_pids for p in self.picks[3]]):
             return False
 
         return True
