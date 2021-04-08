@@ -41,7 +41,7 @@ function standingsRefresh() {
 function putTimeStamp() {
     let date = new Date();
     let period = 'am';
-    if(date.getTime() > 12)
+    if(date.getHours() > 12)
         period = 'pm';
     const hours = ("0" + (date.getHours() % 12)).slice(-2);
     const minutes = ("0" + date.getMinutes()).slice(-2);
