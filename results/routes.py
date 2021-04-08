@@ -16,8 +16,8 @@ results_mod = Blueprint("results", __name__, template_folder='templates', static
 @results_mod.route("/")
 @results_mod.route("/live")
 def results_live():
-    if not RUNNING_LOCALLY:
-        return render_template('locked-page.html', title="Make Picks")
+    # if not RUNNING_LOCALLY:
+    #     return render_template('locked-page.html', title="Make Picks")
 
     tournament = Tournament(year=CURRENT_YEAR)
     tournament.fill_api_leaderboard()
