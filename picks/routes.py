@@ -27,7 +27,10 @@ def picks_index():
 # Make Picks Page
 @picks_mod.route("/make")
 def picks_make():
+    # if not RUNNING_LOCALLY:
+    #     return render_template('locked-page.html', title="Make Picks")
     return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % Player.OWGR_STAT_ID, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
+
 
 @picks_mod.route("/season-history")
 def picks_get_season_history():
@@ -40,9 +43,11 @@ def picks_get_season_history():
 
     return jsonify(season_history)
 
+
 # Make Picks Submission
 @picks_mod.route("/submit", methods=['POST'])
 def picks_submit():
+
     pickset = Pickset(
         name=request.form.get("name").strip().title(), #Ensure name is capitalized
         email=request.form.get("email"),
@@ -65,6 +70,7 @@ def picks_submit():
     session['psid'] = psid  # Set session
     return redirect(url_for('picks.picks_confirmation'))
 
+
 # Picks Confirmation Page
 @picks_mod.route("/confirmation")
 def picks_confirmation():
@@ -82,8 +88,11 @@ def picks_confirmation():
 # Change Picks Page
 @picks_mod.route("/change")
 def picks_change():
+    # if not RUNNING_LOCALLY:
+    #     return render_template('locked-page.html', title="Make Picks")
+
     psid = session.get('psid')
-    if psid is None: # If not logged in
+    if psid is None:  # If not logged in
         return render_template('change/change-picks-login.html')
 
     conn = Conn()   # Will be used more than once
@@ -170,7 +179,7 @@ def picks_submit_changes():
 # Poolwide Picks Page
 @picks_mod.route("/poolwide")
 @picks_mod.route("/poolwide/<int:year>")
-def picks_poolwide(year=CURRENT_YEAR-1):
+def picks_poolwide(year=CURRENT_YEAR):
     return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))
 
 # Most picked macro
