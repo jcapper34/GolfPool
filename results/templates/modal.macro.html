@@ -21,7 +21,7 @@
     </div>
     {# CURRENT TOURNAMENT SECTION #}
     <section class="tab-section" id="current-tournament-section">
-        {% if are_levels_defined(most_picked_players) %}    {# Can't organize if levels havent been defined #}
+        {% if are_levels_defined(pickset.picks) %}    {# Can't organize if levels havent been defined #}
             <div style="text-align:right;margin: 10px">
                 <label style="cursor: pointer">
                     Organize
