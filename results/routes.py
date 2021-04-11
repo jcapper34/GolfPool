@@ -85,6 +85,13 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
 
     pickset.merge_tournament(tournament)
 
+    for pick in pickset.picks:
+        if pick.raw_pos is None:
+            pick.raw_pos = 9999
+
+    for pick in pickset.picks:
+        print(pick.raw_pos)
+
     pickset_modal = get_template_attribute("modal.macro.html", "pickset_modal")
     return pickset_modal(pickset)
 

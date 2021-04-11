@@ -106,7 +106,7 @@ class Tournament:
 
         leaderboard = api_tournament['golfers']
         self.channel_tid = api_tournament.get('eventKey')
-        pprint(leaderboard)
+
         self.players = [Player(pid=pl['golferId'],
                                name=pl['firstName'] + " " + pl['lastName'],
                                pos=pl['position'] if pl['sortHelp'] < 1000 else None,
