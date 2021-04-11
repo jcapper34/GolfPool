@@ -188,3 +188,12 @@ def picks_poolwide(year=CURRENT_YEAR):
 def picks_most(year=CURRENT_YEAR):
     most_picked_macro = get_template_attribute("poolwide/poolwide-picks.macro.html", "most_picked_tab")
     return most_picked_macro(get_most_picked(year))
+
+
+# # Pickset Page
+# @picks_mod.route("/<int:psid>")
+# def pickset_page(psid):
+#     pickset = Pickset(psid=psid)
+#     pickset.fill_picks()
+#
+#     return render_template("pickset-page.html", pickset=pickset)
