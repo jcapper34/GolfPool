@@ -166,7 +166,7 @@ class Pickset:
     Returns: pid, pl.name, level, psname, pa.email, pa.pin, pl.tour_id
     """
     GET_PICKS_QUERY = """
-    SELECT pl.id AS pid, pl.name, COALESCE(lx.level, 4) AS level, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, pa.email, pa.pin, pl.tour_id FROM picks_xref AS px
+    SELECT pl.id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.photo_url, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, pa.email, pa.pin, pl.tour_id FROM picks_xref AS px
           JOIN player pl
             ON px.player_id = pl.id
           JOIN pickset ps
@@ -185,7 +185,8 @@ class Pickset:
         if not results:
             return []
 
-        self.picks = [player.Player(row['pid'], name=row['name'], level=row['level'], tour_id=row['tour_id']) for row in results]
+        self.picks = [player.Player(row['pid'], name=row['name'], level=row['level'],
+                                    tour_id=row['tour_id'], photo_url=row['photo_url']) for row in results]
         if separate:
             self.picks = level_separate(self.picks)
 
