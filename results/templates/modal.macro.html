@@ -36,8 +36,8 @@
             {% for player in pickset.picks|sort(attribute="raw_pos", reverse=False) %}
                 <tr style="cursor: pointer" class="pick-row" data-pid="{{ player.id }}" data-level="{{ player.level }}">
                     <td><figure class="image is-64x64"><img src="{{ player.photo_url }}"></figure></td>
-                    <td class="td-player-name" onclick="prompt_player_modal($(this).parent().data('pid'), $(this).find('a').text(), $(this).next().text())">
-                        <a>{{ player.name }}</a>
+                    <td class="td-player-name" onclick="prompt_player_modal($(this).parent().data('pid'), $(this).text(), $(this).next().text())">
+                        {{ player.name }}
                     </td>
                     <td class="has-text-centered">{% if player.pos is not none %}{{ player.pos }}{% else %}-{% endif %}</td>
                     <td class="td-points has-text-centered">{{ player.points }}</td>
