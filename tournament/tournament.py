@@ -9,10 +9,11 @@ from players.player import Player
 
 class Tournament:
     # Golf Channel URL
-    LEADERBOARD_URL = "https://www.golfchannel.com/api/v2/events/%d/leaderboard" # Parameters: int[tournament_id]
-    EVENTS_URL = "https://www.golfchannel.com/api/v2/tours/1/events/%d" # Parameters: int[year]
+    LEADERBOARD_URL = "https://www.golfchannel.com/api/v2/events/%d/leaderboard"  # Parameters: int[tid]
+    EVENTS_URL = "https://www.golfchannel.com/api/v2/tours/1/events/%d"  # Parameters: int[year]
+    ALL_SCORECARDS_URL = "https://www.golfchannel.com/api/v2/events/%d/scorecard"  # Parameters: int[tid]
 
-    def __init__(self, tid=None, year=CURRENT_YEAR, tournament_name=None, channel_tid=None):
+    def __init__(self, tid=None, year=CURRENT_YEAR, tournament_name=None, channel_tid=None, scorecards=None):
         self.tid = tid
         self.year = year
         self.name = tournament_name
@@ -21,7 +22,8 @@ class Tournament:
         self.players = []
         self.picksets = []
 
-    # TODO: DB Leaderboard is wack
+        self.scorecards = scorecards
+
     ### DATABASE FILLS ###
 
     # Parameters: year, tid
@@ -93,10 +95,10 @@ class Tournament:
         return get_json(Tournament.LEADERBOARD_URL % 19208)
 
     def fill_api_leaderboard(self):
-        if self.channel_tid is None: # If live is requested
-            api_tournament = self.api_get_live()['result'] # Get Tournament From API
+        if self.channel_tid is None:  # If live is requested
+            api_tournament = self.api_get_live()['result']  # Get Tournament From API
         else:
-            api_tournament = get_json(Tournament.LEADERBOARD_URL % self.channel_tid)['result'] # Get Tournament From API
+            api_tournament = get_json(Tournament.LEADERBOARD_URL % self.channel_tid)['result']  # Get Tournament From API
 
         try:
             point_template = get_json('tournament/data/point-template.json')  # Load Point Template Data
@@ -105,6 +107,7 @@ class Tournament:
 
         leaderboard = api_tournament['golfers']
         self.channel_tid = api_tournament.get('eventKey')
+        self.scorecards = api_tournament['scorecards']
 
         self.players = [Player(pid=pl['golferId'],
                                name=pl['firstName'] + " " + pl['lastName'],
@@ -114,8 +117,8 @@ class Tournament:
                                total=pl['overallPar'],
                                thru=pl['thruHole'],
                                photo_url=pl['imageUrl'],
-                               country_flag=pl['representsCountryUrl']
-                               ) for pl in leaderboard]  # Create Player objects of leaderboard
+                               country_flag=pl['representsCountryUrl'],
+                               ) for i, pl in enumerate(leaderboard)]  # Create Player objects of leaderboard
 
         self.players.sort(key=lambda x: (x.raw_pos is None, x.raw_pos))     # Sort so that None is at the end
         self.name = api_tournament.get("eventName")
@@ -182,3 +185,4 @@ class Tournament:
         for pickset in self.picksets:
             ps2 = func_find(all_picks, lambda ps: ps.id == pickset.id)
             pickset.picks = ps2.picks
+

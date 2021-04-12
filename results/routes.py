@@ -112,6 +112,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
 
         player.photo_url = leaderboard_player.photo_url
         player.current_tournament_data = leaderboard_player
+        player.scorecards = func_find(tournament.scorecards, lambda sc: sc['golferId'] == player.id, limit=4)
     else:
         player.fill_tournament_data(tid=tid, year=year, conn=conn)
 

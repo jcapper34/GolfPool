@@ -98,6 +98,41 @@
         {% endif %}
         </div>
     </div>
+    {% if player.scorecards and player.scorecards is not none %}
+        <hr>
+        <section class="scorecards-section">
+            <div class="tabs is-centered">
+                <ul>
+                    {% for scorecard in player.scorecards %}
+                        <li data-round="{{ scorecard.round }}" onclick="scorecard_switch_tabs($(this))" class="{% if loop.index == player.scorecards|length %}is-active{% endif %}">
+                            <a>Round {{ scorecard.round }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% for scorecard in player.scorecards %}
+            <div class="table-container" data-round="{{ scorecard.round }}" style="{% if scorecard.round != player.scorecards|length %}display:none{% endif %}">
+                <table class="table is-bordered">
+                    <tr><th>Hole</th>
+                    {% for hole in scorecard.scores %}
+                        <td>{{ hole.hole }}</td>
+                    {% endfor %}
+                    </tr>
+                    <tr><th>Par</th>
+                    {% for hole in scorecard.scores %}
+                        <td>{{ hole.par }}</td>
+                    {% endfor %}
+                    </tr>
+                    <tr><th>Score</th>
+                    {% for hole in scorecard.scores %}
+                        <td>{{ hole.score }}</td>
+                    {% endfor %}
+                    </tr>
+                </table>
+            </div>
+            {% endfor %}
+        </section>
+    {% endif %}
     <hr>
     <section class="who-picked-section">
         {% if player.num_picked == 0 %}

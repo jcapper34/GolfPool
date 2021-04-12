@@ -90,7 +90,7 @@ function combine_picks_table(tbody) {
 }
 
 function pickset_switch_tabs(li_element) {
-    let tabs = modal.find(".tabs");
+    let tabs = li_element.closest(".tabs");
 
     // Highlight Active Tab
     tabs.find("li").removeClass("is-active");
@@ -104,6 +104,19 @@ function pickset_switch_tabs(li_element) {
         $("#tournament-history-section").show();
         $("#current-tournament-section").hide();
     }
+}
+
+function scorecard_switch_tabs(li_element) {
+    let tabs = li_element.closest(".tabs");
+
+    // Highlight Active Tab
+    tabs.find("li").removeClass("is-active");
+    li_element.addClass("is-active");
+
+    // Show correct table
+    let scorecardsSection = $(".scorecards-section");
+    scorecardsSection.find(".table-container").hide();
+    scorecardsSection.find(".table-container[data-round='" + li_element.data('round') + "']").show();
 }
 
 /* Player Modal */
