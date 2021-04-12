@@ -114,19 +114,22 @@
             <div class="table-container" data-round="{{ scorecard.round }}" style="{% if scorecard.round != player.scorecards|length %}display:none{% endif %}">
                 <table class="table is-bordered">
                     <tr><th>Hole</th>
-                    {% for hole in scorecard.scores %}
-                        <td>{{ hole.hole }}</td>
-                    {% endfor %}
+                        {% for hole in scorecard.scores %}
+                            <td>{{ hole.hole }}</td>
+                        {% endfor %}
+                        <td>Total</td>
                     </tr>
                     <tr><th>Par</th>
-                    {% for hole in scorecard.scores %}
-                        <td>{{ hole.par }}</td>
-                    {% endfor %}
+                        {% for hole in scorecard.scores %}
+                            <td>{{ hole.par }}</td>
+                        {% endfor %}
+                        <td>{{ scorecard.scores|sum(attribute='par') }}</td>
                     </tr>
                     <tr><th>Score</th>
-                    {% for hole in scorecard.scores %}
-                        <td>{{ hole.score }}</td>
-                    {% endfor %}
+                        {% for hole in scorecard.scores %}
+                            <td>{{ hole.score }}</td>
+                        {% endfor %}
+                        <td>{{ scorecard.total }}</td>
                     </tr>
                 </table>
             </div>
