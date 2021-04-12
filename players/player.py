@@ -51,6 +51,8 @@ class Player:
         if self.photo_url is None:
             self.photo_url = Player.PGA_PHOTO_URL % self.tour_id
 
+        self.country_flag = kwargs.get('country_flag')
+
     # Parameters: pid, year
     # Returns: psid, name
     GET_WHO_PICKED_QUERY = """SELECT ps.id AS psid, (pa.name || COALESCE(' - ' || ps.num, '')) AS name FROM pickset AS ps
@@ -83,7 +85,6 @@ class Player:
 
         self.current_tournament_data = func_find(self.tournament_data, lambda t: t['tid'] == tid)
         self.photo_url = self.tournament_data[0]['photo_url']
-
 
     def merge(self, player):
         for key, val in vars(self).items():
