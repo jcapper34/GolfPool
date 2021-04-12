@@ -115,6 +115,5 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
     else:
         player.fill_tournament_data(tid=tid, year=year, conn=conn)
 
-
     player_modal = get_template_attribute("modal.macro.html", "player_modal")
     return player_modal(player)
