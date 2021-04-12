@@ -92,7 +92,6 @@ class Tournament:
         # current_tournament = func_find(events, lambda e: NOW < datetime.strptime(e['endDate'], "%Y-%m-%dT%H:%M:%S"))    # Finds first event with end date after now
         return get_json(Tournament.LEADERBOARD_URL % 19208)
 
-
     def fill_api_leaderboard(self):
         if self.channel_tid is None: # If live is requested
             api_tournament = self.api_get_live()['result'] # Get Tournament From API
@@ -114,8 +113,10 @@ class Tournament:
                                raw_pos=pl['sortHelp'],
                                total=pl['overallPar'],
                                thru=pl['thruHole'],
-                               photo_url=pl['imageUrl']
-                               ) for pl in leaderboard] # Create Player objects of leaderboard
+                               photo_url=pl['imageUrl'],
+                               country_flag=pl['representsCountryUrl']
+                               ) for pl in leaderboard]  # Create Player objects of leaderboard
+
         self.players.sort(key=lambda x: (x.raw_pos is None, x.raw_pos))     # Sort so that None is at the end
         self.name = api_tournament.get("eventName")
 
