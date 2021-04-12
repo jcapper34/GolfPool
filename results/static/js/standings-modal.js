@@ -108,8 +108,8 @@ function pickset_switch_tabs(li_element) {
 
 /* Player Modal */
 function prompt_player_modal(pid, name, pos) {
-    /* Open Modal */
-    modal.addClass("is-active modal-open");
+    /* Open Modal. (Close first if already open) */
+    modal.removeClass("is-active").removeClass("modal-open").addClass("is-active modal-open");
     modalCardBody.html(circle_html);
 
     /* Set modal header */
