@@ -80,12 +80,13 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
     if tid is None:
         tournament.channel_tid = int(request.args.get("channel_tid"))
         tournament.fill_api_leaderboard()
+        pickset.merge_tournament(tournament)
+
     else:
         tournament.fill_db_rankings(conn=conn)  # Get Standings from DB
+        pickset.merge_tournament(tournament)
         for pick in pickset.picks:
             pick.raw_pos = pick.pos
-
-    pickset.merge_tournament(tournament)
 
     for pick in pickset.picks:
         if pick.raw_pos is None:
