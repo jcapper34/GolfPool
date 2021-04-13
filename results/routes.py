@@ -86,6 +86,7 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
     pickset.merge_tournament(tournament)
 
     for pick in pickset.picks:
+        pick.raw_pos = pick.pos
         if pick.raw_pos is None:
             pick.raw_pos = 9999
 
