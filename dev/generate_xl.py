@@ -75,8 +75,8 @@ def write_picks_workbook(year, filename):
     workbook = xlsx.Workbook(filename)
 
     worksheet_names = {
-        "Picks": None,
-        # "Masters": "014",
+        # "Picks": None,
+        "Masters": "014",
         # "PGA Championship": "033",
         # "US Open": "026",
         # "British Open": "100"
@@ -91,6 +91,6 @@ def write_picks_workbook(year, filename):
 
 if __name__ == "__main__":
     year = 2020
-    filename = os.path.join('xlsx', 'picks-%d.xlsx' % year)
+    filename = os.path.join('xlsx', 'masters-%d.xlsx' % year)
 
     write_picks_workbook(year, filename)
