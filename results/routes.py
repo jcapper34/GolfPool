@@ -82,11 +82,12 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
         tournament.fill_api_leaderboard()
     else:
         tournament.fill_db_rankings(conn=conn)  # Get Standings from DB
+        for pick in pickset.picks:
+            pick.raw_pos = pick.pos
 
     pickset.merge_tournament(tournament)
 
     for pick in pickset.picks:
-        pick.raw_pos = pick.pos
         if pick.raw_pos is None:
             pick.raw_pos = 9999
 
