@@ -22,7 +22,7 @@
     {# CURRENT TOURNAMENT SECTION #}
     <section class="tab-section" id="current-tournament-section">
         {% if are_levels_defined(pickset.picks) %}    {# Can't organize if levels havent been defined #}
-            <div style="text-align:right;margin: 10px">
+            <div>
                 <label style="cursor: pointer">
                     Organize
                     <input type="checkbox" onchange="organize_table($(this).prop('checked'))">
@@ -34,7 +34,7 @@
             <tbody>
 
             {% for player in pickset.picks|sort(attribute="raw_pos", reverse=False) %}
-                <tr style="cursor: pointer" class="pick-row" data-pid="{{ player.id }}" data-level="{{ player.level }}">
+                <tr class="pick-row" data-pid="{{ player.id }}" data-level="{{ player.level }}">
                     <td><figure class="image is-64x64"><img src="{{ player.photo_url }}"></figure></td>
                     <td class="td-player-name" onclick="prompt_player_modal($(this).parent().data('pid'), $(this).text(), $(this).next().text())">
                         {{ player.name }}

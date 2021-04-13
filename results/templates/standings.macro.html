@@ -52,10 +52,10 @@
 {% endmacro %}
 
 {% macro standings_header(tournament_name, year, add_refresh=False) %}
-    <div class="level">
-        <div class="level-left" style="padding: 10px">
+    <div id="standings-header" class="level">
+        <div class="level-left">
             <div>
-                <h1 class="title" style="margin-bottom: 5px">
+                <h1 class="title">
                 {{ tournament_name }} - {{ year }}
                 {% if add_refresh %}
                 <a id="refresh-standings" onclick="standingsRefresh()"><span class="icon"><i class="fas fa-sync"></i></span></a>

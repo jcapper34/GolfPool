@@ -9759,6 +9759,15 @@ label.panel-block:hover {
     display: none;
   }
 }
+/* Standings Header */
+#standings-header .level-left {
+  padding: 10px;
+}
+
+#standings-header .level-left {
+  margin-bottom: 5px;
+}
+
 /* Tables */
 #standings-main-section {
   position: relative;
@@ -9809,6 +9818,10 @@ label.panel-block:hover {
     border-bottom: 1px solid lightgray;
   }
 }
+.pick-row {
+  cursor: pointer;
+}
+
 .pick-row td {
   vertical-align: middle;
 }
@@ -9860,6 +9873,11 @@ body.modal-open {
 .player-modal-body .image {
   height: 180px;
   width: 180px;
+}
+
+#current-tournament-section > div {
+  text-align: right;
+  margin: 10px;
 }
 
 #tournament-history-section {
