@@ -67,7 +67,7 @@
 {% macro player_modal(player) %}
     {% if player.current_tournament_data is not none %}
     <div class="media">
-        <figure class="image media-left is-128x128">   {# Todo: Lazy load #}
+        <figure class="image media-left player-modal-image is-128x128">   {# Todo: Lazy load #}
             <img src="{{ player.photo_url }}">
         </figure>
         <div class="media-content">

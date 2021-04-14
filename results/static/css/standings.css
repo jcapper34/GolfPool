@@ -9870,11 +9870,12 @@ body.modal-open {
   min-height: 90vh;
 }
 
-.player-modal-body .image {
-  height: 180px;
-  width: 180px;
+@media only screen and (min-width: 769px) {
+  .player-modal-image {
+    height: 180px !important;
+    width: 180px !important;
+  }
 }
-
 #current-tournament-section > div {
   text-align: right;
   margin: 10px;
