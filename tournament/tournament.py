@@ -111,7 +111,7 @@ class Tournament:
 
         self.players = [Player(pid=pl['golferId'],
                                name=pl['firstName'] + " " + pl['lastName'],
-                               pos=pl['position'] if pl['sortHelp'] < 1000 else None,
+                               pos=pl['position'] if pl['sortHelp'] is not None and pl['sortHelp'] < 1000 else None,
                                points=point_template[str(pl['sortHelp'])] if pl['sortHelp'] is not None and pl['sortHelp'] <= 20 else 0,
                                raw_pos=pl['sortHelp'],
                                total=pl['overallPar'],
