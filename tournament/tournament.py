@@ -92,7 +92,7 @@ class Tournament:
     def api_get_live():
         # events = get_json(Tournament.EVENTS_URL % CURRENT_YEAR)
         # current_tournament = func_find(events, lambda e: NOW < datetime.strptime(e['endDate'], "%Y-%m-%dT%H:%M:%S"))    # Finds first event with end date after now
-        return get_json(Tournament.LEADERBOARD_URL % 19190)
+        return get_json(Tournament.LEADERBOARD_URL % 19207)
 
     def fill_api_leaderboard(self):
         if self.channel_tid is None:  # If live is requested
