@@ -1,0 +1,14 @@
+# IDE Stuff
+.idea/
+__pycache__/
+
+# Style Transcompile
+*.sass
+*.scss
+*.map
+
+# Virtual Environment
+venv/
+
+# IDE
+.DS_Store

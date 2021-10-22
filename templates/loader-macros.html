@@ -1,0 +1,10 @@
+{% macro lazy_loader(src, size="128x128", loader="ring", media_left=False) %}
+    <figure class="{% if media_left %}media-left{% endif %} image is-{{ size }}">
+        <div class="loader lds-{{ loader }}">
+            {% if loader == "ring" %}<div></div><div></div><div></div><div></div>
+            {% elif loader == "ripple"  %}<div></div><div></div>
+            {% endif %}
+        </div>
+        <img class="hide" src="{{ src }}" onload="lazy_load($(this))">
+    </figure>
+{% endmacro %}
