@@ -3,7 +3,7 @@ from pprint import pprint
 import requests
 
 from db.db_helper import filter_conn
-from helper import CURRENT_YEAR, func_find, splash, get_json
+from helper import CURRENT_YEAR, func_find, splash, request_json
 from db.conn import Conn
 from players.player import Player
 from tournament.tournament import Tournament
@@ -154,7 +154,7 @@ def db_upload_leaderboard_individual(tournament, do_commit=True, conn=None):
 def db_upload_leaderboard(year, conn=None):
     conn = filter_conn(conn)
 
-    api_events = get_json("https://www.golfchannel.com/api/v2/tours/%d/events/%d" % (1,year))
+    api_events = request_json("https://www.golfchannel.com/api/v2/tours/%d/events/%d" % (1,year))
 
     major_results = [Tournament(year=year, channel_tid=e['key'], tournament_name=e['name'])
                      for e in func_find(api_events, lambda event: event['major'] and 'players' not in event['name'], limit=4)]
@@ -211,7 +211,7 @@ def db_upload_standings_individual(tournament, conn=None):
 def db_set_photo_urls(conn=None):
     conn = filter_conn(conn)
     db_players = conn.exec_fetch("SELECT id, name FROM player WHERE tour_id is NULL")
-    api_players = get_json(Player.ALL_PLAYERS_URL)['plrs']
+    api_players = request_json(Player.ALL_PLAYERS_URL)['plrs']
 
     for player in db_players:
         match = func_find(api_players, lambda pl: ' '.join((pl['nameF'], pl['nameL'])).lower() == player['name'].lower())

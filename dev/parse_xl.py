@@ -1,7 +1,7 @@
 import xlrd
 
 from db.conn import Conn
-from helper import func_find, get_json, splash
+from helper import func_find, request_json, splash
 from picksets.pickset import Pickset
 from picksets.picksets_db import get_all_picks
 from players.player import Player
@@ -13,7 +13,7 @@ def xl_parse_picks(file_name, year, delete_first=False):
     if delete_first:
         conn.exec("DELETE FROM pickset WHERE season_year=%s", (year,))
 
-    api_players = list(get_json(Player.GOLFERS_URL)['items'].values())
+    api_players = list(request_json(Player.GOLFERS_URL)['items'].values())
     all_players = [Player(**pl) for pl in conn.exec_fetch("SELECT id as pid, name FROM player")]
 
     wb = xlrd.open_workbook(file_name)

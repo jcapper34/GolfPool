@@ -1,7 +1,8 @@
+import json
 from pprint import pprint
 from datetime import datetime
 from db.db_helper import filter_conn
-from helper import func_find, CURRENT_YEAR, get_json, NOW
+from helper import func_find, CURRENT_YEAR, request_json, NOW
 from picksets.pickset import Pickset
 from picksets.picksets_db import get_all_picks
 from players.player import Player
@@ -92,18 +93,18 @@ class Tournament:
     def api_get_live():
         # events = get_json(Tournament.EVENTS_URL % CURRENT_YEAR)
         # current_tournament = func_find(events, lambda e: NOW < datetime.strptime(e['endDate'], "%Y-%m-%dT%H:%M:%S"))    # Finds first event with end date after now
-        return get_json(Tournament.LEADERBOARD_URL % 19198)
+        return request_json(Tournament.LEADERBOARD_URL % 19198)
 
     def fill_api_leaderboard(self):
         if self.channel_tid is None:  # If live is requested
             api_tournament = self.api_get_live()['result']  # Get Tournament From API
         else:
-            api_tournament = get_json(Tournament.LEADERBOARD_URL % self.channel_tid)['result']  # Get Tournament From API
+            api_tournament = request_json(Tournament.LEADERBOARD_URL % self.channel_tid)['result']  # Get Tournament From API
 
         try:
-            point_template = get_json('tournament/data/point-template.json')  # Load Point Template Data
+            point_template = request_json('tournament/data/point-template.json')  # Load Point Template Data
         except FileNotFoundError:
-            point_template = get_json('../tournament/data/point-template.json')  # Load Point Template Data
+            point_template = request_json('../tournament/data/point-template.json')  # Load Point Template Data
 
         leaderboard = api_tournament['golfers']
         self.channel_tid = api_tournament.get('eventKey')
@@ -159,7 +160,7 @@ class Tournament:
             self.picksets[i].pos = pos
 
     @staticmethod
-    def get_passed_events(conn=None): # Used to get all season years that have been stored in DB
+    def get_past_events(conn=None):  # Used to get all season years that have been stored in DB
         conn = filter_conn(conn)
         results = conn.exec_fetch("""
         SELECT season_year, tournament.id, tournament.name from event 
@@ -185,4 +186,3 @@ class Tournament:
         for pickset in self.picksets:
             ps2 = func_find(all_picks, lambda ps: ps.id == pickset.id)
             pickset.picks = ps2.picks
-

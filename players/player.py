@@ -91,7 +91,6 @@ class Player:
             if val is None and getattr(player, key) is not None:
                 setattr(self, key, getattr(player, key))
 
-
     """ Overrides """
     def __str__(self):
         return "Player: id=%s, name='%s'" % (self.id, self.name)
@@ -101,3 +100,6 @@ class Player:
 
     def __eq__(self, other):    # Allows for comparison
         return self.id == other.id and self.name == other.name
+
+    def __dict__(self):
+        return

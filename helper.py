@@ -1,4 +1,5 @@
 import json
+import inspect
 from pprint import pprint
 from datetime import datetime
 from os import environ
@@ -37,7 +38,7 @@ def func_find(obj, func, limit=1, get_index=False):
     return found
 
 
-def get_json(url):
+def request_json(url):
     try:
         if 'http' in url.lower():
             return requests.get(url).json()
@@ -48,8 +49,16 @@ def get_json(url):
         return json.load(f)
 
 
+def obj_to_json(obj):
+    attributes = inspect.getmembers(obj, lambda a: not(inspect.isroutine(a)))
+    properties = {a[0]: a[1] for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))}
+    pprint(properties)
+    return json.dumps(properties)
+
+
 """ CONSTANTS """
 NOW = datetime.now()
 CURRENT_YEAR = int(NOW.year)
 
 RUNNING_LOCALLY = environ.get("USE_LOCAL") is not None
+

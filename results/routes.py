@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, get_template_attribute, jsonify, session
+import json
 
+from flask import Blueprint, render_template, request, get_template_attribute, jsonify, session, Response
 
 from db.conn import Conn
 from helper import func_find, CURRENT_YEAR, RUNNING_LOCALLY
@@ -32,7 +33,10 @@ def results_live():
         main_section_macro = get_template_attribute("standings.macro.html", "standings_main_section")
         return main_section_macro(tournament, user_psid=session.get("psid"), add_refresh=True)
 
-    return render_template('standings-live.html', tournament=tournament, passed_events=Tournament.get_passed_events(), user_psid=session.get("psid"))
+    if request.args.get('json') is not None:
+        return Response(json.dumps(tournament, default=lambda o: o.__dict__, sort_keys=True, indent=4), mimetype='application/json')
+
+    return render_template('standings-live.html', tournament=tournament, passed_events=Tournament.get_past_events(), user_psid=session.get("psid"))
 
 
 """ PAST ROUTES """
@@ -42,7 +46,7 @@ def results_live():
 def results_past(year, tid):
     conn = Conn()
 
-    passed_events = Tournament.get_passed_events()
+    passed_events = Tournament.get_past_events()
 
     # Get Database Standings
     tournament = Tournament(year=year, tid=tid)
