@@ -4,16 +4,21 @@ from requests import get as http_get
 
 import picks
 import results
+import rest
 from db.db_config import USE_LOCAL
-from test import test_graph
+from flask_cors import CORS
 
 app = Flask(__name__)   # Creates app
+
+# Allow Cross Origin
+CORS(app)
 
 app.secret_key = b'=\x06\x9f}\x97\xe9\x88\xba\xd0\xaa\xe7r\x82\x94\x8a\xb8m\x84\xc34%Bu\xc5'    # Key for sessions
 
 """ REGISTER BLUEPRINTS """
 app.register_blueprint(picks.routes.picks_mod, url_prefix='/picks')
 app.register_blueprint(results.routes.results_mod, url_prefix='/results')
+app.register_blueprint(rest.routes.api_mod, url_prefix='/api')
 
 
 """ ROUTES BEGIN """
