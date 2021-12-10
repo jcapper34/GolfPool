@@ -79,7 +79,7 @@ def picks_confirmation():
         return redirect("index")
 
     # Get pickset
-    pickset = Pickset(psid=psid)
+    pickset = Pickset(id=psid)
     pickset.fill_picks()
 
     return render_template("make/picks-confirmation.html", pickset=pickset)
@@ -98,7 +98,7 @@ def picks_change():
     conn = Conn()   # Will be used more than once
 
     # Get pickset
-    pickset = Pickset(psid=psid)
+    pickset = Pickset(id=psid)
     pickset.fill_picks(conn=conn)
 
     return render_template("change/change-picks.html",
@@ -162,7 +162,7 @@ def picks_submit_changes():
         return "Your session has expired, please log back in"
 
     pickset = Pickset(
-        psid=f.get("psid"),
+        id=f.get("psid"),
         name=f.get("name"),
         email=f.get("email"),
         pin=f.get("pin")
@@ -193,7 +193,7 @@ def picks_most(year=CURRENT_YEAR):
 # # Pickset Page
 # @picks_mod.route("/<int:psid>")
 # def pickset_page(psid):
-#     pickset = Pickset(psid=psid)
+#     pickset = Pickset(id=psid)
 #     pickset.fill_picks()
 #
 #     return render_template("pickset-page.html", pickset=pickset)

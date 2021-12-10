@@ -9,10 +9,10 @@ def test_picks_send():
         email='capperjohnm@gmail.com',
         pin=5753,
         picks=[
-            [Player('32102', 'Rickie Fowler'), Player('32102', 'Rickie Fowler'), Player('32102', 'Rickie Fowler')],
-            [Player('32102', 'Rickie Fowler'), Player('32102', 'Rickie Fowler'), Player('32102', 'Rickie Fowler')],
-            [Player('32102', 'Rickie Fowler'), Player('32102', 'Rickie Fowler')],
-            [Player('32102', 'Rickie Fowler'), Player('32102', 'Rickie Fowler')]
+            [Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler')],
+            [Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler')],
+            [Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler')],
+            [Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler')]
         ]
     )
 

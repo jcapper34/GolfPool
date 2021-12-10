@@ -1,57 +1,50 @@
+import json
 from db.conn import Conn
 from db.db_helper import filter_conn
 from helper import func_find, CURRENT_YEAR
 from picksets import pickset
 
+from typing import List, ClassVar
+from dataclasses import dataclass, asdict
 
+
+@dataclass
 class Player:
+    # General
+    id: str
+    name: str
+    tour_id: int = None
+    level: int = None
+
+    # Tournament
+    points: int = None
+    total: str = None
+    pos: str = None
+    raw_pos: int = None
+    thru: str = None
+    holes: list = None
+    current_tournament_data: dict = None
+    season_history: dict = None
+
+    # Picks
+    picked_by: List[str] = None
+    num_picked: int = None
+
+    # Photo
+    photo_url: str = None
+    country_flag: str = None
+
+    # URL CONSTANTS #
     # From PGA Tour Website
-    PGA_PHOTO_URL = "https://pga-tour-res.cloudinary.com/image/upload/c_fill,d_headshots_default.png,dpr_2.0,f_auto,g_face:center,h_300,q_auto,w_300/headshots_%s.png"
-    # OWGR_URL = "https://statdata.pgatour.com/r/stats/%s/186.json"   # Takes year as argument
-    ALL_PLAYERS_URL = "https://statdata.pgatour.com/players/player.json"
+    PGA_PHOTO_URL: ClassVar[str] = "https://pga-tour-res.cloudinary.com/image/upload/c_fill,d_headshots_default.png,dpr_2.0,f_auto,g_face:center,h_300,q_auto,w_300/headshots_%s.png"
+    # OWGR_URL: ClassVar[str] = "https://statdata.pgatour.com/r/stats/%s/186.json"   # Takes year as argument
+    ALL_PLAYERS_URL: ClassVar[str] = "https://statdata.pgatour.com/players/player.json"
 
     # From Golf Channel Website
-    STAT_CATEGORIES_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/categories"
-    OWGR_STAT_ID = 19   # For OWGR ranking
-    STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/2021"   # Parameters: Stat Number
-    GOLFERS_URL = "https://www.golfchannel.com/api/es/fullObject"
-
-    def __init__(self, pid=None, **kwargs):
-        # General
-        self.id = pid
-        self.name = kwargs.get("name")
-        self.tour_id = kwargs.get("tour_id")
-        self.level = kwargs.get("level")
-
-        # Tournament
-        self.points = kwargs.get("points")
-        self.total = kwargs.get("total")
-        self.pos = kwargs.get("pos")
-        if self.pos == 'T999':
-            self.pos = None
-
-        self.raw_pos = kwargs.get("raw_pos")
-
-        self.thru = kwargs.get("thru")
-        if self is None or self.thru == 18:
-            self.thru = 'F'
-        self.holes = kwargs.get("holes")
-
-        self.tournament_data = None
-        self.current_tournament_data = None
-
-        self.season_history = None
-
-        # Picks
-        self.picked_by = None
-        self.num_picked = kwargs.get("num_picked")
-
-        # Photo
-        self.photo_url = kwargs.get('photo_url')
-        if self.photo_url is None:
-            self.photo_url = Player.PGA_PHOTO_URL % self.tour_id
-
-        self.country_flag = kwargs.get('country_flag')
+    STAT_CATEGORIES_URL: ClassVar[str] = "https://www.golfchannel.com/api/v2/tours/1/stats/categories"
+    OWGR_STAT_ID: ClassVar[int] = 19   # For OWGR ranking
+    STATS_URL: ClassVar[str] = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/2021"   # Parameters: Stat Number
+    GOLFERS_URL: ClassVar[str] = "https://www.golfchannel.com/api/es/fullObject"
 
     # Parameters: pid, year
     # Returns: psid, name
@@ -66,7 +59,7 @@ class Player:
 
         results = conn.exec_fetch(self.GET_WHO_PICKED_QUERY, (self.id, year))
 
-        self.picked_by = [pickset.Pickset(psid=row['psid'], name=row['name']) for row in results]
+        self.picked_by = [pickset.Pickset(id=row['psid'], name=row['name']) for row in results]
 
         self.num_picked = len(self.picked_by)
 
@@ -100,6 +93,11 @@ class Player:
 
     def __eq__(self, other):    # Allows for comparison
         return self.id == other.id and self.name == other.name
-
+    
     def __dict__(self):
-        return
+        return asdict(self)
+
+
+if __name__ == '__main__':
+    pl = Player(id="874", name="he")
+    print(json.dump(asdict(pl)))

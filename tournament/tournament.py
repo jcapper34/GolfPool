@@ -30,7 +30,7 @@ class Tournament:
     # Parameters: year, tid
     # Returns: pid, name, points, pos ORDERED BY points
     GET_DB_RANKINGS_QUERY = """
-    WITH leaderboard AS (SELECT pl.id AS pid, pl.name, SUM(elx.points) as points, RANK() OVER(ORDER BY SUM(elx.points) DESC) AS pos FROM event_leaderboard_xref AS elx
+    WITH leaderboard AS (SELECT pl.id, pl.name, SUM(elx.points) as points, RANK() OVER(ORDER BY SUM(elx.points) DESC) AS pos FROM event_leaderboard_xref AS elx
       JOIN event
         ON event.tournament_id = elx.tournament_id AND event.season_year = elx.season_year
       JOIN tournament AS t
@@ -84,7 +84,7 @@ class Tournament:
         if not results:
             return False
 
-        self.picksets = [Pickset(psid=row['psid'], name=row['name'], points=row['points'], pos=row['pos']) for row in results]
+        self.picksets = [Pickset(id=row['psid'], name=row['name'], points=row['points'], pos=row['pos']) for row in results]
 
         return True
 
@@ -110,14 +110,14 @@ class Tournament:
         self.channel_tid = api_tournament.get('eventKey')
         self.scorecards = api_tournament['scorecards']
 
-        self.players = [Player(pid=pl['golferId'],
+        self.players = [Player(id=pl['golferId'],
                                name=pl['firstName'] + " " + pl['lastName'],
                                pos=pl['position'] if pl['sortHelp'] is not None and pl['sortHelp'] < 1000 else None,
                                points=point_template[str(pl['sortHelp'])] if pl['sortHelp'] is not None and pl['sortHelp'] <= 20 else 0,
                                raw_pos=pl['sortHelp'],
                                total=pl['overallPar'],
                                thru=pl['thruHole'],
-                               photo_url=pl['imageUrl'],
+                               photo_url=Player.PGA_PHOTO_URL % pl['imageUrl'],
                                country_flag=pl['representsCountryUrl'],
                                ) for i, pl in enumerate(leaderboard)]  # Create Player objects of leaderboard
 

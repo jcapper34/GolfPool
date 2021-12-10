@@ -1,3 +1,4 @@
+from typing import List
 from db.conn import Conn
 
 
@@ -27,7 +28,7 @@ GET_ALL_PICKS_QUERY = """
                         WHERE ps.season_year = %s
                         ORDER BY psname, level, pl.name
                         """
-def get_all_picks(year=CURRENT_YEAR, separate=False, conn=None):
+def get_all_picks(year=CURRENT_YEAR, separate=False, conn=None) -> List[Pickset]:
     conn = filter_conn(conn)
 
     results = conn.exec_fetch(GET_ALL_PICKS_QUERY, (year,))
@@ -37,10 +38,10 @@ def get_all_picks(year=CURRENT_YEAR, separate=False, conn=None):
     # Makes a mapping of picks to pickset
     pickset_map = {}
     for row in results:
-        player = Player(pid=row['pid'], name=row['name'], level=row['level'], tour_id=row['tour_id'])
+        player = Player(id=row['pid'], name=row['name'], level=row['level'], tour_id=row['tour_id'])
         psid = row['psid']
         if pickset_map.get(psid) is None:
-            pickset_map[psid] = Pickset(psid=psid, name=row['psname'], picks=[player])
+            pickset_map[psid] = Pickset(id=psid, name=row['psname'], picks=[player])
         else:
             pickset_map[psid].picks.append(player)
 
@@ -70,7 +71,7 @@ GET_MOST_PICKED_QUERY = """
 def get_most_picked(year, conn=None):
     conn = filter_conn(conn)
     results = conn.exec_fetch(GET_MOST_PICKED_QUERY, (year,))
-    return [Player(row['id'], name=row['name'], level=row['lev'], num_picked=row['num_picked']) for row in results]
+    return [Player(id=row['id'], name=row['name'], level=row['lev'], num_picked=row['num_picked']) for row in results]
 
 # Parameters: email, pin, year
 # Returns: ps.id

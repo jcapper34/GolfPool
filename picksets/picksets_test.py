@@ -6,7 +6,7 @@ from db.db_helper import filter_conn
 
 """ INDIVIDUAL """
 def test_fill_picks(psid=1, name='Sarah Mathy', conn=None):
-    pickset = Pickset(psid=psid, name=name)
+    pickset = Pickset(id=psid, name=name)
     pickset.fill_picks(conn=conn)
     print(pickset.picks)
     # for level in pickset.picks:

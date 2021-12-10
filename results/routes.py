@@ -76,7 +76,7 @@ def results_past(year, tid):
 def get_pickset_modal(year=CURRENT_YEAR, tid=None):
     conn = Conn()
 
-    pickset = Pickset(psid=request.args.get("psid"))
+    pickset = Pickset(id=request.args.get("psid"))
     pickset.fill_picks(separate=False, conn=conn)       # Get pickset from DB
     pickset.fill_tournament_history(year, conn=conn)    # Get tournament history from DB
 
@@ -109,7 +109,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
 
     conn = Conn()
 
-    player = Player(pid=pid)
+    player = Player(id=pid)
     player.fill_who_picked(year=year, conn=conn)
 
     if tid is None:

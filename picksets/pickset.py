@@ -1,32 +1,47 @@
+from dataclasses import asdict, dataclass
 from db.conn import Conn
 from db.db_helper import filter_conn
 from helper import CURRENT_YEAR, func_find
 from mailer.postman import Postman
 from players import player
-from typing import List
+from typing import List, ClassVar
 
 from players.players_helper import level_separate
 
-
+@dataclass
 class Pickset:
+    # General Info
+    id: int = None
+    name: str = None
+    email: str = None
+    pin: str = None
+
+    # Picks
+    picks: List = None
+
+    # Tournament Info    
+    points: int = None
+    pos: int = None
+    tournament_history: List = None
+    
     """ CONSTANTS """
-    PICKS_ALLOWED = [3, 3, 2, 2]
+    PICKS_ALLOWED: ClassVar[List[int]] = [3, 3, 2, 2]
 
-    """ CONSTRUCTOR """
-    def __init__(self, psid=None, name=None, email=None, pin=None, picks=None, points=None, pos=None):
-        # General Info
-        self.id = psid
-        self.name = name
-        self.email = email
-        self.pin = pin
+    # """ CONSTRUCTOR """
+    # def __init__(self, psid=None, name=None, email=None, pin=None, picks=None, points=None, pos=None):
+    #     # General Info
+    #     self.id = psid
+    #     self.name = name
+    #     self.email = email
+    #     self.pin = pin
 
-        # Picks
-        self.picks = picks
+    #     # Picks
+    #     self.picks = picks
 
-        # Tournament
-        self.points = points
-        self.pos = pos
-        self.tournament_history = None
+    #     # Tournament
+    #     self.points = points
+    #     self.pos = pos
+    #     self.tournament_history = None
 
     """ PICK SUBMISSION """
     def submit_picks(self, form_picks, conn=None):
@@ -72,7 +87,7 @@ class Pickset:
             level_players = []
             for p in level:  # Iterate through form inputted players
                 player_data = p.split('*')
-                level_players.append(player.Player(name=player_data[0], pid=player_data[1]))
+                level_players.append(player.Player(name=player_data[0], id=player_data[1]))
 
             picks.append(level_players)
 
@@ -186,7 +201,7 @@ class Pickset:
             return []
 
         self.picks = [player.Player(row['pid'], name=row['name'], level=row['level'],
-                                    tour_id=row['tour_id'], photo_url=row['photo_url']) for row in results]
+                                    tour_id=row['tour_id'], photo_url=player.Player.PGA_PHOTO_URL % row['photo_url']) for row in results]
         if separate:
             self.picks = level_separate(self.picks)
 
@@ -229,3 +244,6 @@ class Pickset:
         if self.pos is not None and self.points is not None:
             s += ", pos=%d, points=%d" % (self.pos, self.points)
         return s
+    
+    def __dict__(self):
+        return asdict(self)

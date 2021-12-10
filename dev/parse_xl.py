@@ -14,7 +14,7 @@ def xl_parse_picks(file_name, year, delete_first=False):
         conn.exec("DELETE FROM pickset WHERE season_year=%s", (year,))
 
     api_players = list(request_json(Player.GOLFERS_URL)['items'].values())
-    all_players = [Player(**pl) for pl in conn.exec_fetch("SELECT id as pid, name FROM player")]
+    all_players = [Player(**pl) for pl in conn.exec_fetch("SELECT id, name FROM player")]
 
     wb = xlrd.open_workbook(file_name)
     sheet = wb.sheet_by_index(0)
@@ -40,7 +40,7 @@ def xl_parse_picks(file_name, year, delete_first=False):
                     print("Doesn't exist", name)
                     continue
 
-            pickset.picks.append(Player(name=name, pid=match.id))
+            pickset.picks.append(Player(name=name, id=match.id))
 
         pickset.db_inserts(year, conn=conn)
 
