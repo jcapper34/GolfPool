@@ -14,10 +14,10 @@ LOCAL_DB_CREDENTIALS = {
 }
 
 HEROKU_DB_CREDENTIALS = {
-            "dbname": 'd5le5ff7esjtrb',
-            "user": 'xcidhpvweehrud',
-            "host": 'ec2-23-21-171-25.compute-1.amazonaws.com',
-            "password": 'fdc587747cf954a402fc66ca4c5710e908b006200ccff68db953b32ed352a2a9',
+            "dbname": 'd494jt3e43ugjm',
+            "user": 'dnydvecerfhlus',
+            "host": 'ec2-3-215-52-251.compute-1.amazonaws.com',
+            "password": '5bb791bfdcb7afa07b23f9703f9e3091c3d52459f4bfd0390afcc6938e9a0af5',
             "options": '-c search_path=golfpool'
 }
 
