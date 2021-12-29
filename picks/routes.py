@@ -7,18 +7,22 @@ from db.conn import Conn
 from helper import CURRENT_YEAR, splash, RUNNING_LOCALLY
 from mailer.postman import Postman
 from picksets.pickset import Pickset
-from picksets.picksets_db import get_all_picks, get_login, get_most_picked, get_email_pin
-from players.players_db import get_levels
+from picksets.pickset_submission import submit_change_picks, submit_picks
+from picksets.picksets_db import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks
+from players.players_db import get_levels_db
 from players.player import Player
 from tournament.tournament import Tournament
 
-picks_mod = Blueprint("picks", __name__, template_folder='templates', static_folder='static')   # Register Blueprint
+picks_mod = Blueprint("picks", __name__, template_folder='templates',
+                      static_folder='static')   # Register Blueprint
 
 HIDE_PICKS = True
 
 """ ROUTES """
 
 # Root of Picks Module
+
+
 @picks_mod.route("/")
 def picks_index():
     return "<a href='%s'>Make Picks</a><br><a href='%s'>Change Picks</a>" % (url_for('picks.picks_make'), url_for('picks.picks_change'))
@@ -29,7 +33,7 @@ def picks_index():
 def picks_make():
     if not RUNNING_LOCALLY:
         return render_template('locked-page.html', title="Make Picks")
-    return render_template("make/make-picks.html", level_players=get_levels(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % Player.OWGR_STAT_ID, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
+    return render_template("make/make-picks.html", level_players=get_levels_db(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % Player.OWGR_STAT_ID, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
 
 
 @picks_mod.route("/season-history")
@@ -39,7 +43,8 @@ def picks_get_season_history():
     for year in range(2015, CURRENT_YEAR):
         tournament = Tournament(year=year, tid='cumulative')
         tournament.fill_db_rankings(conn=conn)
-        season_history.append((year, {pl.id:pl.pos for pl in tournament.players}))
+        season_history.append(
+            (year, {pl.id: pl.pos for pl in tournament.players}))
 
     return jsonify(season_history)
 
@@ -47,21 +52,20 @@ def picks_get_season_history():
 # Make Picks Submission
 @picks_mod.route("/submit", methods=['POST'])
 def picks_submit():
+    # Extract Form
+    # Ensure name is capitalized
+    name = request.form.get("name").strip().title()
+    email = request.form.get("email")
+    pin = request.form.get("pin")
+    form_picks = [request.form.getlist("level-1"),
+                  request.form.getlist("level-2"),
+                  request.form.getlist("level-3"),
+                  request.form.getlist("level-4")]
 
-    pickset = Pickset(
-        name=request.form.get("name").strip().title(), #Ensure name is capitalized
-        email=request.form.get("email"),
-        pin=request.form.get("pin")
-    )
     try:
         # Submit pickset, will return pickset id
-        psid = pickset.submit_picks([
-            request.form.getlist("level-1"),
-            request.form.getlist("level-2"),
-            request.form.getlist("level-3"),
-            request.form.getlist("level-4")
-            ])
-        if not psid: #If form not in correct format
+        psid = submit_picks(name, email, pin, form_picks)
+        if not psid:  # If form not in correct format
             return "Error: Picks not submitted correctly."
     except Exception as e:   # If internal error
         print(e)
@@ -80,7 +84,7 @@ def picks_confirmation():
 
     # Get pickset
     pickset = Pickset(id=psid)
-    pickset.fill_picks()
+    pickset.picks = get_picks(psid)
 
     return render_template("make/picks-confirmation.html", pickset=pickset)
 
@@ -99,14 +103,15 @@ def picks_change():
 
     # Get pickset
     pickset = Pickset(id=psid)
-    pickset.fill_picks(conn=conn)
+    pickset.picks = get_picks(psid, conn=conn)
 
     return render_template("change/change-picks.html",
-                           level_players=get_levels(CURRENT_YEAR, conn=conn),
+                           level_players=get_levels_db(
+                               CURRENT_YEAR, conn=conn),
                            pickset=pickset,
                            year=CURRENT_YEAR,
                            OWGR_URL=Player.STATS_URL % 19,
-                            API_PLAYERS_URL=Player.GOLFERS_URL
+                           API_PLAYERS_URL=Player.GOLFERS_URL
                            )
 
 # Change Picks Login
@@ -147,7 +152,7 @@ def picks_forgot_pin():
 # Change Picks Logout
 @picks_mod.route("/change/logout")
 def picks_change_logout():
-    if session.get('psid') is not None: # If logged in
+    if session.get('psid') is not None:  # If logged in
         session.clear()
 
     return redirect(url_for('picks.picks_change'))
@@ -161,14 +166,14 @@ def picks_submit_changes():
     if session.get("psid") != int(f.get("psid")):
         return "Your session has expired, please log back in"
 
-    pickset = Pickset(
-        id=f.get("psid"),
-        name=f.get("name"),
-        email=f.get("email"),
-        pin=f.get("pin")
-    )
     try:
-        if not pickset.submit_change_picks([f.getlist('level-'+str(l)) for l in range(1,5)]):
+        change_success = submit_change_picks(pid=f.get("psid"),
+                                             name=f.get("name"),
+                                             email=f.get("email"),
+                                             pin=f.get("pin"),
+                                             form_picks=[f.getlist('level-'+str(l)) for l in range(1, 5)])
+
+        if not change_success:
             return "Error: Form not filled out correctly"
     except Exception as e:
         print(e)
@@ -184,9 +189,12 @@ def picks_poolwide(year=CURRENT_YEAR):
     return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))
 
 # Most picked macro
+
+
 @picks_mod.route("/most-picked/<int:year>")
 def picks_most(year=CURRENT_YEAR):
-    most_picked_macro = get_template_attribute("poolwide/poolwide-picks.macro.html", "most_picked_tab")
+    most_picked_macro = get_template_attribute(
+        "poolwide/poolwide-picks.macro.html", "most_picked_tab")
     return most_picked_macro(get_most_picked(year))
 
 

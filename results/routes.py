@@ -5,36 +5,40 @@ from flask import Blueprint, render_template, request, get_template_attribute, j
 from db.conn import Conn
 from helper import func_find, CURRENT_YEAR, RUNNING_LOCALLY
 from picksets.pickset import Pickset
-from picksets.picksets_db import get_all_picks
+from picksets.picksets_db import get_all_picks, get_picks, get_tournament_history
 from players.player import Player
+from players.players_db import get_tournament_player_db, who_picked_player
+from tournament.standings_calc import calculate_api_standings
 from tournament.tournament import Tournament
+from tournament.tournament_retriever import get_api_tournament
 
-results_mod = Blueprint("results", __name__, template_folder='templates', static_folder='static')   # Register blueprint
+results_mod = Blueprint("results", __name__, template_folder='templates',
+                        static_folder='static')   # Register blueprint
 
 """ LIVE ROUTES """
 
 # Root of Results Module
+
 @results_mod.route("/")
 @results_mod.route("/live")
 def results_live():
     # if not RUNNING_LOCALLY:
     #     return render_template('locked-page.html', title="Make Picks")
 
-    tournament = Tournament(year=CURRENT_YEAR)
-    tournament.fill_api_leaderboard()
-    tournament.calculate_api_standings()
+    tournament = get_api_tournament()
+    calculate_api_standings(tournament, year=CURRENT_YEAR)
 
     if request.args.get("refresh") is not None:    # If refresh
-        standings_macro = get_template_attribute("standings.macro.html", "standings_table")
-        leaderboard_macro = get_template_attribute("standings.macro.html", "leaderboard_table")
+        standings_macro = get_template_attribute(
+            "standings.macro.html", "standings_table")
+        leaderboard_macro = get_template_attribute(
+            "standings.macro.html", "leaderboard_table")
         return jsonify([standings_macro(tournament.picksets), leaderboard_macro(tournament.players)])
 
     if request.args.get('main_section_only') is not None:
-        main_section_macro = get_template_attribute("standings.macro.html", "standings_main_section")
+        main_section_macro = get_template_attribute(
+            "standings.macro.html", "standings_main_section")
         return main_section_macro(tournament, user_psid=session.get("psid"), add_refresh=True)
-
-    if request.args.get('json') is not None:
-        return Response(json.dumps(tournament, default=lambda o: o.__dict__, sort_keys=True, indent=4), mimetype='application/json')
 
     return render_template('standings-live.html', tournament=tournament, passed_events=Tournament.get_past_events(), user_psid=session.get("psid"))
 
@@ -42,6 +46,8 @@ def results_live():
 """ PAST ROUTES """
 
 # Past Standings
+
+
 @results_mod.route("/<int:year>/<tid>")
 def results_past(year, tid):
     conn = Conn()
@@ -50,7 +56,8 @@ def results_past(year, tid):
 
     # Get Database Standings
     tournament = Tournament(year=year, tid=tid)
-    if not tournament.fill_db_rankings(conn=conn):   # If tournament not found in DB
+    # If tournament not found in DB
+    if not tournament.fill_db_rankings(conn=conn):
         if request.args.get('main_section_only') is None:
             return render_template("locked-standings.html", tournament=tournament, passed_events=passed_events)
         else:
@@ -63,7 +70,8 @@ def results_past(year, tid):
     tournament.merge_all_picks(all_picks)
 
     if request.args.get('main_section_only') is not None:   # For quick tab switching
-        main_section_macro = get_template_attribute("standings.macro.html", "standings_main_section")
+        main_section_macro = get_template_attribute(
+            "standings.macro.html", "standings_main_section")
         return main_section_macro(tournament, user_psid=session.get("psid"))
 
     return render_template('standings-past.html', tournament=tournament, passed_events=passed_events, user_psid=session.get("psid"))
@@ -74,16 +82,20 @@ def results_past(year, tid):
 @results_mod.route("/live/get-pickset-modal")
 @results_mod.route("/<int:year>/<tid>/get-pickset-modal")
 def get_pickset_modal(year=CURRENT_YEAR, tid=None):
+    psid = request.args.get("psid")
+    channel_tid = request.args.get("channel_tid")
+
     conn = Conn()
 
-    pickset = Pickset(id=request.args.get("psid"))
-    pickset.fill_picks(separate=False, conn=conn)       # Get pickset from DB
-    pickset.fill_tournament_history(year, conn=conn)    # Get tournament history from DB
+    pickset = Pickset(psid)
+    pickset.picks = get_picks(psid, separate=False, conn=conn)
+
+    # Get tournament history from DB
+    pickset.tournament_history = get_tournament_history(psid, conn=conn)
 
     tournament = Tournament(year=year, tid=tid)
     if tid is None:
-        tournament.channel_tid = int(request.args.get("channel_tid"))
-        tournament.fill_api_leaderboard()
+        tournament = get_api_tournament()
         pickset.merge_tournament(tournament)
 
     else:
@@ -110,18 +122,20 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
     conn = Conn()
 
     player = Player(id=pid)
-    player.fill_who_picked(year=year, conn=conn)
+    player.picked_by = who_picked_player(player.id, year=year, conn=conn)
 
     if tid is None:
-        tournament = Tournament(year=year, channel_tid=int(channel_tid))
-        tournament.fill_api_leaderboard()
-        leaderboard_player = func_find(tournament.players, lambda pl: pl.id == player.id)
+        tournament = get_api_tournament(channel_tid=int(channel_tid))
+        tournament.year = year
+        leaderboard_player = func_find(
+            tournament.players, lambda pl: pl.id == player.id)
 
         player.photo_url = leaderboard_player.photo_url
         player.current_tournament_data = leaderboard_player
-        player.scorecards = func_find(tournament.scorecards, lambda sc: sc['golferId'] == player.id, limit=4)
+        player.scorecards = func_find(
+            tournament.scorecards, lambda sc: sc['golferId'] == player.id, limit=4)
     else:
-        player.fill_tournament_data(tid=tid, year=year, conn=conn)
+        player.merge(get_tournament_player_db(pid, tid, year, conn=conn))
 
     player_modal = get_template_attribute("modal.macro.html", "player_modal")
     return player_modal(player)

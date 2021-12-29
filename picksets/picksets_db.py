@@ -12,23 +12,24 @@ from players.player import Player
 # Returns: psid, psname, pid, pl.name, pl.level
 from players.players_helper import level_separate
 
-# Parameters: year
-# Returns: psid, psname, pid, pl.name, level, pl.tour_id
-GET_ALL_PICKS_QUERY = """
-                SELECT ps.id AS psid, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, px.player_id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.tour_id
-                        FROM picks_xref AS px
-                        JOIN pickset AS ps
-                            ON px.pickset_id = ps.id
-                        JOIN participant AS pa
-                            ON ps.participant_id = pa.id
-                        JOIN player AS pl
-                            ON px.player_id = pl.id
-                        LEFT JOIN level_xref AS lx
-                            ON px.player_id = lx.player_id AND ps.season_year = lx.season_year
-                        WHERE ps.season_year = %s
-                        ORDER BY psname, level, pl.name
-                        """
+
 def get_all_picks(year=CURRENT_YEAR, separate=False, conn=None) -> List[Pickset]:
+    # Parameters: year
+    # Returns: psid, psname, pid, pl.name, level, pl.tour_id
+    GET_ALL_PICKS_QUERY = """
+        SELECT ps.id AS psid, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, px.player_id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.tour_id
+            FROM picks_xref AS px
+            JOIN pickset AS ps
+                ON px.pickset_id = ps.id
+            JOIN participant AS pa
+                ON ps.participant_id = pa.id
+            JOIN player AS pl
+                ON px.player_id = pl.id
+            LEFT JOIN level_xref AS lx
+                ON px.player_id = lx.player_id AND ps.season_year = lx.season_year
+            WHERE ps.season_year = %s
+            ORDER BY psname, level, pl.name
+            """
     conn = filter_conn(conn)
 
     results = conn.exec_fetch(GET_ALL_PICKS_QUERY, (year,))
@@ -38,10 +39,12 @@ def get_all_picks(year=CURRENT_YEAR, separate=False, conn=None) -> List[Pickset]
     # Makes a mapping of picks to pickset
     pickset_map = {}
     for row in results:
-        player = Player(id=row['pid'], name=row['name'], level=row['level'], tour_id=row['tour_id'])
+        player = Player(id=row['pid'], name=row['name'],
+                        level=row['level'], tour_id=row['tour_id'])
         psid = row['psid']
         if pickset_map.get(psid) is None:
-            pickset_map[psid] = Pickset(id=psid, name=row['psname'], picks=[player])
+            pickset_map[psid] = Pickset(
+                id=psid, name=row['psname'], picks=[player])
         else:
             pickset_map[psid].picks.append(player)
 
@@ -57,33 +60,81 @@ def get_all_picks(year=CURRENT_YEAR, separate=False, conn=None) -> List[Pickset]
     return pickset_list
 
 
-# Parameters: year
-# Returns: id, name, num_picked, lev ORDERED BY num_picked
-GET_MOST_PICKED_QUERY = """
-                SELECT pl.id, pl.name, COUNT(*) AS num_picked, COALESCE(lx.level, 4) AS lev FROM player AS pl
-                    JOIN picks_xref as pi ON pl.id = pi.player_id
-                    JOIN pickset ps on pi.pickset_id = ps.id
-                    LEFT JOIN level_xref lx on pl.id = lx.player_id AND ps.season_year = lx.season_year
-                WHERE ps.season_year = %s
-                GROUP BY pl.id, pl.name, lev
-                ORDER BY num_picked DESC
-            """
-def get_most_picked(year, conn=None):
+def get_tournament_history(psid, year=CURRENT_YEAR, conn=None):
+    """
+    Parameters: season_year, ps.id
+    Returns: tournament.name, pos, points
+    """
+    GET_TOURNAMENT_HISTORY_QUERY = """
+        SELECT t.name, esx.position AS pos, esx.points FROM event_standings_xref AS esx
+            JOIN tournament AS t
+                ON t.id = esx.tournament_id
+            WHERE esx.season_year = %s AND esx.pickset_id = %s
+        """
+
+    conn = filter_conn(conn)
+    return conn.exec_fetch(
+        GET_TOURNAMENT_HISTORY_QUERY, (year, psid))
+
+
+def get_picks(psid=None, separate=True, conn=None) -> List:
+    """
+    Parameters: ps.id
+    Returns: pid, pl.name, level, psname, pa.email, pa.pin, pl.tour_id
+    """
+    GET_PICKS_QUERY = """
+        SELECT pl.id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.photo_url, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, pa.email, pa.pin, pl.tour_id FROM picks_xref AS px
+            JOIN player pl
+            ON px.player_id = pl.id
+            JOIN pickset ps
+            ON px.pickset_id = ps.id
+            JOIN participant pa
+            ON pa.id = ps.participant_id
+            LEFT JOIN level_xref lx
+            ON pl.id = lx.player_id AND ps.season_year = lx.season_year
+            WHERE ps.id = %s ORDER BY lx.level
+    """
+    conn = filter_conn(conn)
+
+    results = conn.exec_fetch(GET_PICKS_QUERY, (psid,))
+
+    picks = [Player(row['pid'], name=row['name'], level=row['level'],
+                    tour_id=row['tour_id'], photo_url=row['photo_url']) for row in results]
+    if not separate:
+        return picks
+
+    return level_separate(picks)
+
+
+def get_most_picked(year, conn=None) -> List[Player]:
+    # Parameters: year
+    # Returns: id, name, num_picked, lev ORDERED BY num_picked
+    GET_MOST_PICKED_QUERY = """
+        SELECT pl.id, pl.name, COUNT(*) AS num_picked, COALESCE(lx.level, 4) AS lev FROM player AS pl
+            JOIN picks_xref as pi ON pl.id = pi.player_id
+            JOIN pickset ps on pi.pickset_id = ps.id
+            LEFT JOIN level_xref lx on pl.id = lx.player_id AND ps.season_year = lx.season_year
+        WHERE ps.season_year = %s
+        GROUP BY pl.id, pl.name, lev
+        ORDER BY num_picked DESC
+    """
     conn = filter_conn(conn)
     results = conn.exec_fetch(GET_MOST_PICKED_QUERY, (year,))
     return [Player(id=row['id'], name=row['name'], level=row['lev'], num_picked=row['num_picked']) for row in results]
 
-# Parameters: email, pin, year
-# Returns: ps.id
-GET_LOGIN_QUERY = """
-    SELECT ps.id FROM participant AS pa
-        JOIN pickset ps on pa.id = ps.participant_id
-        WHERE pa.email = %s AND pa.pin = %s AND ps.season_year = %s
-        LIMIT 1
-"""
+
 def get_login(email, pin, conn=None):
+    # Parameters: email, pin, year
+    # Returns: ps.id
+    GET_LOGIN_QUERY = """
+        SELECT ps.id FROM participant AS pa
+            JOIN pickset ps on pa.id = ps.participant_id
+            WHERE pa.email = %s AND pa.pin = %s AND ps.season_year = %s
+            LIMIT 1
+    """
     conn = filter_conn(conn)
-    result = conn.exec_fetch(GET_LOGIN_QUERY, (email, pin, CURRENT_YEAR))   # Remember to change year
+    # Remember to change year
+    result = conn.exec_fetch(GET_LOGIN_QUERY, (email, pin, CURRENT_YEAR))
 
     if conn.cur.rowcount == 0:
         return False
@@ -91,8 +142,8 @@ def get_login(email, pin, conn=None):
     return result[0][0]
 
 
-EMAIL_EXISTS_QUERY = "SELECT pin FROM participant WHERE email=%s LIMIT 1"
 def get_email_pin(email, conn=None):
+    EMAIL_EXISTS_QUERY = "SELECT pin FROM participant WHERE email=%s LIMIT 1"
     conn = filter_conn(conn)
     result = conn.exec_fetch(EMAIL_EXISTS_QUERY, (email, ), fetchall=False)
 

@@ -8,11 +8,11 @@ def test_picks_send():
         name='John Capper',
         email='capperjohnm@gmail.com',
         pin=5753,
-        picks=[
-            [Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler')],
-            [Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler')],
-            [Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler')],
-            [Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler')]
+        picks= [
+            (Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler')),
+            (Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler')),
+            (Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler')),
+            (Player(id='32102', name='Rickie Fowler'), Player(id='32102', name='Rickie Fowler'))
         ]
     )
 

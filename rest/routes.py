@@ -6,17 +6,22 @@ from requests import api
 from helper import CURRENT_YEAR
 
 from picksets.picksets_db import get_all_picks
+from tournament.standings_calc import calculate_api_standings
+from tournament.tournament import Tournament
+from tournament.tournament_retriever import get_api_tournament
 
 
 api_mod = blueprints.Blueprint("rest", __name__)
 
 @api_mod.route("/picks/<int:year>")
-def get_picks(year=CURRENT_YEAR):
+def get_json_picks(year=CURRENT_YEAR):
     all_picks = get_all_picks(year)
-    return json.dumps([asdict(pickset) for pickset in all_picks]), 200, {'content-type':'application/json'}
+    return jsonify([asdict(pickset) for pickset in all_picks])
 
 
-@api_mod.route("/player/<int:pid>")
-def get_player(pid):
-    return jsonify()
+@api_mod.route("/results/live")
+def get_json_live_results():
+    tournament = get_api_tournament()
+    calculate_api_standings(tournament, year=CURRENT_YEAR)
+    return jsonify(asdict(tournament))
 

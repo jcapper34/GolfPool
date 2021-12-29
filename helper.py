@@ -3,17 +3,20 @@ import inspect
 from pprint import pprint
 from datetime import datetime
 from os import environ
+from typing import Dict
 
 import requests
 
 """ FUNCTIONS """
+
 def splash(obj):
     if isinstance(obj, list):
         obj = [val.__str__() for val in obj]
     elif isinstance(obj, dict):
-        obj = {key:val.__str__() for key, val in obj.items()}
+        obj = {key: val.__str__() for key, val in obj.items()}
 
     pprint(obj)
+
 
 def func_find(obj, func, limit=1, get_index=False):
     found = []
@@ -38,7 +41,7 @@ def func_find(obj, func, limit=1, get_index=False):
     return found
 
 
-def request_json(url):
+def request_json(url) -> Dict:
     try:
         if 'http' in url.lower():
             return requests.get(url).json()
@@ -49,16 +52,16 @@ def request_json(url):
         return json.load(f)
 
 
-def obj_to_json(obj):
+def obj_to_json(obj) -> str:
     attributes = inspect.getmembers(obj, lambda a: not(inspect.isroutine(a)))
-    properties = {a[0]: a[1] for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))}
-    pprint(properties)
+    properties = {a[0]: a[1] for a in attributes if not(
+        a[0].startswith('__') and a[0].endswith('__'))}
     return json.dumps(properties)
 
-
+ 
 """ CONSTANTS """
-NOW = datetime.now()
-CURRENT_YEAR = int(NOW.year)
+# CURRENT_YEAR = int(datetime.now().year)
+CURRENT_YEAR = 2021
 
 RUNNING_LOCALLY = environ.get("USE_LOCAL") is not None
-
+# RUNNING_LOCALLY = False

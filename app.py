@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 from requests import get as http_get
+import logging
 
 import picks
 import results
@@ -9,6 +10,9 @@ from db.db_config import USE_LOCAL
 from flask_cors import CORS
 
 app = Flask(__name__)   # Creates app
+
+logging.basicConfig(format='[%(asctime)s] - %(message)s', level=logging.INFO)
+logging.info("Using local database" if USE_LOCAL else "Using heroku database")
 
 # Allow Cross Origin
 CORS(app)
