@@ -6,7 +6,7 @@ import logging
 import picks
 import results
 import rest
-from db.db_config import USE_LOCAL
+from config import USE_LOCAL
 from flask_cors import CORS
 
 app = Flask(__name__)   # Creates app

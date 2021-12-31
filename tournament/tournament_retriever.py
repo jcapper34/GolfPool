@@ -8,7 +8,7 @@ from tournament.tournament import Tournament
 def api_get_live() -> Dict:
     # events = get_json(EVENTS_URL % CURRENT_YEAR)
     # current_tournament = func_find(events, lambda e: NOW < datetime.strptime(e['endDate'], "%Y-%m-%dT%H:%M:%S"))    # Finds first event with end date after now
-    return request_json(Tournament.LEADERBOARD_URL % 19198)
+    return request_json(LEADERBOARD_URL % 19198)
 
 
 def get_api_tournament(channel_tid=None) -> Tournament:
