@@ -1,6 +1,7 @@
 from pprint import pprint
 
 import requests
+from config import ALL_PLAYERS_URL, OWGR_STAT_ID, PGA_PHOTO_URL, STATS_URL
 
 from db.db_helper import filter_conn
 from helper import CURRENT_YEAR, func_find, splash, request_json
@@ -223,7 +224,7 @@ def db_set_photo_urls(conn=None):
     conn = filter_conn(conn)
     db_players = conn.exec_fetch(
         "SELECT id, name FROM player WHERE tour_id is NULL")
-    api_players = request_json(Player.ALL_PLAYERS_URL)['plrs']
+    api_players = request_json(ALL_PLAYERS_URL)['plrs']
 
     for player in db_players:
         match = func_find(api_players, lambda pl: ' '.join(
@@ -231,15 +232,15 @@ def db_set_photo_urls(conn=None):
         if match is not None:
             pid = match['pid']
             conn.exec("UPDATE player SET tour_id = %s, photo_url = %s WHERE id=%s",
-                      (pid, Player.PGA_PHOTO_URL % pid, player['id']))
+                      (pid, PGA_PHOTO_URL % pid, player['id']))
 
     conn.commit()
 
 
 def check_levels_good(levels):
     # flattened_levels = [pl for level in levels for pl in level]
-    owgr_data = requests.get(Player.STATS_URL %
-                             Player.OWGR_STAT_ID).json()[:100]
+    owgr_data = requests.get(STATS_URL %
+                             OWGR_STAT_ID).json()[:100]
     for i, player in enumerate(owgr_data, start=1):
         p_name = player['firstName'] + " " + player['lastName']
         found = False

@@ -1,8 +1,6 @@
 from typing import List
 from db.conn import Conn
 
-
-# GROUP FUNCTIONS #
 from db.db_helper import filter_conn
 from helper import CURRENT_YEAR
 from picksets.pickset import Pickset

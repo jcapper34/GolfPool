@@ -1,6 +1,7 @@
 # Library imports
 from pprint import pprint
 from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for, get_template_attribute
+from config import GOLFERS_URL, OWGR_STAT_ID, STATS_URL
 
 # My function imports
 from db.conn import Conn
@@ -33,7 +34,7 @@ def picks_index():
 def picks_make():
     if not RUNNING_LOCALLY:
         return render_template('locked-page.html', title="Make Picks")
-    return render_template("make/make-picks.html", level_players=get_levels_db(CURRENT_YEAR), OWGR_URL=Player.STATS_URL % Player.OWGR_STAT_ID, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
+    return render_template("make/make-picks.html", level_players=get_levels_db(CURRENT_YEAR), OWGR_URL=STATS_URL % OWGR_STAT_ID, API_PLAYERS_URL=Player.GOLFERS_URL, year=CURRENT_YEAR)
 
 
 @picks_mod.route("/season-history")
@@ -110,8 +111,8 @@ def picks_change():
                                CURRENT_YEAR, conn=conn),
                            pickset=pickset,
                            year=CURRENT_YEAR,
-                           OWGR_URL=Player.STATS_URL % 19,
-                           API_PLAYERS_URL=Player.GOLFERS_URL
+                           OWGR_URL=STATS_URL % 19,
+                           API_PLAYERS_URL=GOLFERS_URL
                            )
 
 # Change Picks Login

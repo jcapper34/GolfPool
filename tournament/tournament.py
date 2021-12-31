@@ -22,25 +22,6 @@ class Tournament:
     picksets: List[Pickset] = None
     scorecards: List = None
 
-    # Golf Channel URL
-    # Parameters: int[tid]
-    LEADERBOARD_URL: ClassVar[str] = "https://www.golfchannel.com/api/v2/events/%d/leaderboard"
-    # Parameters: int[year]
-    EVENTS_URL: ClassVar[str] = "https://www.golfchannel.com/api/v2/tours/1/events/%d"
-    # Parameters: int[tid]
-    ALL_SCORECARDS_URL: ClassVar[str] = "https://www.golfchannel.com/api/v2/events/%d/scorecard"
-
-    # def __init__(self, tid=None, year=CURRENT_YEAR, tournament_name=None, channel_tid=None, scorecards=None):
-    #     self.tid = tid
-    #     self.year = year
-    #     self.name = tournament_name
-    #     self.channel_tid = channel_tid
-
-    #     self.players = []
-    #     self.picksets = []
-
-    #     self.scorecards = scorecards
-
     ### DATABASE FILLS ###
 
     # Parameters: year, tid
