@@ -13,3 +13,7 @@ venv/
 # IDE
 .DS_Store
 .vscode
+
+# Test Framework
+test/
+dev/
