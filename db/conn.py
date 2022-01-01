@@ -41,4 +41,5 @@ class Conn:
         return where_str + ' AND '.join(self.cur.mogrify(x[0] + " = %s", (x[1],)).decode('utf-8') for x in where)
 
     def __del__(self):
-        self.conn.close()
+        if getattr(self, "conn", None) is not None:
+            self.conn.close()
