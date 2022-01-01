@@ -11,15 +11,15 @@ from tournament.tournament import Tournament
 from tournament.tournament_retriever import get_api_tournament
 
 
-api_mod = blueprints.Blueprint("rest", __name__)
+mod = blueprints.Blueprint("rest", __name__)
 
-@api_mod.route("/picks/<int:year>")
+@mod.route("/picks/<int:year>")
 def get_json_picks(year=CURRENT_YEAR):
     all_picks = get_all_picks(year)
     return jsonify([asdict(pickset) for pickset in all_picks])
 
 
-@api_mod.route("/results/live")
+@mod.route("/results/live")
 def get_json_live_results():
     tournament = get_api_tournament()
     calculate_api_standings(tournament, year=CURRENT_YEAR)

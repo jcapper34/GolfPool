@@ -1,1 +1,1 @@
-from picks.routes import picks_mod
+from picks.picks_routes import mod

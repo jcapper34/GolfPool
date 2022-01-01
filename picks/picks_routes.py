@@ -14,7 +14,7 @@ from players.players_db import get_levels_db
 from players.player import Player
 from tournament.tournament import Tournament
 
-picks_mod = Blueprint("picks", __name__, template_folder='templates',
+mod = Blueprint("picks", __name__, template_folder='templates',
                       static_folder='static')   # Register Blueprint
 
 HIDE_PICKS = True
@@ -24,20 +24,20 @@ HIDE_PICKS = True
 # Root of Picks Module
 
 
-@picks_mod.route("/")
+@mod.route("/")
 def picks_index():
     return "<a href='%s'>Make Picks</a><br><a href='%s'>Change Picks</a>" % (url_for('picks.picks_make'), url_for('picks.picks_change'))
 
 
 # Make Picks Page
-@picks_mod.route("/make")
+@mod.route("/make")
 def picks_make():
     if not RUNNING_LOCALLY:
         return render_template('locked-page.html', title="Make Picks")
     return render_template("make/make-picks.html", level_players=get_levels_db(CURRENT_YEAR), OWGR_URL=STATS_URL % OWGR_STAT_ID, API_PLAYERS_URL=GOLFERS_URL, year=CURRENT_YEAR)
 
 
-@picks_mod.route("/season-history")
+@mod.route("/season-history")
 def picks_get_season_history():
     conn = Conn()
     season_history = []
@@ -51,7 +51,7 @@ def picks_get_season_history():
 
 
 # Make Picks Submission
-@picks_mod.route("/submit", methods=['POST'])
+@mod.route("/submit", methods=['POST'])
 def picks_submit():
     # Extract Form
     # Ensure name is capitalized
@@ -77,7 +77,7 @@ def picks_submit():
 
 
 # Picks Confirmation Page
-@picks_mod.route("/confirmation")
+@mod.route("/confirmation")
 def picks_confirmation():
     psid = session.get('psid')
     if psid is None:    # If no longer a session
@@ -91,7 +91,7 @@ def picks_confirmation():
 
 
 # Change Picks Page
-@picks_mod.route("/change")
+@mod.route("/change")
 def picks_change():
     if not RUNNING_LOCALLY:
         return render_template('locked-page.html', title="Make Picks")
@@ -116,7 +116,7 @@ def picks_change():
                            )
 
 # Change Picks Login
-@picks_mod.route("/change/submit-login", methods=['POST'])
+@mod.route("/change/submit-login", methods=['POST'])
 def picks_change_login():
     email = request.form.get('email')
     pin = request.form.get('pin')
@@ -131,7 +131,7 @@ def picks_change_login():
     return jsonify(resp)
 
 
-@picks_mod.route("/change/forgot-pin", methods=['GET', 'POST'])
+@mod.route("/change/forgot-pin", methods=['GET', 'POST'])
 def picks_forgot_pin():
     if request.method == 'GET':
         return render_template('change/change-picks-forgot-pin.html', username=request.args.get("username"))
@@ -151,7 +151,7 @@ def picks_forgot_pin():
 
 
 # Change Picks Logout
-@picks_mod.route("/change/logout")
+@mod.route("/change/logout")
 def picks_change_logout():
     if session.get('psid') is not None:  # If logged in
         session.clear()
@@ -160,7 +160,7 @@ def picks_change_logout():
 
 
 # Change Picks Submission
-@picks_mod.route("/submit-changes", methods=['POST'])
+@mod.route("/submit-changes", methods=['POST'])
 def picks_submit_changes():
     f = request.form
 
@@ -184,15 +184,15 @@ def picks_submit_changes():
 
 
 # Poolwide Picks Page
-@picks_mod.route("/poolwide")
-@picks_mod.route("/poolwide/<int:year>")
+@mod.route("/poolwide")
+@mod.route("/poolwide/<int:year>")
 def picks_poolwide(year=CURRENT_YEAR):
     return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))
 
 # Most picked macro
 
 
-@picks_mod.route("/most-picked/<int:year>")
+@mod.route("/most-picked/<int:year>")
 def picks_most(year=CURRENT_YEAR):
     most_picked_macro = get_template_attribute(
         "poolwide/poolwide-picks.macro.html", "most_picked_tab")

@@ -22,7 +22,7 @@ params:
     {% import 'standings.macro.html' as smac %}
     <div id="main-columns" class="columns">
         <div class="column is-2">
-            {{ smac.standings_menu(tournament.tid, tournament.year, passed_events) }}
+            {{ smac.standings_menu(tournament.tid, tournament.year, past_events) }}
         </div>
         <section id="standings-main-section" class="section column">
             {{ smac.standings_main_section(tournament, user_psid, add_refresh=False) }}

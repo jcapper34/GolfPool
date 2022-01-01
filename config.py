@@ -5,6 +5,10 @@ from helper import RUNNING_LOCALLY
 USE_LOCAL = RUNNING_LOCALLY    # Will be true if running locally
 # USE_LOCAL = False   # Uncomment if you want to use the remote DB locally
 
+# =======================
+# Database Credentials
+# =======================
+
 LOCAL_DB_CREDENTIALS = {
             "dbname": 'postgres',
             "user": 'jcapp',
@@ -21,7 +25,10 @@ HEROKU_DB_CREDENTIALS = {
             "options": '-c search_path=golfpool'
 }
 
-# Golf Channel URL
+# =======================
+# Golf Channel API
+# =======================
+
 # Parameters: int[tid]
 LEADERBOARD_URL = "https://www.golfchannel.com/api/v2/events/%d/leaderboard"
 # Parameters: int[year]
@@ -40,3 +47,13 @@ STAT_CATEGORIES_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/categori
 OWGR_STAT_ID = 19   # For OWGR ranking
 STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/2021"   # Parameters: Stat Number
 GOLFERS_URL = "https://www.golfchannel.com/api/es/fullObject"
+
+# =======================
+# Routing Aliases
+# =======================
+ROUTING_ALIASES = (
+    ("/picksets/make", "picks.picks_make"),
+    ("/picksets/change", "picks.picks_change"),
+    ("/standings/live", "results.results_live"),
+    ("/standings/<int:year>/<tid>", "results.results_past")
+)
