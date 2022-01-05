@@ -3,13 +3,13 @@ from flask import Flask, render_template, redirect, url_for, request, jsonify
 from requests import get as http_get
 import logging
 
-from picks.picks_routes import mod as picks_mod
-from results.results_routes import mod as results_mod
-from api.api_routes import mod as api_mod
+from web.picks.picks_routes import mod as picks_mod
+from web.results.results_routes import mod as results_mod
+from web.api.api_routes import mod as api_mod
 from config import ROUTING_ALIASES, USE_LOCAL
 from flask_cors import CORS
 
-app = Flask(__name__)   # Creates apps
+app = Flask(__name__, static_folder='web/static', template_folder='web/templates')   # Creates app
 
 # Allow Cross Origin
 CORS(app)
