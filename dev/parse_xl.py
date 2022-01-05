@@ -4,7 +4,7 @@ from config import GOLFERS_URL
 from db.conn import Conn
 from helper import func_find, request_json, splash
 from picksets.pickset import Pickset
-from picksets.picksets_getters import get_all_picks
+from picksets.pickset_getters import get_all_picks
 from players.player import Player
 from players.players_helper import level_separate
 

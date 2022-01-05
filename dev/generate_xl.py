@@ -4,7 +4,7 @@ from db.conn import Conn
 import xlsxwriter as xlsx
 from pprint import pprint
 
-from picksets.picksets_getters import get_all_picks
+from picksets.pickset_getters import get_all_picks
 from tournament.tournament import Tournament
 
 

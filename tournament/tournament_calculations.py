@@ -1,6 +1,6 @@
 from db.db_helper import filter_conn
 from helper import func_find
-from picksets.picksets_db import get_all_picks
+from picksets.pickset_getters import get_all_picks
 
 
 def calculate_api_standings(tournament, year=None, get_picks=True, conn=None):

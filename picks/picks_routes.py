@@ -9,8 +9,8 @@ from helper import CURRENT_YEAR, splash, RUNNING_LOCALLY
 from mailer.postman import Postman
 from picksets.pickset import Pickset
 from picksets.pickset_submission import submit_change_picks, submit_picks
-from picksets.picksets_db import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks
-from players.players_db import get_levels_db
+from picksets.pickset_getters import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks
+from players.player_getters import get_levels_db
 from players.player import Player
 from tournament.tournament import Tournament
 

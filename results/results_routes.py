@@ -5,10 +5,10 @@ from flask import Blueprint, render_template, request, get_template_attribute, j
 from db.conn import Conn
 from helper import func_find, CURRENT_YEAR, RUNNING_LOCALLY
 from picksets.pickset import Pickset
-from picksets.picksets_db import get_all_picks, get_picks, get_tournament_history
+from picksets.pickset_getters import get_all_picks, get_picks, get_tournament_history
 from players.player import Player
-from players.players_db import get_tournament_player_db, who_picked_player
-from tournament.standings_calc import calculate_api_standings
+from players.player_getters import get_tournament_player_db, who_picked_player
+from tournament.tournament_calculations import calculate_api_standings
 from tournament.tournament import Tournament
 from tournament.tournament_retriever import get_api_tournament
 

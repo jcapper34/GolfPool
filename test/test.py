@@ -13,10 +13,10 @@ from tournament.tournament import Tournament
 from test.tournament_test import test_fill_db_rankings, test_fill_db_standings
 from mailer.postman import Postman
 
-from players.players_db import *
+from players.player_getters import *
 from players.player import Player
 from picksets.pickset_submission import *
-from picksets.picksets_getters import *
+from picksets.pickset_getters import *
 from db.conn import Conn
 from db.db_helper import filter_conn
 

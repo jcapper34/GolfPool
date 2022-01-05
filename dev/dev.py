@@ -7,7 +7,7 @@ from db.db_helper import filter_conn
 from helper import CURRENT_YEAR, func_find, splash, request_json
 from db.conn import Conn
 from players.player import Player
-from tournament.standings_calc import calculate_api_standings
+from tournament.tournament_calculations import calculate_api_standings
 from tournament.tournament import Tournament
 from tournament.tournament_retriever import get_api_tournament
 
