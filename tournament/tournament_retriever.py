@@ -34,7 +34,7 @@ def get_api_tournament(channel_tid=None) -> Tournament:
                            raw_pos=pl['sortHelp'],
                            total=pl['overallPar'],
                            thru=pl['thruHole'],
-                           photo_url=PGA_PHOTO_URL % pl['imageUrl'],
+                           photo_url=pl['imageUrl'],
                            country_flag=pl['representsCountryUrl'],
                            ) for i, pl in enumerate(leaderboard)]  # Create Player objects of leaderboard
 

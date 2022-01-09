@@ -87,12 +87,21 @@
                 <tr>
                     <td>
                          {# Show Thru #}
-                        {% if player.current_tournament_data.thru is none %}-
-                        {% elif player.current_tournament_data.thru == 18 %}F
-                        {% else %}{{ player.current_tournament_data.thru }}
+                        {% if player.current_tournament_data.thru is none %}
+                            -
+                        {% elif player.current_tournament_data.thru == 18 %}
+                            F
+                        {% else %}
+                            {{ player.current_tournament_data.thru }}
                         {% endif %}
                     </td>
-                    <td>{% if player.current_tournament_data.points is none %}0{% else %}{{ player.current_tournament_data.points }}{% endif %}</td>
+                    <td>
+                        {% if player.current_tournament_data.points is none %}
+                            0
+                        {% else %}
+                            {{ player.current_tournament_data.points }}
+                        {% endif %}
+                    </td>
                 </tr>
             </table>
         </div>
@@ -151,7 +160,7 @@
 
         {% from "helper.macro.html" import collapse_header %}
         <div class="collapse-wrapper">
-            {{ collapse_header("Picked by " + player.num_picked|string + " Person(s)", collapsed=player.num_picked > 5, text_size=5) }}
+            {{ collapse_header("Picked by " + player.num_picked|string + " Person(s)", collapsed=player.picked_by|length, text_size=5) }}
             <div class="collapse-body">
                 <table id="picked-by-table" class="table is-fullwidth">
                     {% for ps in player.picked_by %}

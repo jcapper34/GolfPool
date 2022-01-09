@@ -36,13 +36,13 @@ def get_tournament_player_db(pid, tid, year, conn=None):
     
     player = Player(id=pid)
 
-    player.tournament_data = conn.exec_fetch(GET_TOURNAMENT_DATA_QUERY, (pid, year))
-    player.tournament_data = list(player.tournament_data)
+    tournament_data = conn.exec_fetch(GET_TOURNAMENT_DATA_QUERY, (pid, year))
+    tournament_data = list(tournament_data)
 
-    player.current_tournament_data = func_find(player.tournament_data, lambda t: t['tid'] == tid)
-    player.photo_url = player.tournament_data[0]['photo_url']
+    current_tournament_data = func_find(tournament_data, lambda t: t['tid'] == tid)
+    photo_url = tournament_data[0]['photo_url']
     
-    return player
+    return current_tournament_data, photo_url
 
 
 # Parameters: pid, year

@@ -13,11 +13,12 @@ from tournament.tournament import Tournament
 from tournament.tournament_retriever import get_api_tournament
 
 mod = Blueprint("results", __name__, template_folder='templates',
-                        static_folder='static')   # Register blueprint
+                static_folder='static')   # Register blueprint
 
 """ LIVE ROUTES """
 
 # Root of Results Module
+
 
 @mod.route("/")
 @mod.route("/live")
@@ -135,7 +136,17 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
         player.scorecards = func_find(
             tournament.scorecards, lambda sc: sc['golferId'] == player.id, limit=4)
     else:
-        player.merge(get_tournament_player_db(pid, tid, year, conn=conn))
+        current_tournament_data, photo_url = get_tournament_player_db(
+            pid, tid, year, conn=conn)
+
+        player.current_tournament_data = Player(
+            id=pid,
+            pos=current_tournament_data['pos'],
+            total=current_tournament_data['total'],
+            thru=current_tournament_data['thru'],
+            points=current_tournament_data['points']
+        )
+        player.photo_url = photo_url
 
     player_modal = get_template_attribute("modal.macro.html", "player_modal")
     return player_modal(player)
