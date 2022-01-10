@@ -24,8 +24,8 @@ class Player:
     raw_pos: int = None
     thru: str = None
     holes: list = None
-    current_tournament_data: dict = None
     season_history: dict = None
+    scorecards: List = None
 
     # Picks
     picked_by: List[str] = None
@@ -35,14 +35,16 @@ class Player:
     photo_url: str = None
     country_flag: str = None
 
-    def merge(self, player):
-        for prop in Player.__dataclass_fields__:
-            val = getattr(self, prop)
-            if val is None and getattr(player, prop) is not None:
-                setattr(self, prop, getattr(player, prop))
+    def set_attributes(self, attr_map):
+        for key, val in attr_map.items():
+            setattr(self, key, val)
+            
+    def merge_attributes(self, attr_map):
+        for key, val in attr_map.items():
+            if getattr(self, key) is None:
+                setattr(self, key, val)
 
     """ Overrides """
-
     def __str__(self):
         return "Player: [id=%s, name='%s']" % (self.id, self.name)
 

@@ -16,7 +16,7 @@ def get_api_tournament(channel_tid=None) -> Tournament:
     if tournament.channel_tid is None:  # If live is requested
             api_tournament = api_get_live()['result']  # Get Tournament From API
     else:
-        api_tournament = request_json(LEADERBOARD_URL % tournament.channel_tid)['result']  # Get Tournament From API
+        api_tournament = request_json(LEADERBOARD_URL % int(tournament.channel_tid))['result']  # Get Tournament From API
 
     try:
         point_template = request_json('tournament/data/point-template.json')  # Load Point Template Data

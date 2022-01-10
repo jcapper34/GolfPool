@@ -65,7 +65,7 @@
 
 
 {% macro player_modal(player) %}
-    {% if player.current_tournament_data is not none %}
+    {% if player.pos is not none %}
     <div class="media">
         <figure class="image media-left player-modal-image is-128x128">   {# Todo: Lazy load #}
             <img src="{{ player.photo_url }}">
@@ -75,11 +75,11 @@
                 <tr class="hide"></tr>
                 <tr><th>Position</th><th>Score</th></tr>
                 <tr>
-                    <td>{% if player.current_tournament_data.pos is none %}-{% else %}{{ player.current_tournament_data.pos }}{% endif %}</td>
+                    <td>{% if player.pos is none %}-{% else %}{{ player.pos }}{% endif %}</td>
                     <td>
                          {# Show Total #}
-                        {% if player.current_tournament_data.total < 0 %}{{ player.current_tournament_data.total }}
-                        {% elif player.current_tournament_data.total > 0 %}+{{ player.current_tournament_data.total }}
+                        {% if player.total < 0 %}{{ player.total }}
+                        {% elif player.total > 0 %}+{{ player.total }}
                         {% else %}E{% endif %}
                     </td>
                 </tr>
@@ -87,19 +87,19 @@
                 <tr>
                     <td>
                          {# Show Thru #}
-                        {% if player.current_tournament_data.thru is none %}
+                        {% if player.thru is none %}
                             -
-                        {% elif player.current_tournament_data.thru == 18 %}
+                        {% elif player.thru == 18 %}
                             F
                         {% else %}
-                            {{ player.current_tournament_data.thru }}
+                            {{ player.thru }}
                         {% endif %}
                     </td>
                     <td>
-                        {% if player.current_tournament_data.points is none %}
+                        {% if player.points is none %}
                             0
                         {% else %}
-                            {{ player.current_tournament_data.points }}
+                            {{ player.points }}
                         {% endif %}
                     </td>
                 </tr>
@@ -160,7 +160,7 @@
 
         {% from "helper.macro.html" import collapse_header %}
         <div class="collapse-wrapper">
-            {{ collapse_header("Picked by " + player.num_picked|string + " Person(s)", collapsed=player.picked_by|length, text_size=5) }}
+            {{ collapse_header("Picked by " + player.picked_by|length|string + " Person(s)", collapsed=player.picked_by|length, text_size=5) }}
             <div class="collapse-body">
                 <table id="picked-by-table" class="table is-fullwidth">
                     {% for ps in player.picked_by %}

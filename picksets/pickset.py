@@ -37,9 +37,11 @@ class Pickset:
             if pl is None:  # If not found
                 golfer.points = 0
                 continue
-
-            golfer.merge(pl)
-
+            
+            golfer.pos = pl.pos
+            golfer.total = pl.total
+            golfer.points = pl.points
+            golfer.thru = pl.thru
 
     def __str__(self):
         s = "Pickset: id=%s, name='%s'" % (self.id, self.name)

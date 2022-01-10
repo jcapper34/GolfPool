@@ -1,3 +1,4 @@
+from dataclasses import asdict
 import json
 
 from flask import Blueprint, render_template, request, get_template_attribute, jsonify, session, Response
@@ -126,27 +127,17 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
     player.picked_by = who_picked_player(player.id, year=year, conn=conn)
 
     if tid is None:
-        tournament = get_api_tournament(channel_tid=int(channel_tid))
+        tournament = get_api_tournament(channel_tid=channel_tid)
         tournament.year = year
         leaderboard_player = func_find(
             tournament.players, lambda pl: pl.id == player.id)
-
-        player.photo_url = leaderboard_player.photo_url
-        player.current_tournament_data = leaderboard_player
+        player.merge_attributes(asdict(leaderboard_player))
         player.scorecards = func_find(
             tournament.scorecards, lambda sc: sc['golferId'] == player.id, limit=4)
     else:
-        current_tournament_data, photo_url = get_tournament_player_db(
+        tournament_results = get_tournament_player_db(
             pid, tid, year, conn=conn)
-
-        player.current_tournament_data = Player(
-            id=pid,
-            pos=current_tournament_data['pos'],
-            total=current_tournament_data['total'],
-            thru=current_tournament_data['thru'],
-            points=current_tournament_data['points']
-        )
-        player.photo_url = photo_url
+        player.set_attributes(tournament_results)
 
     player_modal = get_template_attribute("modal.macro.html", "player_modal")
     return player_modal(player)

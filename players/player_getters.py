@@ -1,3 +1,4 @@
+from typing import Dict, Tuple
 from config import PGA_PHOTO_URL
 from db.db_helper import filter_conn
 from helper import CURRENT_YEAR, func_find
@@ -31,18 +32,17 @@ SELECT position AS pos, score AS total, points, tournament_id AS tid, 18 AS thru
     JOIN player p on elx.player_id = p.id
     WHERE p.id = %s AND elx.season_year=%s
 """
-def get_tournament_player_db(pid, tid, year, conn=None):
+def get_tournament_player_db(pid, tid, year, conn=None) -> Dict:
     conn = filter_conn(conn)
     
     player = Player(id=pid)
 
-    tournament_data = conn.exec_fetch(GET_TOURNAMENT_DATA_QUERY, (pid, year))
-    tournament_data = list(tournament_data)
+    all_tournament_results = list(conn.exec_fetch(GET_TOURNAMENT_DATA_QUERY, (pid, year)))
 
-    current_tournament_data = func_find(tournament_data, lambda t: t['tid'] == tid)
-    photo_url = tournament_data[0]['photo_url']
+    tournament_results = dict(func_find(all_tournament_results, lambda t: t['tid'] == tid))
+    del tournament_results['tid']   # Don't need this property anymore
     
-    return current_tournament_data, photo_url
+    return tournament_results
 
 
 # Parameters: pid, year
