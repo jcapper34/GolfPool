@@ -32,17 +32,17 @@ SELECT position AS pos, score AS total, points, tournament_id AS tid, 18 AS thru
     JOIN player p on elx.player_id = p.id
     WHERE p.id = %s AND elx.season_year=%s
 """
-def get_tournament_player_db(pid, tid, year, conn=None) -> Dict:
+def get_tournament_player_db(pid, year, conn=None) -> Tuple[Dict]:
     conn = filter_conn(conn)
     
     player = Player(id=pid)
 
     all_tournament_results = list(conn.exec_fetch(GET_TOURNAMENT_DATA_QUERY, (pid, year)))
 
-    tournament_results = dict(func_find(all_tournament_results, lambda t: t['tid'] == tid))
-    del tournament_results['tid']   # Don't need this property anymore
+    # tournament_results = dict(func_find(all_tournament_results, lambda t: t['tid'] == tid))
+    # del tournament_results['tid']   # Don't need this property anymore
     
-    return tournament_results
+    return tuple(dict(t) for t in all_tournament_results)
 
 
 # Parameters: pid, year

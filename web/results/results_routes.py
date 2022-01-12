@@ -126,6 +126,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
     player = Player(id=pid)
     player.picked_by = who_picked_player(player.id, year=year, conn=conn)
 
+    # Get API results
     if tid is None:
         tournament = get_api_tournament(channel_tid=channel_tid)
         tournament.year = year
@@ -134,10 +135,19 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
         player.merge_attributes(asdict(leaderboard_player))
         player.scorecards = func_find(
             tournament.scorecards, lambda sc: sc['golferId'] == player.id, limit=4)
+    # Get DB Results
     else:
         tournament_results = get_tournament_player_db(
-            pid, tid, year, conn=conn)
-        player.set_attributes(tournament_results)
+            pid, year, conn=conn)
+        player.season_history = tournament_results
+        player.photo_url = tournament_results[0]['photo_url']
+        if tid != "cumulative":
+            current_results = func_find(tournament_results, lambda t: t['tid'] == tid)
+            if current_results is None:
+                return "Invalid tournament id was specified" # TODO: Return error
+            current_results = dict(current_results)
+            del current_results['tid']
+            player.merge_attributes(current_results)
 
     player_modal = get_template_attribute("modal.macro.html", "player_modal")
     return player_modal(player)
