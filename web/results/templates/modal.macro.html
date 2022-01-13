@@ -154,7 +154,7 @@
     {% endif %}
     <hr>
     <section class="who-picked-section">
-        {% if player.num_picked == 0 %}
+        {% if player.picked_by|length == 0 %}
             <h2 class="title is-5">Player was not picked</h2>
         {% else %}
 

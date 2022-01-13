@@ -1,4 +1,6 @@
 from typing import Dict
+from datetime import datetime
+
 from config import LEADERBOARD_URL, EVENTS_URL, PGA_PHOTO_URL
 from helper import request_json
 from players.player import Player
@@ -14,9 +16,11 @@ def api_get_live() -> Dict:
 def get_api_tournament(channel_tid=None) -> Tournament:
     tournament = Tournament(channel_tid=channel_tid)
     if tournament.channel_tid is None:  # If live is requested
-            api_tournament = api_get_live()['result']  # Get Tournament From API
+            api_data = api_get_live()
+            api_tournament = api_data['result']  # Get Tournament From API
     else:
-        api_tournament = request_json(LEADERBOARD_URL % int(tournament.channel_tid))['result']  # Get Tournament From API
+        api_data = request_json(LEADERBOARD_URL % int(tournament.channel_tid))
+        api_tournament = api_data['result']  # Get Tournament From API
 
     try:
         point_template = request_json('tournament/data/point-template.json')  # Load Point Template Data
@@ -24,6 +28,8 @@ def get_api_tournament(channel_tid=None) -> Tournament:
         point_template = request_json('../tournament/data/point-template.json')  # Load Point Template Data
 
     leaderboard = api_tournament['golfers']
+    
+    tournament.year = datetime.strptime(api_data['latestOddsUpdate'], "%B %d, %Y").year
     tournament.channel_tid = api_tournament.get('eventKey')
     tournament.scorecards = api_tournament['scorecards']
 

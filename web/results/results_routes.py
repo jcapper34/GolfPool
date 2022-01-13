@@ -129,7 +129,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
     # Get API results
     if tid is None:
         tournament = get_api_tournament(channel_tid=channel_tid)
-        tournament.year = year
+        # tournament.year = year
         leaderboard_player = func_find(
             tournament.players, lambda pl: pl.id == player.id)
         player.merge_attributes(asdict(leaderboard_player))
