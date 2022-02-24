@@ -1,7 +1,6 @@
 certifi==2018.11.29
 chardet==3.0.4
 Click==7.0
-Cython==0.29.2
 Flask==1.0.2
 gunicorn==19.9.0
 idna==2.8
