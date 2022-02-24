@@ -1,9 +1,10 @@
 import xlrd
+from config import GOLFERS_URL
 
 from db.conn import Conn
-from helper import func_find, get_json, splash
+from helper import func_find, request_json, splash
 from picksets.pickset import Pickset
-from picksets.picksets_db import get_all_picks
+from picksets.pickset_getters import get_all_picks
 from players.player import Player
 from players.players_helper import level_separate
 
@@ -13,8 +14,8 @@ def xl_parse_picks(file_name, year, delete_first=False):
     if delete_first:
         conn.exec("DELETE FROM pickset WHERE season_year=%s", (year,))
 
-    api_players = list(get_json(Player.GOLFERS_URL)['items'].values())
-    all_players = [Player(**pl) for pl in conn.exec_fetch("SELECT id as pid, name FROM player")]
+    api_players = list(request_json(GOLFERS_URL)['items'].values())
+    all_players = [Player(**pl) for pl in conn.exec_fetch("SELECT id, name FROM player")]
 
     wb = xlrd.open_workbook(file_name)
     sheet = wb.sheet_by_index(0)
@@ -40,7 +41,7 @@ def xl_parse_picks(file_name, year, delete_first=False):
                     print("Doesn't exist", name)
                     continue
 
-            pickset.picks.append(Player(name=name, pid=match.id))
+            pickset.picks.append(Player(name=name, id=match.id))
 
         pickset.db_inserts(year, conn=conn)
 

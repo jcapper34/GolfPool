@@ -1,12 +1,15 @@
 from pprint import pprint
 
 import requests
+from config import ALL_PLAYERS_URL, OWGR_STAT_ID, PGA_PHOTO_URL, STATS_URL
 
 from db.db_helper import filter_conn
-from helper import CURRENT_YEAR, func_find, splash, get_json
+from helper import CURRENT_YEAR, func_find, splash, request_json
 from db.conn import Conn
 from players.player import Player
+from tournament.tournament_calculations import calculate_api_standings
 from tournament.tournament import Tournament
+from tournament.tournament_retriever import get_api_tournament
 
 """
 Channel TIDS
@@ -39,65 +42,65 @@ def get_email_addresses(year):
 def insert_levels(year=CURRENT_YEAR):
     levels = (
         (
-         'Rory McIlroy',
-         'Jon Rahm',
-         'Brooks Koepka',
-         'Justin Thomas',
-         'Dustin Johnson',
-         'Bryson DeChambeau',
-         'Patrick Reed',
-         'Patrick Cantlay',
-         'Webb Simpson',
-         'Collin Morikawa',
-         'Xander Schauffele',
-         'Tyrrell Hatton',
-         'Tony Finau'
+            'Rory McIlroy',
+            'Jon Rahm',
+            'Brooks Koepka',
+            'Justin Thomas',
+            'Dustin Johnson',
+            'Bryson DeChambeau',
+            'Patrick Reed',
+            'Patrick Cantlay',
+            'Webb Simpson',
+            'Collin Morikawa',
+            'Xander Schauffele',
+            'Tyrrell Hatton',
+            'Tony Finau'
         ),
         (
-        'Sungjae Im',
-        'Viktor Hovland',
-        'Daniel Berger',
-        'Matthew Fitzpatrick',
-        'Billy Horschel',
-        'Paul Casey',
-        'Lee Westwood',
-        'Harris English',
-        'Scottie Scheffler',
-        'Matthew Wolff',
-        'Tommy Fleetwood',
-        'Hideki Matsuyama',
-        'Ryan Palmer',
-        'Louis Oosthuizen',
-        'Adam Scott',
-        'Justin Rose',
+            'Sungjae Im',
+            'Viktor Hovland',
+            'Daniel Berger',
+            'Matthew Fitzpatrick',
+            'Billy Horschel',
+            'Paul Casey',
+            'Lee Westwood',
+            'Harris English',
+            'Scottie Scheffler',
+            'Matthew Wolff',
+            'Tommy Fleetwood',
+            'Hideki Matsuyama',
+            'Ryan Palmer',
+            'Louis Oosthuizen',
+            'Adam Scott',
+            'Justin Rose',
 
         ),
         (
-        'Kevin Na',
-        'Abraham Ancer',
-        'Joaquin Niemann',
-        'Victor Perez',
-        'Cameron Smith',
-        'Jason Kokrak',
-        'Christiaan Bezuidenhout',
-        'Kevin Kisner',
-        'Max Homa',
-        'Marc Leishman',
-        'Sergio Garcia',
-        'Corey Conners',
-        'Henrik Stenson',
-        'Matt Kuchar',
-        'Jason Day',
-        'Shane Lowry',
-        'Jordan Spieth',
-        'Gary Woodland',
-        'Bubba Watson',
-        'Bernd Wiesberger',
-        'Phil Mickelson',
-        'Rickie Fowler',
-        'Danny Willett',
-        'Ian Poulter',
-        'Si Woo Kim'
+            'Kevin Na',
+            'Abraham Ancer',
+            'Joaquin Niemann',
+            'Victor Perez',
+            'Cameron Smith',
+            'Jason Kokrak',
+            'Christiaan Bezuidenhout',
+            'Kevin Kisner',
+            'Max Homa',
+            'Marc Leishman',
+            'Sergio Garcia',
+            'Corey Conners',
+            'Henrik Stenson',
+            'Matt Kuchar',
+            'Jason Day',
+            'Shane Lowry',
+            'Jordan Spieth',
+            'Gary Woodland',
+            'Bubba Watson',
+            'Bernd Wiesberger',
+            'Phil Mickelson',
+            'Rickie Fowler',
+            'Danny Willett',
+            'Ian Poulter',
+            'Si Woo Kim'
 
         )
     )
@@ -114,12 +117,14 @@ def insert_levels(year=CURRENT_YEAR):
 
     for level_num in range(1, len(levels)+1):
         for player_name in levels[level_num-1]:
-            results = conn.exec_fetch("SELECT id FROM player WHERE name=%s", (player_name,), fetchall=False)    # Get player id
+            results = conn.exec_fetch(
+                "SELECT id FROM player WHERE name=%s", (player_name,), fetchall=False)    # Get player id
             if results is None:
                 print("Player %s does not exist" % player_name)
                 continue
             pid = results[0]
-            conn.exec("INSERT INTO level_xref (player_id, season_year, level) VALUES(%s,%s,%s)", (pid, year, level_num))
+            conn.exec(
+                "INSERT INTO level_xref (player_id, season_year, level) VALUES(%s,%s,%s)", (pid, year, level_num))
 
     conn.commit()
 
@@ -129,16 +134,19 @@ def db_upload_leaderboard_individual(tournament, do_commit=True, conn=None):
 
     tournament.fill_api_leaderboard()
 
-    conn.exec('INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING', (tournament.year,))  # Insert season
+    conn.exec('INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING',
+              (tournament.year,))  # Insert season
 
-    conn.exec("DELETE FROM event_leaderboard_xref CASCADE WHERE tournament_id=%s AND season_year=%s", (tournament.tid, tournament.year))
+    conn.exec("DELETE FROM event_leaderboard_xref CASCADE WHERE tournament_id=%s AND season_year=%s",
+              (tournament.tid, tournament.year))
     conn.exec('INSERT INTO event (tournament_id, season_year) VALUES (%s, %s) ON CONFLICT DO NOTHING',
               (tournament.tid, tournament.year))  # Insert season
 
     leaderboard_insert_query = "INSERT INTO event_leaderboard_xref (tournament_id, season_year, position, score, points, player_id) VALUES "
 
     for player in tournament.players:
-        conn.exec("INSERT INTO player (id, name) VALUES (%s,%s) ON CONFLICT DO NOTHING", (player.id, player.name))
+        conn.exec("INSERT INTO player (id, name) VALUES (%s,%s) ON CONFLICT DO NOTHING",
+                  (player.id, player.name))
         values_query = conn.cur.mogrify(" (%s,%s,%s,%s,%s,%s),",
                                         (tournament.tid, tournament.year, player.pos, player.total, player.points, player.id))
         leaderboard_insert_query += values_query.decode()
@@ -154,12 +162,8 @@ def db_upload_leaderboard_individual(tournament, do_commit=True, conn=None):
 def db_upload_leaderboard(year, conn=None):
     conn = filter_conn(conn)
 
-    api_events = get_json("https://www.golfchannel.com/api/v2/tours/%d/events/%d" % (1,year))
-
     major_results = [Tournament(year=year, channel_tid=e['key'], tournament_name=e['name'])
                      for e in func_find(api_events, lambda event: event['major'] and 'players' not in event['name'], limit=4)]
-
-
     print([(m.channel_tid, m.name) for m in major_results])
     assert len(major_results) == 4
     assert all(['players' not in m.name.lower() for m in major_results])
@@ -184,15 +188,19 @@ def db_upload_leaderboard(year, conn=None):
     conn.commit()
 
 
-def db_upload_standings_individual(tournament, conn=None):
+def db_upload_standings_individual(channel_tid, tid, year, conn=None):
     conn = filter_conn(conn)
 
-    tournament.fill_api_leaderboard()
-    tournament.calculate_api_standings(get_picks=True, conn=conn)
+    tournament = get_api_tournament(channel_tid=channel_tid)
+    tournament.tid = tid
+    tournament.year = year
+    calculate_api_standings(tournament, get_picks=True, conn=conn)
 
-    conn.exec('INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING', (tournament.year,))  # Insert season
+    conn.exec('INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING',
+              (tournament.year,))  # Insert season
 
-    conn.exec("DELETE FROM event_standings_xref CASCADE WHERE tournament_id=%s AND season_year=%s", (tournament.tid, tournament.year))
+    conn.exec("DELETE FROM event_standings_xref CASCADE WHERE tournament_id=%s AND season_year=%s",
+              (tournament.tid, tournament.year))
     conn.exec('INSERT INTO event (tournament_id, season_year) VALUES (%s, %s) ON CONFLICT DO NOTHING',
               (tournament.tid, tournament.year))  # Insert season
 
@@ -210,22 +218,25 @@ def db_upload_standings_individual(tournament, conn=None):
 
 def db_set_photo_urls(conn=None):
     conn = filter_conn(conn)
-    db_players = conn.exec_fetch("SELECT id, name FROM player WHERE tour_id is NULL")
-    api_players = get_json(Player.ALL_PLAYERS_URL)['plrs']
+    db_players = conn.exec_fetch(
+        "SELECT id, name FROM player WHERE tour_id is NULL")
+    api_players = request_json(ALL_PLAYERS_URL)['plrs']
 
     for player in db_players:
-        match = func_find(api_players, lambda pl: ' '.join((pl['nameF'], pl['nameL'])).lower() == player['name'].lower())
+        match = func_find(api_players, lambda pl: ' '.join(
+            (pl['nameF'], pl['nameL'])).lower() == player['name'].lower())
         if match is not None:
             pid = match['pid']
-            conn.exec("UPDATE player SET tour_id = %s, photo_url = %s WHERE id=%s", (pid, Player.PGA_PHOTO_URL % pid, player['id']))
-
+            conn.exec("UPDATE player SET tour_id = %s, photo_url = %s WHERE id=%s",
+                      (pid, PGA_PHOTO_URL % pid, player['id']))
 
     conn.commit()
 
 
 def check_levels_good(levels):
     # flattened_levels = [pl for level in levels for pl in level]
-    owgr_data = requests.get(Player.STATS_URL % Player.OWGR_STAT_ID).json()[:100]
+    owgr_data = requests.get(STATS_URL %
+                             OWGR_STAT_ID).json()[:100]
     for i, player in enumerate(owgr_data, start=1):
         p_name = player['firstName'] + " " + player['lastName']
         found = False
@@ -244,6 +255,4 @@ if __name__ == "__main__":
     for channel_tid, tid in []:
         tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2021)
         db_upload_standings_individual(tournament, conn=con)
-        db_upload_leaderboard_individual(tournament, conn=con)
-
-
+        db_upload_leaderboard_individual(channel_tid, tid, 2021, conn=con)

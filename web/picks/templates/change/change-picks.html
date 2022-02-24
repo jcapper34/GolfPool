@@ -1,0 +1,73 @@
+{#
+params: level_players, pickset, year, OWGR_RANKINGS
+-
+#}
+{% extends "base.html" %}
+{% import 'make/make-picks.macro.html' as mp_macs %}
+{% block add_head %}
+<link rel="stylesheet" href="/picks/static/css/make-picks.css">
+{% endblock %}
+{% block title %}Change Picks | {{ pickset.name }}{% endblock %}
+{% block hero_title %}Change Picks - {{ pickset.name }}{% endblock %}
+
+{% block body %}
+
+{# Logout Box #}
+<div style="padding:5px" class="has-text-centered">
+    <a href="{{ url_for('picks.picks_change_logout') }}">Logout</a>
+</div>
+
+{# Picks Sections #}
+<div class="columns">
+    <div class="column">
+        <form id="make-picks-form" onsubmit="return submit_change_picks($(this))">
+
+            {#  Hidden General Fields #}
+            <input type="hidden" name="psid" value="{{ pickset.id }}">
+            <input type="hidden" name="name" value="{{ pickset.name }}">
+            <input type="hidden" name="email" value="{{ pickset.email }}">
+            <input type="hidden" name="pin" value="{{ pickset.pin }}">
+
+            {# Levels 1-3 Section #}
+            {% set num_picks = [3,3,2] %}
+            {% for n in num_picks %}
+                {{ mp_macs.main_level_field(loop.index, n, level_players[loop.index0]) }}
+            {% endfor %}
+
+            {# Levels 4 Section #}
+            {{ mp_macs.level_4_section(pickset.picks[3]) }}
+
+            {# Submission Section #}
+            <section class="section">
+                <div class="container">
+                    <div class="field is-grouped is-grouped-right">
+                        <div class="control">
+                            <button onclick="revert_picks()" class="button is-light is-pulled-right" type="button">Revert</button>
+                        </div>
+                        <div class="control">
+                            <button id="submit-picks-button" class="button is-link is-pulled-right" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block add_below %}
+<script>
+const OWGR_URL = '{{ OWGR_URL }}';
+
+{# Initial Picks #}
+const initialMainLevels = {{ (pickset.picks[0]|map(attribute='id')|list + pickset.picks[1]|map(attribute='id')|list + pickset.picks[2]|map(attribute='id')|list)|tojson }};
+const initialLevel4Ids = {{ pickset.picks[3]|map(attribute='id')|list|tojson }};
+const initialLevel4Names = {{ pickset.picks[3]|map(attribute='name')|list|tojson }};
+
+
+const API_PLAYERS_URL = "{{ API_PLAYERS_URL }}";
+</script>
+<script src="/picks/static/js/make-picks.js?v=1.4"></script>
+<script src="/picks/static/js/change-picks.js?v=1.0"></script>
+{% endblock %}

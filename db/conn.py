@@ -1,18 +1,19 @@
 import psycopg2
 import psycopg2.extras
-from db.db_config import USE_LOCAL, LOCAL_DB_CREDENTIALS, HEROKU_DB_CREDENTIALS
+from config import USE_LOCAL, LOCAL_DB_CREDENTIALS, HEROKU_DB_CREDENTIALS
 
 
 class Conn:
     def __init__(self, use_local=USE_LOCAL):
-        # credentials = LOCAL_DB_CREDENTIALS if use_local else HEROKU_DB_CREDENTIALS  # Uncomment when local db is installed
-        credentials = HEROKU_DB_CREDENTIALS
+        # Uncomment when local db is installed
+        credentials = LOCAL_DB_CREDENTIALS if use_local else HEROKU_DB_CREDENTIALS
         self.conn = psycopg2.connect(**credentials)
         self.new_cursor()
 
     def new_cursor(self, use_dict=True):
         if use_dict:
-            self.cur = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            self.cur = self.conn.cursor(
+                cursor_factory=psycopg2.extras.DictCursor)
         else:
             self.cur = self.conn.cursor()
 
@@ -40,4 +41,5 @@ class Conn:
         return where_str + ' AND '.join(self.cur.mogrify(x[0] + " = %s", (x[1],)).decode('utf-8') for x in where)
 
     def __del__(self):
-        self.conn.close()
+        if getattr(self, "conn", None) is not None:
+            self.conn.close()

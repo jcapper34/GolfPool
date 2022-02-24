@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Archive{% endblock %}
+{% block hero_title %}Archive{% endblock %}
+
+{% block add_head %}
+<style>
+#seasons-table th, #seasons-table td {
+    text-align: center;
+}
+.year-th {
+    font-size: 20px;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <table class="table is-striped is-bordered is-fullwidth" id="seasons-table">
+            {% for year in years[1:] %}
+                {% set year = year[0] %}
+                <tr><th colspan="2" class="year-th">{{ year }}</th></tr>
+                <tr>
+                    <td><a href="/picks/poolwide/{{ year }}">Picks</></td>
+                    <td><a href="/standings/{{ year }}/014">Standings</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endblock %}
+
+{% block add_below %}
+{% endblock %}

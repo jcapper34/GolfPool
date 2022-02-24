@@ -1,0 +1,133 @@
+{% macro standings_menu(current_tid, current_year, past_events) %}    {# current_tid and current_year are used for highlighting #}
+    <div id="standings-menu" class="menu">
+        <div id="standings-menu-header" class="level is-mobile">
+            <div class="level-left">
+                <h4 class="subtitle">Menu</h4>
+            </div>
+            <div class="level-right">
+                {% from 'helper.macro.html' import menu_burger %}
+                {{ menu_burger("toggle_mobile_standings_menu($(this))") }}
+            </div>
+        </div>
+        <div id="standings-menu-items">
+            <ul class="menu-list">
+                <p class="menu-label">Dynamic Results</p>
+                <li><a onclick="switch_tournament($(this))" class="{% if current_tid is none %}is-active{% endif %}" data-href="{{ url_for('results.results_live') }}">Live Standings</a></li>
+            </ul>
+            <p class="menu-label">Final Results</p>
+                <ul class="menu-list">
+                    <li>
+                    {% for year in past_events %}
+                    <a onclick="switch_tournament($(this))" data-href="{{ url_for('results.results_past', tid='cumulative', year=year) }}">{{ year }}</a>
+                    <ul class="collapse-">
+                       {% for tourny in past_events[year] %}
+                        <li><a onclick="switch_tournament($(this))" class="{% if tourny.id==current_tid and year==current_year %}is-active{% endif %}" data-href="{{ url_for('results.results_past', tid=tourny.id, year=year) }}">{{ tourny.name }}</a></li>
+                        {% endfor %}
+                        <a onclick="switch_tournament($(this))" data-href="{{ url_for('results.results_past', tid='cumulative', year=year) }}">Cumulative</a>
+                    </ul>
+                    {% endfor %}
+                    </li>
+                </ul>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro standings_main_section(tournament, user_psid, add_refresh=False) %}
+    {{ standings_header(tournament.name, tournament.year, add_refresh=add_refresh) }}
+
+    {# Tables #}
+    <div id="standings-tables">
+        <div class="columns">
+            <div id="standings-table-column" class="column is-half">
+                {{ standings_table(tournament.picksets, user_psid) }}
+            </div>
+            <div id="leaderboard-table-column" class="column is-half">
+            {{ leaderboard_table(tournament.players) }}
+            </div>
+        </div>
+    </div>
+    <div id="standings-loader-box">
+        <div class="lds-roller absolutely-centered"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    </div>
+{% endmacro %}
+
+{% macro standings_header(tournament_name, year, add_refresh=False) %}
+    <div id="standings-header" class="level">
+        <div class="level-left">
+            <div>
+                <h1 class="title">
+                {{ tournament_name }} - {{ year }}
+                {% if add_refresh %}
+                <a id="refresh-standings" onclick="standingsRefresh()"><span class="icon"><i class="fas fa-sync"></i></span></a>
+                {% endif %}
+                </h1>
+                {% if add_refresh %}
+                    <p>Note: Results are approximately 5 min behind realtime</p>
+                    <p>Results were last updated at <span id="refresh-time"></span></p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="level-right">
+            <input id="tournament-search" onkeyup="tournament_search()" class="input level-item" placeholder="Search">
+        </div>
+    </div>
+    <div class="switch-box">
+        <label class="switch">
+          <input id="table-switch" type="checkbox" checked onchange="switch_table($(this))" autocomplete="off">
+          <span class="slider round"></span>
+        </label>
+    </div>
+{% endmacro %}
+
+
+{# Tables #}
+{% macro standings_table(picksets, user_psid) %}
+    <table id="standings-table" class="table is-fullwidth is-hoverable">
+        <thead>
+            <tr><th class="th-pos">Position</th><th>Name</th><th class="th-points">Points</th><th class="th-filter">Filter</th><th class="th-star hide">&nbsp;</th></tr>
+        </thead>
+        <span id="favorite-standings"></span>
+        <tbody id="standings-body">
+            {% if picksets %}
+                {% for pickset in picksets %}
+                    <tr class="pickset-row {% if pickset.id == user_psid %}is-selected{% endif %}" data-psid="{{ pickset.id }}" data-picks='{{ pickset.picks|map(attribute='id')|list|tojson }}'>
+                        <td class="td-pos">
+                        {{ pickset.pos }}
+                        </td>
+                        <td class="td-name">{{ pickset.name }}</td>
+                        <td class="td-points">{{ pickset.points }}</td>
+                        <td class="td-filter is-narrow"><input type="checkbox" class="filter-checkbox"> </td>
+                        {# TODO: "Favorite person" functionality #}
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td class="has-text-centered" colspan="4">No results to show</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% macro leaderboard_table(players) %}
+    <table id="leaderboard-table" class="table is-fullwidth is-hoverable">
+        <thead>
+            <tr><th class="th-pos">Position</th><th>Name</th><th class="th-points">Points</th></tr>
+        </thead>
+        <tbody id="leaderboard-body">
+        {% if players %}
+            {% for player in players %}
+                <tr data-pid="{{ player.id }}" class="animated player-row">
+                    {% if player.pos is none %}
+                    <td class="td-pos">-</td>
+                    {% else %}
+                    <td class="td-pos">{{ player.pos }}</td>
+                    {% endif %}
+                    <td class="td-name">{{ player.name }}</td>
+                    <td class="td-points">{{ player.points }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td class="has-text-centered" colspan="4">No results to show</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+{% endmacro %}
