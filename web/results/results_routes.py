@@ -1,7 +1,7 @@
 from dataclasses import asdict
 import json
 
-from flask import Blueprint, render_template, request, get_template_attribute, jsonify, session, Response
+from flask import Blueprint, render_template, request, get_template_attribute, jsonify, session, Response, redirect, url_for
 
 from db.conn import Conn
 from helper import func_find, CURRENT_YEAR, RUNNING_LOCALLY
@@ -22,6 +22,9 @@ mod = Blueprint("results", __name__, template_folder='templates',
 
 
 @mod.route("/")
+def results_home():
+    return redirect(url_for('results_live'))
+    
 @mod.route("/live")
 def results_live():
     # if not RUNNING_LOCALLY:
