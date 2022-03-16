@@ -23,7 +23,7 @@ mod = Blueprint("results", __name__, template_folder='templates',
 
 @mod.route("/")
 def results_home():
-    return redirect(url_for('results_live'))
+    return redirect(url_for('results.results_live'))
     
 @mod.route("/live")
 def results_live():
