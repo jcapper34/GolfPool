@@ -61,6 +61,3 @@ def obj_to_json(obj) -> str:
 """ CONSTANTS """
 # CURRENT_YEAR = int(datetimse.now().year)
 CURRENT_YEAR = 2021
-
-RUNNING_LOCALLY = environ.get("USE_LOCAL") is not None
-# RUNNING_LOCALLY = False

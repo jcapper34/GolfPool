@@ -4,7 +4,7 @@ import json
 from flask import Blueprint, render_template, request, get_template_attribute, jsonify, session, Response, redirect, url_for
 
 from db.conn import Conn
-from helper import func_find, CURRENT_YEAR, RUNNING_LOCALLY
+from helper import func_find, CURRENT_YEAR
 from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks, get_picks, get_tournament_history
 from players.player import Player
@@ -27,9 +27,6 @@ def results_home():
     
 @mod.route("/live")
 def results_live():
-    # if not RUNNING_LOCALLY:
-    #     return render_template('locked-page.html', title="Make Picks")
-
     tournament = get_api_tournament()
     calculate_api_standings(tournament, year=CURRENT_YEAR)
 

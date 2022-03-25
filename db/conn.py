@@ -1,13 +1,28 @@
 import psycopg2
 import psycopg2.extras
-from config import USE_LOCAL, LOCAL_DB_CREDENTIALS, HEROKU_DB_CREDENTIALS
-
+from urllib.parse import urlparse
+from config import LOCAL_DB_CREDENTIALS, HEROKU_DB_CREDENTIALS, USE_LOCAL
 
 class Conn:
-    def __init__(self, use_local=USE_LOCAL):
+    def __init__(self, use_local=False):
         # Uncomment when local db is installed
-        credentials = LOCAL_DB_CREDENTIALS if use_local else HEROKU_DB_CREDENTIALS
-        self.conn = psycopg2.connect(**credentials)
+        db_url = urlparse(LOCAL_DB_CREDENTIALS if USE_LOCAL else HEROKU_DB_CREDENTIALS)
+        
+        username = db_url.username
+        password = db_url.password
+        database = db_url.path[1:]
+        hostname = db_url.hostname
+        port = db_url.port
+        self.conn = psycopg2.connect(
+            database = database,
+            user = username,
+            password = password,
+            host = hostname,
+            port = port
+        )
+        
+        # credentials = LOCAL_DB_CREDENTIALS if use_local else HEROKU_DB_CREDENTIALS
+        # self.conn = psycopg2.connect(**credentials)
         self.new_cursor()
 
     def new_cursor(self, use_dict=True):

@@ -1,16 +1,15 @@
+import os
 from email.message import EmailMessage
 import smtplib
 from pprint import pprint
 
 from helper import CURRENT_YEAR
 
-
 class Postman:
-    MAIL_SERVER = 'smtp.aol.com'
-    MAIL_PORT = 587
-    SENDER_EMAIL = 'golf.pool@aol.com'
-    # SENDER_PASSWORD = 'GolfPoolEmail1' # This is for browser
-    SENDER_PASSWORD = 'tvdectelmfbjkfwr'
+    MAIL_SERVER = os.getenv('GOLF_POOL_EMAIL_SERVER')
+    MAIL_PORT = os.getenv('GOLF_POOL_EMAIL_PORT')
+    SENDER_EMAIL = os.getenv('GOLF_POOL_EMAIL_ADDRESS')
+    SENDER_PASSWORD = os.getenv('GOLF_POOL_EMAIL_PASSWORD')
 
     def __init__(self, recipients, message_subject="Golf Pool %d" % CURRENT_YEAR, message_body=None):   # Recipients needs to be list or tuple
         self.recipients = recipients

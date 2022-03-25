@@ -5,7 +5,8 @@ from config import GOLFERS_URL, OWGR_STAT_ID, STATS_URL
 
 # My function imports
 from db.conn import Conn
-from helper import CURRENT_YEAR, splash, RUNNING_LOCALLY
+from helper import CURRENT_YEAR, splash
+from config import USE_LOCAL
 from mailer.postman import Postman
 from picksets.pickset import Pickset
 from picksets.pickset_submission import submit_change_picks, submit_picks
@@ -32,7 +33,7 @@ def picks_index():
 # Make Picks Page
 @mod.route("/make")
 def picks_make():
-    if not RUNNING_LOCALLY:
+    if not USE_LOCAL:
         return render_template('locked-page.html', title="Make Picks")
     return render_template("make/make-picks.html", level_players=get_levels_db(CURRENT_YEAR), OWGR_URL=STATS_URL % OWGR_STAT_ID, API_PLAYERS_URL=GOLFERS_URL, year=CURRENT_YEAR)
 
@@ -93,7 +94,7 @@ def picks_confirmation():
 # Change Picks Page
 @mod.route("/change")
 def picks_change():
-    if not RUNNING_LOCALLY:
+    if not USE_LOCAL:
         return render_template('locked-page.html', title="Make Picks")
 
     psid = session.get('psid')
