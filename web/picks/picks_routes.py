@@ -1,12 +1,11 @@
 # Library imports
 from pprint import pprint
 from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for, get_template_attribute
-from config import GOLFERS_URL, OWGR_STAT_ID, STATS_URL
+from config import GOLFERS_URL, OWGR_STAT_ID, PICKS_LOCKED, STATS_URL
 
 # My function imports
 from db.conn import Conn
 from helper import CURRENT_YEAR, splash
-from config import USE_LOCAL
 from mailer.postman import Postman
 from picksets.pickset import Pickset
 from picksets.pickset_submission import submit_change_picks, submit_picks
@@ -33,7 +32,8 @@ def picks_index():
 # Make Picks Page
 @mod.route("/make")
 def picks_make():
-    if not USE_LOCAL:
+    # Make sure you don't allow picks to be made if picks are locked
+    if PICKS_LOCKED:
         return render_template('locked-page.html', title="Make Picks")
     return render_template("make/make-picks.html", level_players=get_levels_db(CURRENT_YEAR), OWGR_URL=STATS_URL % OWGR_STAT_ID, API_PLAYERS_URL=GOLFERS_URL, year=CURRENT_YEAR)
 
@@ -68,10 +68,10 @@ def picks_submit():
         # Submit pickset, will return pickset id
         psid = submit_picks(name, email, pin, form_picks)
         if not psid:  # If form not in correct format
-            return "Error: Picks not submitted correctly."
+            return "Error: Picks not submitted correctly.", 500
     except Exception as e:   # If internal error
         print(e)
-        return "Server Error: Please try again later"
+        return "Server Error: Please try again later", 500
 
     session['psid'] = psid  # Set session
     return redirect(url_for('picks.picks_confirmation'))
@@ -94,8 +94,9 @@ def picks_confirmation():
 # Change Picks Page
 @mod.route("/change")
 def picks_change():
-    if not USE_LOCAL:
-        return render_template('locked-page.html', title="Make Picks")
+    # Make sure you don't allow pick changes if picks are locked
+    if PICKS_LOCKED:
+        return render_template('locked-page.html', title="Change Picks")
 
     psid = session.get('psid')
     if psid is None:  # If not logged in
@@ -119,6 +120,9 @@ def picks_change():
 # Change Picks Login
 @mod.route("/change/submit-login", methods=['POST'])
 def picks_change_login():
+    # Make sure you don't allow changes if picks are locked
+    if PICKS_LOCKED:
+        return render_template('locked-page.html', title="Change Picks")
     email = request.form.get('email')
     pin = request.form.get('pin')
     psid = get_login(email, pin)
@@ -188,13 +192,17 @@ def picks_submit_changes():
 @mod.route("/poolwide")
 @mod.route("/poolwide/<int:year>")
 def picks_poolwide(year=CURRENT_YEAR):
+    # Make sure you don't show current year picks if picks aren't locked
+    if not PICKS_LOCKED and year == CURRENT_YEAR:
+        year = CURRENT_YEAR - 1
     return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))
 
 # Most picked macro
-
-
 @mod.route("/most-picked/<int:year>")
 def picks_most(year=CURRENT_YEAR):
+    # Make sure you don't show current year picks if picks aren't locked
+    if not PICKS_LOCKED and year == CURRENT_YEAR:
+        year = CURRENT_YEAR - 1
     most_picked_macro = get_template_attribute(
         "poolwide/poolwide-picks.macro.html", "most_picked_tab")
     return most_picked_macro(get_most_picked(year))

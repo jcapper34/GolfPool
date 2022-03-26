@@ -2,6 +2,7 @@ from dataclasses import asdict
 import json
 
 from flask import Blueprint, render_template, request, get_template_attribute, jsonify, session, Response, redirect, url_for
+from config import PICKS_LOCKED
 
 from db.conn import Conn
 from helper import func_find, CURRENT_YEAR
@@ -27,8 +28,9 @@ def results_home():
     
 @mod.route("/live")
 def results_live():
+    year = CURRENT_YEAR if PICKS_LOCKED else CURRENT_YEAR - 1    
     tournament = get_api_tournament()
-    calculate_api_standings(tournament, year=CURRENT_YEAR)
+    calculate_api_standings(tournament, year=year)
 
     if request.args.get("refresh") is not None:    # If refresh
         standings_macro = get_template_attribute(

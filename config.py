@@ -4,9 +4,7 @@ import os
 # Database Credentials
 # =======================
 
-LOCAL_DB_CREDENTIALS = os.getenv('LOCAL_DATABASE_URL')
-
-HEROKU_DB_CREDENTIALS = os.getenv('DATABASE_URL')
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # =======================
 # Golf Channel API
@@ -41,4 +39,5 @@ ROUTING_ALIASES = (
     ("/standings/<int:year>/<tid>", "results.results_past")
 )
 
-USE_LOCAL = os.getenv("USE_LOCAL").lower() == 'true'
+SRC_LOCAL = bool(eval(os.getenv("SRC_LOCAL", True)))
+PICKS_LOCKED = bool(eval(os.getenv("PICKS_LOCKED", True)))

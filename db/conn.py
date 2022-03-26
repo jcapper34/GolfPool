@@ -1,12 +1,12 @@
 import psycopg2
 import psycopg2.extras
 from urllib.parse import urlparse
-from config import LOCAL_DB_CREDENTIALS, HEROKU_DB_CREDENTIALS, USE_LOCAL
+from config import DATABASE_URL
 
 class Conn:
     def __init__(self, use_local=False):
         # Uncomment when local db is installed
-        db_url = urlparse(LOCAL_DB_CREDENTIALS if USE_LOCAL else HEROKU_DB_CREDENTIALS)
+        db_url = urlparse(DATABASE_URL)
         
         username = db_url.username
         password = db_url.password

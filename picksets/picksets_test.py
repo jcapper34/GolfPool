@@ -1,6 +1,6 @@
 from picksets.pickset import Pickset
 from players.players_helper import level_separate
-from picksets.picksets_db import get_most_picked, get_all_picks
+from picksets.pickset_getters import get_most_picked, get_all_picks
 from db.conn import Conn
 from db.db_helper import filter_conn
 

@@ -6,7 +6,7 @@ import logging
 from web.picks.picks_routes import mod as picks_mod
 from web.results.results_routes import mod as results_mod
 from web.api.api_routes import mod as api_mod
-from config import ROUTING_ALIASES, USE_LOCAL
+from config import DATABASE_URL, ROUTING_ALIASES, SRC_LOCAL
 from flask_cors import CORS
 
 app = Flask(__name__, static_folder='web/static', template_folder='web/templates')   # Creates app
@@ -21,7 +21,7 @@ app.secret_key = b'=\x06\x9f}\x97\xe9\x88\xba\xd0\xaa\xe7r\x82\x94\x8a\xb8m\x84\
 #       Logging
 # ========================
 logging.basicConfig(format='[%(asctime)s] - %(message)s', level=logging.INFO)
-logging.info("Using local database" if USE_LOCAL else "Using heroku database")
+logging.info("Using database: " + DATABASE_URL)
 
 # ========================
 # Register Blueprints
@@ -85,8 +85,8 @@ def page_not_found(e):
 # Jinja Globals
 # ========================
 @app.context_processor
-def is_local():
-    return dict(is_local=USE_LOCAL)
+def retrieve_src_local():
+    return dict(src_local=SRC_LOCAL)
 
 
 def are_levels_defined(players):

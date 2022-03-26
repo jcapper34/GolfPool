@@ -10,8 +10,7 @@ from players.player import Player
 # Returns: psid, psname, pid, pl.name, pl.level
 from players.players_helper import level_separate
 
-
-def get_all_picks(year=CURRENT_YEAR, separate=False, conn=None) -> List[Pickset]:
+def get_all_picks(year, separate=False, conn=None) -> List[Pickset]:
     # Parameters: year
     # Returns: psid, psname, pid, pl.name, level, pl.tour_id
     GET_ALL_PICKS_QUERY = """

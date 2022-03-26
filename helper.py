@@ -2,7 +2,6 @@ import json
 import inspect
 from pprint import pprint
 from datetime import datetime
-from os import environ
 from typing import Dict
 
 import requests
@@ -59,5 +58,4 @@ def obj_to_json(obj) -> str:
 
  
 """ CONSTANTS """
-# CURRENT_YEAR = int(datetimse.now().year)
-CURRENT_YEAR = 2021
+CURRENT_YEAR = int(datetime.now().year)

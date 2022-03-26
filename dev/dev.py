@@ -250,9 +250,9 @@ def check_levels_good(levels):
 
 
 if __name__ == "__main__":
-    # insert_levels(CURRENT_YEAR)
-    con = Conn()
-    for channel_tid, tid in []:
-        tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2021)
-        db_upload_standings_individual(tournament, conn=con)
-        db_upload_leaderboard_individual(channel_tid, tid, 2021, conn=con)
+    insert_levels(CURRENT_YEAR)
+    # con = Conn()
+    # for channel_tid, tid in []:
+    #     tournament = Tournament(channel_tid=channel_tid, tid=tid, year=2021)
+    #     db_upload_standings_individual(tournament, conn=con)
+    #     db_upload_leaderboard_individual(channel_tid, tid, 2021, conn=con)
