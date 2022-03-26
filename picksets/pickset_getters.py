@@ -66,12 +66,12 @@ def get_tournament_history(psid, year=CURRENT_YEAR, conn=None):
         SELECT t.name, esx.position AS pos, esx.points FROM event_standings_xref AS esx
             JOIN tournament AS t
                 ON t.id = esx.tournament_id
-            WHERE esx.season_year = %s AND esx.pickset_id = %s
+            WHERE esx.pickset_id = %s
         """
 
     conn = filter_conn(conn)
     return conn.exec_fetch(
-        GET_TOURNAMENT_HISTORY_QUERY, (year, psid))
+        GET_TOURNAMENT_HISTORY_QUERY, (psid,))
 
 
 def get_picks(psid=None, separate=True, conn=None) -> List:
