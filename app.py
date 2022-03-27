@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 from requests import get as http_get
 import logging
+from helper import CURRENT_YEAR
 
 from web.picks.picks_routes import mod as picks_mod
 from web.results.results_routes import mod as results_mod
@@ -36,7 +37,7 @@ app.register_blueprint(api_mod, url_prefix='/api')
 # =======================
 @app.route("/")
 def index():
-    return render_template("home.html")
+    return render_template("home.html", year=CURRENT_YEAR)
 
 
 # =======================
