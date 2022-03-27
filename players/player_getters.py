@@ -17,7 +17,7 @@ GET_LEVELS_QUERY = """
 def get_levels_db(year, separate=True, conn=None):
     conn = filter_conn(conn)
     results = conn.exec_fetch(GET_LEVELS_QUERY, (year,))
-    players = [Player(id=row['player_id'], name=row['name'], level=row['level'], photo_url=PGA_PHOTO_URL % row['photo_url']) for row in results]
+    players = [Player(id=row['player_id'], name=row['name'], level=row['level'], photo_url=row['photo_url']) for row in results]
 
     if separate:
         return level_separate(players)

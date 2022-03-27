@@ -35,7 +35,7 @@ def picks_make():
     # Make sure you don't allow picks to be made if picks are locked
     if PICKS_LOCKED:
         return render_template('locked-page.html', title="Make Picks")
-    return render_template("make/make-picks.html", level_players=get_levels_db(CURRENT_YEAR), OWGR_URL=STATS_URL % OWGR_STAT_ID, API_PLAYERS_URL=GOLFERS_URL, year=CURRENT_YEAR)
+    return render_template("make/make-picks.html", level_players=get_levels_db(CURRENT_YEAR), OWGR_URL=STATS_URL % (OWGR_STAT_ID, CURRENT_YEAR), API_PLAYERS_URL=GOLFERS_URL, year=CURRENT_YEAR)
 
 
 @mod.route("/season-history")
@@ -113,7 +113,7 @@ def picks_change():
                                CURRENT_YEAR, conn=conn),
                            pickset=pickset,
                            year=CURRENT_YEAR,
-                           OWGR_URL=STATS_URL % 19,
+                           OWGR_URL=STATS_URL % (19, CURRENT_YEAR),
                            API_PLAYERS_URL=GOLFERS_URL
                            )
 

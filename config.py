@@ -26,8 +26,9 @@ ALL_PLAYERS_URL = "https://statdata.pgatour.com/players/player.json"
 # From Golf Channel Website
 STAT_CATEGORIES_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/categories"
 OWGR_STAT_ID = 19   # For OWGR ranking
-STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/2021"   # Parameters: Stat Number
+STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/%d"   # Parameters: Stat Number, year
 GOLFERS_URL = "https://www.golfchannel.com/api/es/fullObject"
+INDIVIDUAL_GOLFER_URL = "https://www.golfchannel.com/api/v2/golfers/%s/full" # Parameters: pid
 
 # =======================
 # Routing Aliases
