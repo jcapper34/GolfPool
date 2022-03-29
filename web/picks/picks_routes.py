@@ -9,9 +9,8 @@ from helper import CURRENT_YEAR, splash
 from mailer.postman import Postman
 from picksets.pickset import Pickset
 from picksets.pickset_submission import submit_change_picks, submit_picks
-from picksets.pickset_getters import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks
+from picksets.pickset_getters import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks, get_pickset
 from players.player_getters import get_levels_db
-from players.player import Player
 from tournament.tournament import Tournament
 
 mod = Blueprint("picks", __name__, template_folder='templates',
@@ -85,8 +84,9 @@ def picks_confirmation():
         return redirect("index")
 
     # Get pickset
-    pickset = Pickset(id=psid)
-    pickset.picks = get_picks(psid)
+    conn = Conn()
+    pickset = get_pickset(psid, conn=conn)
+    pickset.picks = get_picks(psid, conn=conn)
 
     return render_template("make/picks-confirmation.html", pickset=pickset)
 
@@ -105,7 +105,7 @@ def picks_change():
     conn = Conn()   # Will be used more than once
 
     # Get pickset
-    pickset = Pickset(id=psid)
+    pickset = get_pickset(psid, conn=conn)
     pickset.picks = get_picks(psid, conn=conn)
 
     return render_template("change/change-picks.html",

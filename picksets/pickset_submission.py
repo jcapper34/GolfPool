@@ -29,7 +29,7 @@ def submit_change_picks(pid, name, email, pin, form_picks, conn=None):
     # Get main levels
     picks = extract_form_picks(form_picks)
 
-    if not validate_picks(conn):   # Make sure picks are valid
+    if not validate_picks(picks, conn=conn):   # Make sure picks are valid
         return False
 
     db_update_picks(pid, picks, conn=conn)

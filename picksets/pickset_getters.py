@@ -6,8 +6,6 @@ from helper import CURRENT_YEAR
 from picksets.pickset import Pickset
 from players.player import Player
 
-# Parameters: year
-# Returns: psid, psname, pid, pl.name, pl.level
 from players.players_helper import level_separate
 
 def get_all_picks(year, separate=False, conn=None) -> List[Pickset]:
@@ -73,6 +71,22 @@ def get_tournament_history(psid, year=CURRENT_YEAR, conn=None):
     return conn.exec_fetch(
         GET_TOURNAMENT_HISTORY_QUERY, (psid,))
 
+
+def get_pickset(psid, conn=None):
+    """
+    Parameters: ps.id
+    Returns: 
+    """
+    GET_PICKSET_QUERY = """
+        SELECT pa.name, pa.email, pa.pin FROM participant as pa
+            JOIN pickset ps
+            ON ps.participant_id = pa.id
+            WHERE ps.id = %s
+    """
+    conn = filter_conn(conn)
+    results = conn.exec_fetch(GET_PICKSET_QUERY, (psid,), fetchall=False)
+    return Pickset(id=psid, name=results['name'], email=results['email'], pin=results['pin'])
+    
 
 def get_picks(psid=None, separate=True, conn=None) -> List:
     """
