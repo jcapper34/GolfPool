@@ -9666,9 +9666,16 @@ label.panel-block:hover {
 }
 
 #picks-table th, #picks-table td {
-  text-align: center;
   min-width: 200px;
   vertical-align: middle;
+}
+
+#picks-table th {
+  text-align: center;
+}
+
+#picks-table th:first-of-type {
+  text-align: left;
 }
 
 #picks-table td:hover {
