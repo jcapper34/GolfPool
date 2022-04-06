@@ -56,7 +56,7 @@ def picks_submit():
     # Extract Form
     # Ensure name is capitalized
     name = request.form.get("name").strip().title()
-    email = request.form.get("email")
+    email = request.form.get("email").lower()
     pin = request.form.get("pin")
     form_picks = [request.form.getlist("level-1"),
                   request.form.getlist("level-2"),
@@ -123,7 +123,7 @@ def picks_change_login():
     # Make sure you don't allow changes if picks are locked
     if PICKS_LOCKED:
         return render_template('locked-page.html', title="Change Picks")
-    email = request.form.get('email')
+    email = request.form.get('email').lower()
     pin = request.form.get('pin')
     psid = get_login(email, pin)
     resp = {"success": True}
@@ -175,7 +175,7 @@ def picks_submit_changes():
     try:
         change_success = submit_change_picks(pid=f.get("psid"),
                                              name=f.get("name"),
-                                             email=f.get("email"),
+                                             email=f.get("email").lower(),
                                              pin=f.get("pin"),
                                              form_picks=[f.getlist('level-'+str(l)) for l in range(1, 5)])
 
