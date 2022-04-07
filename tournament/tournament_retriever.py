@@ -1,5 +1,7 @@
+import json
 from typing import Dict
 from datetime import datetime
+import requests
 
 from config import LEADERBOARD_URL, EVENTS_URL, PGA_PHOTO_URL
 from helper import request_json
@@ -10,7 +12,11 @@ from tournament.tournament import Tournament
 def api_get_live() -> Dict:
     # events = get_json(EVENTS_URL % CURRENT_YEAR)
     # current_tournament = func_find(events, lambda e: NOW < datetime.strptime(e['endDate'], "%Y-%m-%dT%H:%M:%S"))    # Finds first event with end date after now
-    return request_json(LEADERBOARD_URL % 19198)
+    # r = requests.get(ACTIVE_EVENTS_URL)
+    # current_tournament = json.loads(eval(r.content))[0]
+    # print(int(current_tournament['key']))
+    # return request_json(LEADERBOARD_URL % int(current_tournament['key']))
+    return request_json(LEADERBOARD_URL % 19540)
 
 
 def get_api_tournament(channel_tid=None) -> Tournament:
