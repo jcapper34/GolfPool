@@ -106,14 +106,14 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
     else:
         tournament.fill_db_rankings(conn=conn)  # Get Standings from DB
         pickset.merge_tournament(tournament)
-        for pick in pickset.picks:
-            pick.raw_pos = pick.pos if pick.pos[0] != 'T' else pick.pos[1:]
 
     for pick in pickset.picks:
-        if pick.raw_pos is None:
+        if pick.pos is None:
             pick.raw_pos = math.inf
+        else:
+            pick.raw_pos = int(pick.pos) if pick.pos[0] != 'T' else int(pick.pos[1:])
     
-    pickset.picks.sort(key=lambda p: (p.points, p.raw_pos), reverse=True)
+    pickset.picks.sort(key=lambda p: p.raw_pos)
     
     pickset_modal = get_template_attribute("modal.macro.html", "pickset_modal")
     return pickset_modal(pickset)
