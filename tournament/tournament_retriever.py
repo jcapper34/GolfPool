@@ -48,6 +48,7 @@ def get_api_tournament(channel_tid=None) -> Tournament:
                            thru=pl['thruHole'],
                            photo_url=pl['imageUrl'],
                            country_flag=pl['representsCountryUrl'],
+                           status=pl['status']
                            ) for i, pl in enumerate(leaderboard)]  # Create Player objects of leaderboard
 
     tournament.players.sort(key=lambda x: (x.raw_pos is None, x.raw_pos))     # Sort so that None is at the end

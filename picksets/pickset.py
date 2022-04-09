@@ -42,6 +42,7 @@ class Pickset:
             golfer.total = pl.total
             golfer.points = pl.points
             golfer.thru = pl.thru
+            golfer.status = pl.status
 
     def __str__(self):
         s = "Pickset: id=%s, name='%s'" % (self.id, self.name)

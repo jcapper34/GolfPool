@@ -138,6 +138,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
         leaderboard_player = func_find(
             tournament.players, lambda pl: pl.id == player.id)
         player.merge_attributes(asdict(leaderboard_player))
+        player.status = leaderboard_player.status
         player.scorecards = func_find(
             tournament.scorecards, lambda sc: sc['golferId'] == player.id, limit=4)
     # Get DB Results

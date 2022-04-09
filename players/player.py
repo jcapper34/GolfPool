@@ -23,6 +23,7 @@ class Player:
     pos: str = None
     raw_pos: int = None
     thru: str = None
+    status: str = ""
     holes: list = None
     season_history: dict = None
     scorecards: List = None

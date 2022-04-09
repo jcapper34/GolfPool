@@ -116,11 +116,7 @@
         {% if players %}
             {% for player in players %}
                 <tr data-pid="{{ player.id }}" class="animated player-row">
-                    {% if player.pos is none %}
-                    <td class="td-pos">-</td>
-                    {% else %}
-                    <td class="td-pos">{{ player.pos }}</td>
-                    {% endif %}
+                    <td class="td-pos">{{ player|positionDisplay }}</td>
                     <td class="td-name">{{ player.name }}</td>
                     <td class="td-points">{{ player.points }}</td>
                 </tr>

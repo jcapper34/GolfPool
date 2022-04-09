@@ -3,6 +3,7 @@ from flask import Flask, render_template, redirect, url_for, request, jsonify
 from requests import get as http_get
 import logging
 from helper import CURRENT_YEAR
+from jinjafilters import register_filters
 
 from web.picks.picks_routes import mod as picks_mod
 from web.results.results_routes import mod as results_mod
@@ -31,6 +32,10 @@ app.register_blueprint(picks_mod, url_prefix='/picks')
 app.register_blueprint(results_mod, url_prefix='/results')
 app.register_blueprint(api_mod, url_prefix='/api')
 
+# ========================
+# Register Jinja Filters
+# ========================
+register_filters(app)
 
 # =======================
 #   Routes Begin
@@ -88,13 +93,6 @@ def page_not_found(e):
 @app.context_processor
 def retrieve_src_local():
     return dict(src_local=SRC_LOCAL)
-
-
-def are_levels_defined(players):
-    return any([pl.level != 4 for pl in players])
-
-
-app.jinja_env.globals['are_levels_defined'] = are_levels_defined
 
 if __name__ == "__main__":
     app.run()   # Run

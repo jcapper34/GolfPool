@@ -21,7 +21,7 @@
     </div>
     {# CURRENT TOURNAMENT SECTION #}
     <section class="tab-section" id="current-tournament-section">
-        {% if are_levels_defined(pickset.picks) %}    {# Can't organize if levels havent been defined #}
+        {% if pickset.picks|are_levels_defined %}    {# Can't organize if levels havent been defined #}
             <div>
                 <label style="cursor: pointer">
                     Organize
@@ -39,7 +39,7 @@
                     <td class="td-player-name" onclick="prompt_player_modal($(this).parent().data('pid'), $(this).text(), $(this).next().text())">
                         {{ player.name }}
                     </td>
-                    <td class="has-text-centered">{% if player.pos is not none %}{{ player.pos }}{% else %}-{% endif %}</td>
+                    <td class="has-text-centered">{{ player|positionDisplay }}</td>
                     <td class="td-points has-text-centered">{{ player.points }}</td>
                 </tr>
             {% endfor %}
@@ -75,7 +75,7 @@
                 <tr class="hide"></tr>
                 <tr><th>Position</th><th>Score</th></tr>
                 <tr>
-                    <td>{% if player.pos is none %}-{% else %}{{ player.pos }}{% endif %}</td>
+                    <td>{{ player|positionDisplay }}</td>
                     <td>
                          {# Show Total #}
                         {% if player.total < 0 %}{{ player.total }}
