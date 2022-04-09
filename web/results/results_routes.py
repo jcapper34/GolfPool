@@ -111,9 +111,9 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
         if pick.pos is None:
             pick.raw_pos = math.inf
         else:
-            pick.raw_pos = int(pick.pos) if pick.pos[0] != 'T' else int(pick.pos[1:])
+            pick.raw_pos = int(pick.pos) if isinstance(pick.pos, int) or pick.pos[0] != 'T' else int(pick.pos[1:])
     
-    pickset.picks.sort(key=lambda p: p.raw_pos)
+    pickset.picks.sort(key=lambda p: (p.raw_pos, p.status))
     
     pickset_modal = get_template_attribute("modal.macro.html", "pickset_modal")
     return pickset_modal(pickset)
