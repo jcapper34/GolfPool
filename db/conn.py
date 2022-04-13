@@ -1,28 +1,33 @@
+from lib2to3.pgen2.pgen import DFAState
 import psycopg2
 import psycopg2.extras
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 from config import DATABASE_URL
+
 
 class Conn:
     def __init__(self, use_local=False):
-        # Uncomment when local db is installed
-        db_url = urlparse(DATABASE_URL)
+        if " " not in DATABASE_URL:
+            db_url = urlparse(DATABASE_URL)
+
+            username = db_url.username
+            password = db_url.password
+            database = db_url.path[1:]
+            hostname = db_url.hostname
+            port = db_url.port
+            sslmode = parse_qs(db_url.query).get("sslmode")
+            sslmode = "prefer" if sslmode is None else sslmode[0]
+            self.conn = psycopg2.connect(
+                database=database,
+                user=username,
+                password=password,
+                host=hostname,
+                port=port,
+                sslmode=sslmode
+            )
+        else:
+            self.conn = psycopg2.connect(DATABASE_URL)
         
-        username = db_url.username
-        password = db_url.password
-        database = db_url.path[1:]
-        hostname = db_url.hostname
-        port = db_url.port
-        self.conn = psycopg2.connect(
-            database = database,
-            user = username,
-            password = password,
-            host = hostname,
-            port = port
-        )
-        
-        # credentials = LOCAL_DB_CREDENTIALS if use_local else HEROKU_DB_CREDENTIALS
-        # self.conn = psycopg2.connect(**credentials)
         self.new_cursor()
 
     def new_cursor(self, use_dict=True):

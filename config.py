@@ -3,13 +3,38 @@ import os
 # =======================
 # Database Credentials
 # =======================
-
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+# =======================
+# Point Map
+# =======================
+POINT_MAP = {
+    "1": 100,
+    "2": 75,
+    "3": 65,
+    "4": 60,
+    "5": 55,
+    "6": 50,
+    "7": 45,
+    "8": 40,
+    "9": 35,
+    "10": 30,
+    "11": 25,
+    "12": 20,
+    "13": 16,
+    "14": 12,
+    "15": 9,
+    "16": 6,
+    "17": 4,
+    "18": 3,
+    "19": 2,
+    "20": 1
+}
+
 
 # =======================
 # Golf Channel API
 # =======================
-
 # Parameters: int[tid]
 LEADERBOARD_URL = "https://www.golfchannel.com/api/v2/events/%d/leaderboard"
 # Parameters: int[year]
@@ -24,11 +49,14 @@ PGA_PHOTO_URL = "https://pga-tour-res.cloudinary.com/image/upload/c_fill,d_heads
 ALL_PLAYERS_URL = "https://statdata.pgatour.com/players/player.json"
 
 # From Golf Channel Website
+ACTIVE_EVENTS_URL = "https://www.golfchannel.com/api/v2/events/active"
 STAT_CATEGORIES_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/categories"
 OWGR_STAT_ID = 19   # For OWGR ranking
-STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/%d"   # Parameters: Stat Number, year
+# Parameters: Stat Number, year
+STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/%d"
 GOLFERS_URL = "https://www.golfchannel.com/api/es/fullObject"
-INDIVIDUAL_GOLFER_URL = "https://www.golfchannel.com/api/v2/golfers/%s/full" # Parameters: pid
+# Parameters: pid
+INDIVIDUAL_GOLFER_URL = "https://www.golfchannel.com/api/v2/golfers/%s/full"
 
 # =======================
 # Routing Aliases
