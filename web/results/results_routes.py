@@ -13,7 +13,7 @@ from players.player import Player
 from players.player_getters import get_tournament_player_db, who_picked_player
 from tournament.tournament_calculations import calculate_api_standings
 from tournament.tournament import Tournament
-from tournament.tournament_retriever import get_api_tournament
+from tournament.tournament_retriever import get_api_tournament, get_db_rankings, get_db_standings, get_past_events, tournament_name_mapper
 
 mod = Blueprint("results", __name__, template_folder='templates',
                 static_folder='static')   # Register blueprint
@@ -45,7 +45,7 @@ def results_live():
             "standings.macro.html", "standings_main_section")
         return main_section_macro(tournament, user_psid=session.get("psid"), add_refresh=True)
 
-    return render_template('standings-live.html', tournament=tournament, past_events=Tournament.get_past_events(), user_psid=session.get("psid"))
+    return render_template('standings-live.html', tournament=tournament, past_events=get_past_events(), user_psid=session.get("psid"))
 
 
 """ PAST ROUTES """
@@ -57,18 +57,20 @@ def results_live():
 def results_past(year, tid):
     conn = Conn()
 
-    past_events = Tournament.get_past_events()
+    past_events = get_past_events()
 
-    # Get Database Standings
-    tournament = Tournament(year=year, tid=tid)
+    # Get Database Rankings
+    tournament = Tournament(name=tournament_name_mapper(tid), year=year, tid=tid)
+    tournament.players = get_db_rankings(tid, year, conn=conn)
+    
     # If tournament not found in DB
-    if not tournament.fill_db_rankings(conn=conn):
+    if tournament.players is None:
         if request.args.get('main_section_only') is None:
             return render_template("locked-standings.html", tournament=tournament, past_events=past_events)
         else:
             return "<p class='has-text-centered'>No results to show</p>"
 
-    tournament.fill_db_standings(conn=conn)
+    tournament.picksets = get_db_standings(tid, year, conn=conn)
 
     # Merge all picks with tournament
     all_picks = get_all_picks(year, conn=conn)
@@ -98,13 +100,14 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
     # Get tournament history from DB
     pickset.tournament_history = get_tournament_history(psid, conn=conn)
 
-    tournament = Tournament(year=year, tid=tid)
+    tournament = None
     if tid is None:
         tournament = get_api_tournament()
         pickset.merge_tournament(tournament)
 
     else:
-        tournament.fill_db_rankings(conn=conn)  # Get Standings from DB
+        tournament = Tournament(name=tournament_name_mapper(tid), year=year, tid=tid)
+        tournament.players = get_db_rankings(tid, year, conn=conn)  # Get Standings from DB
         pickset.merge_tournament(tournament)
 
     for pick in pickset.picks:
@@ -124,7 +127,7 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
 @mod.route("/<int:year>/<tid>/get-player-modal")
 def get_player_modal(year=CURRENT_YEAR, tid=None):
     pid = int(request.args.get("pid"))
-    channel_tid = int(request.args.get("channel_tid"))
+    channel_tid = request.args.get("channel_tid")
 
     conn = Conn()
 
@@ -133,7 +136,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
 
     # Get API results
     if tid is None:
-        tournament = get_api_tournament(channel_tid=channel_tid)
+        tournament = get_api_tournament(channel_tid)
         # tournament.year = year
         leaderboard_player = func_find(
             tournament.players, lambda pl: pl.id == player.id)

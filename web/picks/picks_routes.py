@@ -12,6 +12,7 @@ from picksets.pickset_submission import submit_change_picks, submit_picks
 from picksets.pickset_getters import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks, get_pickset
 from players.player_getters import get_levels_db
 from tournament.tournament import Tournament
+from tournament.tournament_retriever import get_db_rankings
 
 mod = Blueprint("picks", __name__, template_folder='templates',
                       static_folder='static')   # Register Blueprint
@@ -42,10 +43,9 @@ def picks_get_season_history():
     conn = Conn()
     season_history = []
     for year in range(2015, CURRENT_YEAR):
-        tournament = Tournament(year=year, tid='cumulative')
-        tournament.fill_db_rankings(conn=conn)
+        players = get_db_rankings(tid='cumulative', year=year, conn=conn)
         season_history.append(
-            (year, {pl.id: pl.pos for pl in tournament.players}))
+            (year, {pl.id: pl.pos for pl in players}))
 
     return jsonify(season_history)
 
