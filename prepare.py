@@ -29,6 +29,7 @@ def compile_sass():
                             css_dir, sass_entry.name.split(".")[0] + '.min.css')
                         with open(css_filename, 'w') as f:
                             f.write(css_out)
+                            print("Compiled SASS into", css_filename)
 
 
 if __name__ == "__main__":

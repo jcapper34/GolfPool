@@ -1,2 +1,1 @@
-release: python prepare.py
-web: gunicorn app:app
+web: python prepare.py && gunicorn app:app
