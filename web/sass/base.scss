@@ -1,0 +1,107 @@
+@import "./bulma-all";
+@import "./loader.scss";
+
+
+$desktop_media : "only screen and (min-width: 769px)";
+$mobile_media : "only screen and (max-width: 769px)";
+
+.page-title-hero {
+  background-image: url("/static/img/hero-background-golf.jpg");
+  height: 200px;
+}
+
+.page-title-hero .title {
+    color: white !important;
+}
+
+.absolutely-centered {
+  position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.loader {
+    width: 100%;
+    height: 100%;
+}
+
+.hide {
+    display: none !important;
+}
+
+.disable-scroll {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+#top-nav {
+    z-index: 30;
+}
+
+#mobile-nav {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: -100vw;
+  height: 100vh;
+  width: 100vw;
+  background: white;
+  z-index: 20;
+
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+}
+
+
+/* Custom Burger */
+.burger {
+    display: block;
+    position: relative;
+
+    width: 3.25rem;
+    height: 3.25rem;
+    margin-left: auto;
+
+    cursor: pointer;
+}
+@media only screen and (min-width: 1024px){
+  .burger {
+    display: none;
+  }
+}
+.burger span {
+   display:block;
+   position:absolute;
+   background-color:black;
+   border-radius:2px;
+   left:35%;
+   width:30%;
+   height:2%;
+   transition: transform 0.5s, opacity 0.5s;
+}
+.burger span:nth-child(1) {
+  transform-origin: 0 0;
+  top:35%;
+}
+.burger span:nth-child(2) {
+ top:49%;
+}
+.burger span:nth-child(3) {
+  transform-origin: 0 100%;
+  bottom:35%;
+}
+
+/* Burger with Menu Open */
+.burger.menu-open span:nth-child(1){
+    width: 41%;
+    transform: rotate(45deg);
+}
+.burger.menu-open span:nth-child(2){
+    opacity: 0;
+}
+.burger.menu-open span:nth-child(3){
+    width: 41%;
+    transform: rotate(-45deg);
+}

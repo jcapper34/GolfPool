@@ -1,0 +1,183 @@
+@import "base.scss";
+
+/* Standings Menu */
+#standings-menu {
+    margin: 10px 10px 0 10px;
+    padding: 5px 5px 0 5px;
+    top: 10px;
+}
+
+#standings-menu-header {
+    margin-bottom: 5px;
+}
+
+#standings-menu:hover .collapse-arrow {
+    display: block;
+}
+
+@media only screen and (min-width: 769px) {
+    #standings-menu {
+        padding: 20px;
+        position: sticky;
+        position: -webkit-sticky;
+        height: 500px;
+        overflow-y: scroll;
+        -ms-overflow-y: scroll;
+        border-right: 1px solid lightgray;
+    }
+
+    #standings-menu-items {
+        display: initial !important;
+    }
+
+    #standings-menu-header {
+        display: none;
+    }
+}
+
+/* Standings Header */
+#standings-header .level-left {
+    padding: 10px;
+}
+
+#standings-header .title {
+    margin-bottom: 5px;
+}
+
+/* Tables */
+#standings-main-section {
+    position: relative;
+}
+
+.shrink {
+    width: 0 !important;
+    height: 0 !important;
+    transition-duration: 2s;
+}
+
+#leaderboard-body tr,
+#standings-body tr {
+    cursor: pointer;
+}
+
+.row-bordered td {
+    border-top-width: 5px;
+}
+
+.td-filter,
+.th-filter {
+    text-align: center;
+}
+
+.switch-box {
+    text-align: right;
+    padding: 0 0 10px 0;
+}
+
+@media only screen and (min-width: 769px) {
+    .switch-box {
+        display: none;
+    }
+
+    #standings-table-column,
+    #leaderboard-table-column {
+        display: initial !important;
+    }
+}
+
+@media only screen and (max-width: 769px) {
+
+    #leaderboard-table-column,
+    .td-filter,
+    .th-filter,
+    #standings-menu-items {
+        display: none;
+    }
+
+    #standings-main-section {
+        padding-top: 0;
+    }
+
+    #standings-menu {
+        border-bottom: 1px solid lightgray;
+    }
+}
+
+.pick-row {
+    cursor: pointer;
+}
+
+.pick-row td {
+    vertical-align: middle;
+}
+
+.td-pos,
+.td-points,
+.td-filter,
+.th-pos,
+.th-points,
+.th-filter {
+    text-align: center !important;
+}
+
+#standings-tables {
+    min-height: 300px;
+}
+
+#refresh-standings {
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+#standings-loader-box {
+    height: 250px;
+    width: 100%;
+    display: none;
+    position: relative;
+}
+
+.favorite-star {
+    color: white;
+    text-shadow: 0 0 2px black;
+}
+
+.favorite-star.favorited {
+    color: #FFDF00 !important;
+}
+
+/* MODALS */
+@media only screen and (max-width: 769px) {
+    .modal-card-body .tabs a {
+        font-size: 14px;
+    }
+}
+
+body.modal-open {
+    position: fixed;
+    width: 100%;
+}
+
+.modal-card-body {
+    min-height: 90vh;
+}
+
+@media only screen and (min-width: 769px) {
+    .player-modal-image {
+        height: 180px !important;
+        width: 180px !important;
+    }
+}
+
+#current-tournament-section>div {
+    text-align: right;
+    margin: 10px;
+}
+
+#tournament-history-section {
+    display: none;
+}
+
+.stats-table td,
+.stats-table th {
+    text-align: center;
+}

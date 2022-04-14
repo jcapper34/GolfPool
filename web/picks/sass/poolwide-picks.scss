@@ -1,0 +1,58 @@
+@import "base.scss";
+
+
+#picks-table th,
+#picks-table td {
+    min-width: 200px;
+    vertical-align: middle;
+}
+
+#picks-table th {
+    text-align: center;
+}
+
+#picks-table th:first-of-type {
+    text-align: left;
+}
+
+#picks-table td:hover {
+    cursor: pointer;
+}
+
+main {
+    background-color: whitesmoke;
+}
+
+#picks-tabs li {
+    background-color: #191919;
+}
+
+#picks-tabs a {
+    color: whitesmoke;
+}
+
+#picks-tabs li.is-active {
+    background-color: whitesmoke;
+}
+
+#picks-tabs li.is-active a {
+    color: black;
+}
+
+#most-picked-section td,
+#most-picked-section th {
+    width: 50%;
+}
+
+#format-checkbox {
+    float: right;
+    margin: 10px 60px 10px 20px;
+}
+
+#compare-table {
+    display: none;
+}
+
+label.checkbox {
+    cursor: pointer;
+}

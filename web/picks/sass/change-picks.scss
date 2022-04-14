@@ -1,0 +1,129 @@
+@import "base.scss";
+
+/* GENERAL INPUT */
+.general-input {
+  border-radius: 5px;
+}
+
+.general-input:focus {
+  outline: none;
+}
+
+/* MAIN LEVEL PICKS */
+.player-checkbox+span {
+  width: 100%;
+}
+
+.player-checkbox:checked+span {
+  background-color: black;
+  color: white;
+}
+
+.player-checkbox[name=level-1]:checked+span {
+  background-color: #3273dc;
+}
+
+.player-checkbox[name=level-2]:checked+span {
+  background-color: #23d160;
+}
+
+.player-checkbox[name=level-3]:checked+span {
+  background-color: #363636;
+}
+
+.active {
+  border-left: 3px solid #3273dc !important;
+}
+
+.go-to-button {
+  border: 3px solid transparent;
+}
+
+.player-checkbox {
+  display: none;
+}
+
+label {
+  cursor: pointer;
+}
+
+.player-label {
+  will-change: background-color, transform, font-sizes, color;
+  transition-duration: 400ms;
+  padding: 5px;
+  border: 1px solid lightgray;
+  border-radius: 10px;
+}
+
+.player-checkbox:checked+.player-label {
+  font-size: 1.02rem;
+  background-color: blue;
+  color: white;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  transform: scale(1.02);
+}
+
+@media only screen and (min-width: 800px) {
+  .pick-box {
+    margin: 0 5% 0 5%;
+  }
+}
+
+@media only screen and (max-width: 350px) {
+  .stats-table {
+    display: none;
+  }
+}
+
+#make-picks-form {
+  padding: 10px 0 10px 0;
+}
+
+.player-details {
+  display: none;
+}
+
+.reset-level {
+  display: none;
+}
+
+.pick-box .title {
+  margin-bottom: 5px !important;
+}
+
+.pick-box hr {
+  margin-top: 10px;
+}
+
+.reset-level {
+  display: none;
+}
+
+/* LEVEL 4 PICKS */
+#suggestions-box {
+  padding: 0;
+}
+
+.level-4-option td {
+  cursor: pointer;
+  padding: 4px 8px 4px 8px;
+}
+
+.level-4-option:hover {
+  background: #23d160;
+  color: white;
+}
+
+#level-4-text {
+  text-transform: capitalize;
+  padding: 16px 10px 16px 10px;
+}
+
+#level-4-text,
+.level-4-option td {
+  font-size: 16px;
+}
+
+#suggestions-box table {
+  width: 100%;
+}
