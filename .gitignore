@@ -6,7 +6,7 @@ __pycache__/
 # *.sass
 # *.scss
 *.map
-*/static/css/*
+**/static/css/
 
 # Virtual Environment
 venv/
