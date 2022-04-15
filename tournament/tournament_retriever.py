@@ -12,7 +12,7 @@ from tournament.tournament import Tournament
 
 
 def get_api_tournament(channel_tid=None) -> Tournament:
-    channel_tid = int(channel_tid) if channel_tid is not None else GlobalCache.current_tid
+    channel_tid = int(channel_tid) if channel_tid and channel_tid is not None else GlobalCache.current_tid
     api_data = request_json(LEADERBOARD_URL % channel_tid)
     api_tournament = api_data['result']
 
