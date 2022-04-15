@@ -7,7 +7,6 @@ import logging
 from pytz import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
-from sympy import timed
 from config import EVENTS_URL
 from db.conn import Conn
 from db.db_helper import filter_conn
@@ -66,7 +65,7 @@ def update_last_major():
             eventStart = isoparse(event.get("startDate"))
             eventEnd = isoparse(event.get("endDate"))
 
-            if dt > eventEnd:
+            if event.get("winnerKey"):
                 conn = Conn()
 
                 inDb = conn.exec_fetch(
@@ -105,13 +104,13 @@ def update_last_major():
 
                     conn.exec(standings_insert_query[:-1])
                     conn.commit()
-                    print(event.get("name"), "was uploaded to DB")
+                    logging.info("%s was uploaded to DB", event.get("name"))
 
                 else:
-                    print(event.get("name"), "is already in DB")
+                    logging.info("%s is already in DB", event.get("name"))
 
             if dt > eventStart:
                 GlobalCache.current_tid = channel_tid
                 break
 
-    print("Cron Job Finished")
+    logging.info("Cron Job Finished")
