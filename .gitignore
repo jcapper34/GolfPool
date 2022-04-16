@@ -3,9 +3,6 @@
 __pycache__/
 
 # Style Transcompile
-# *.sass
-# *.scss
-*.map
 **/static/css/
 
 # Virtual Environment
@@ -15,3 +12,6 @@ venv/
 .DS_Store
 .vscode
 
+
+# Generated Files
+**/static/generated/

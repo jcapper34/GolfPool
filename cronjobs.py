@@ -1,5 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+import os
 from pprint import pprint
+import shutil
 from threading import Thread
 from dateutil.parser import isoparse
 
@@ -7,7 +9,7 @@ import logging
 from pytz import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
-from config import EVENTS_URL
+from config import EVENTS_URL, XL_DIR
 from db.conn import Conn
 from db.db_helper import filter_conn
 from globalcache import GlobalCache
@@ -22,12 +24,14 @@ def start_jobs():
     """
     scheduler = BackgroundScheduler(timezone=timezone("US/Pacific"))
 
-    # Call job async
-    Thread(target=update_last_major, args=[]).start()
+    job_funcs = [update_last_major, xl_cleanup]
+    for job_func in job_funcs:
+        # Call job async
+        Thread(target=job_func, args=[]).start()
 
-    # Add Jobs
-    job = scheduler.add_job(
-        update_last_major, trigger='cron', day_of_week='0,6', hour='*')
+        # Add Jobs
+        job = scheduler.add_job(
+            job_func, trigger='cron', day_of_week='0,6', hour='*')
 
     # Start Periodic Scheduler
     scheduler.start()
@@ -77,11 +81,11 @@ def update_last_major():
                     # Insert season
                     conn.exec(
                         "INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING", (eventEnd.year,))
-                    
+
                     # Insert Event
                     conn.exec('INSERT INTO event (tournament_id, season_year) VALUES (%s, %s) ON CONFLICT DO NOTHING',
                               (tid, eventEnd.year))  # Insert event
-                    
+
                     # Insert the leaderboard entries
                     leaderboard_insert_query = "INSERT INTO event_leaderboard_xref (tournament_id, season_year, position, score, points, player_id) VALUES "
                     for player in tournament.players:
@@ -92,9 +96,10 @@ def update_last_major():
                         leaderboard_insert_query += values_query.decode()
 
                     conn.exec(leaderboard_insert_query[:-1])
-                    
+
                     # Insert standings entries
-                    calculate_api_standings(tournament, get_picks=True, conn=conn)
+                    calculate_api_standings(
+                        tournament, get_picks=True, conn=conn)
                     standings_insert_query = "INSERT INTO event_standings_xref (tournament_id, season_year, pickset_id, position, points) VALUES "
 
                     for pickset in tournament.picksets:
@@ -114,3 +119,18 @@ def update_last_major():
                 break
 
     logging.info("Cron Job Finished")
+
+
+def xl_cleanup():
+    """
+    Delete any excel generated files that are expired
+    """
+    
+    expiration_delta = timedelta(hours=1)
+    dt = datetime.now()
+    
+    for filename in os.listdir(XL_DIR):
+        filepath = os.path.join(XL_DIR, filename)
+        if os.path.isdir(filepath):
+            if os.path.getmtime(filepath) + expiration_delta.total_seconds() < dt.timestamp():
+                shutil.rmtree(filepath, ignore_errors=False, onerror=None)

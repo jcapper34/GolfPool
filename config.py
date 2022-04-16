@@ -31,6 +31,21 @@ POINT_MAP = {
     "20": 1
 }
 
+# =======================
+# Paths
+# =======================
+XL_DIR = 'web/static/generated/xl/'
+
+
+# =======================
+# Maps
+# =======================
+TOURNAMENT_NAME_MAP = {
+    "014": "The Masters",
+    "026": "U.S Open",
+    "100": "British Open",
+    "033": "PGA Championship",
+}
 
 # =======================
 # Golf Channel API

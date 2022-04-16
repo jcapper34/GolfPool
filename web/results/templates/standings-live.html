@@ -24,7 +24,7 @@ params:
             {{ smac.standings_menu(none, tournament.year, past_events) }}
         </div>
         <section id="standings-main-section" class="section column">
-            {{ smac.standings_main_section(tournament, user_psid, add_refresh=True) }}
+            {{ smac.standings_main_section(tournament, user_psid, add_refresh=True, add_export=False) }}
         </section>
     </div>
 {% endblock %}

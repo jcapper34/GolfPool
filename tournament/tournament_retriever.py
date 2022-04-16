@@ -118,13 +118,3 @@ def get_past_events(conn=None):
             year_tourny[row[0]].append(info)
 
     return year_tourny
-
-def tournament_name_mapper(tid) -> str:
-    tournament_names = {
-        "014": "The Masters",
-        "026": "U.S Open",
-        "100": "British Open",
-        "033": "PGA Championship",
-        'cumulative': 'Cumulative'
-    }
-    return tournament_names[tid]

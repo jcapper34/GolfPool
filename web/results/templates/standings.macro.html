@@ -32,8 +32,8 @@
     </div>
 {% endmacro %}
 
-{% macro standings_main_section(tournament, user_psid, add_refresh=False) %}
-    {{ standings_header(tournament.name, tournament.year, add_refresh=add_refresh) }}
+{% macro standings_main_section(tournament, user_psid, add_refresh, add_export) %}
+    {{ standings_header(tournament.name, tournament.year, add_refresh, add_export) }}
 
     {# Tables #}
     <div id="standings-tables">
@@ -51,14 +51,16 @@
     </div>
 {% endmacro %}
 
-{% macro standings_header(tournament_name, year, add_refresh=False) %}
+{% macro standings_header(tournament_name, year, add_refresh, add_export) %}
     <div id="standings-header" class="level">
         <div class="level-left">
             <div>
                 <h1 class="title">
-                {{ tournament_name }} - {{ year }}
+                    {{ tournament_name }} - {{ year }}
                 {% if add_refresh %}
-                <a id="refresh-standings" onclick="standingsRefresh()"><span class="icon"><i class="fas fa-sync"></i></span></a>
+                    <a id="refresh-standings" onclick="standingsRefresh()"><span class="icon"><i class="fas fa-sync"></i></span></a>
+                {% elif add_export %}
+                    <a id="export-standings" onclick="generateSpreadsheet()"><span class="icon"><i class="fas fa-file-export"></i></span></a>
                 {% endif %}
                 </h1>
                 {% if add_refresh %}

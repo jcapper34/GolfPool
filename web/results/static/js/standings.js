@@ -126,6 +126,10 @@ function switch_table(e) {
 
 }
 
+function generateSpreadsheet() {
+    window.location.replace(window.location.href + "/generate-xl");
+}
+
 /*
 On startup
 */
