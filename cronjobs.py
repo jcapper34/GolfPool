@@ -14,7 +14,8 @@ from db.conn import Conn
 from db.db_helper import filter_conn
 from globalcache import GlobalCache
 from helper import CURRENT_YEAR
-from tournament.tournament_calculations import calculate_api_standings
+from picksets.pickset_getters import get_all_picks
+from tournament.tournament_calculations import calculate_standings
 from tournament.tournament_retriever import get_api_tournament
 
 
@@ -84,7 +85,7 @@ def update_last_major():
 
                     # Insert Event
                     conn.exec('INSERT INTO event (tournament_id, season_year) VALUES (%s, %s) ON CONFLICT DO NOTHING',
-                              (tid, eventEnd.year))  # Insert event
+                              (tid, CURRENT_YEAR))  # Insert event
 
                     # Insert the leaderboard entries
                     leaderboard_insert_query = "INSERT INTO event_leaderboard_xref (tournament_id, season_year, position, score, points, player_id) VALUES "
@@ -98,13 +99,12 @@ def update_last_major():
                     conn.exec(leaderboard_insert_query[:-1])
 
                     # Insert standings entries
-                    calculate_api_standings(
-                        tournament, get_picks=True, conn=conn)
+                    picksets = calculate_standings(tournament.players, get_all_picks(CURRENT_YEAR, conn=conn))
                     standings_insert_query = "INSERT INTO event_standings_xref (tournament_id, season_year, pickset_id, position, points) VALUES "
 
-                    for pickset in tournament.picksets:
+                    for pickset in picksets:
                         values_query = conn.cur.mogrify(" (%s,%s,%s,%s,%s),",
-                                                        (tid, eventEnd.year, pickset.id, pickset.pos, pickset.points))
+                                                        (tid, CURRENT_YEAR, pickset.id, pickset.pos, pickset.points))
                         standings_insert_query += values_query.decode()
 
                     conn.exec(standings_insert_query[:-1])

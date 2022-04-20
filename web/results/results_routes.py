@@ -13,7 +13,7 @@ from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks, get_picks, get_tournament_history
 from players.player import Player
 from players.player_getters import get_tournament_player_db, who_picked_player
-from tournament.tournament_calculations import calculate_api_standings
+from tournament.tournament_calculations import calculate_standings
 from tournament.tournament import Tournament
 from tournament.tournament_retriever import get_api_tournament, get_db_rankings, get_db_standings, get_past_events
 from tournament.xl_generator import write_picks_workbook
@@ -34,7 +34,7 @@ def results_home():
 def results_live():
     year = CURRENT_YEAR if PICKS_LOCKED else CURRENT_YEAR - 1    
     tournament = get_api_tournament()
-    calculate_api_standings(tournament, year=year)
+    tournament.picksets = calculate_standings(tournament.players, get_all_picks(year))
 
     if request.args.get("refresh") is not None:    # If refresh
         standings_macro = get_template_attribute(

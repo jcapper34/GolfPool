@@ -1,33 +1,43 @@
+from typing import List
 from db.db_helper import filter_conn
 from helper import func_find
+from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks
+from players.player import Player
 
 
-def calculate_api_standings(tournament, year=None, get_picks=True, conn=None):
-    conn = filter_conn(conn)
-
-    year = year if year is not None else tournament.year
-
-    if get_picks:
-        tournament.picksets = get_all_picks(
-            year, conn=conn)  # Load DB Picks
-
-    for pickset in tournament.picksets:
+def calculate_standings(players: List[Player], picksets: List[Pickset]) -> List[Pickset]:
+    '''
+    Calculate the pickset standings from the players
+    
+    '''
+    # Caches the points of players
+    player_points_map = {}
+    for pickset in picksets:
         if pickset.points is None:
             pickset.points = 0
         for picked_player in pickset.picks:
-            match = func_find(
-                tournament.players, func=lambda x: x.id == picked_player.id)
-            if match is not None:
-                pickset.points += match.points
+            if picked_player.id in player_points_map:
+                pickset.points += player_points_map[picked_player.id]
+            else:
+                match = func_find(
+                    players, func=lambda x: x.id == picked_player.id)
+                points = match.points if match is not None else 0
 
-    tournament.picksets.sort(key=lambda x: x.points,
+                pickset.points += points
+                player_points_map[picked_player.id] = points
+    
+    picksets.sort(key=lambda x: x.points,
                              reverse=True)    # Sort Standings
 
-    tournament.picksets = rank(tournament.picksets)
+    return rank(picksets)
 
 
-def rank(picksets):  # Give Picksets their positions after calculating standings
+def rank(picksets) -> List[Pickset]: 
+    '''
+    Give Picksets their positions after calculating standings
+    
+    '''
     n = len(picksets)
     pos = 1
     for i in range(n):
