@@ -72,7 +72,7 @@ def get_tournament_history(psid, year=CURRENT_YEAR, conn=None):
         GET_TOURNAMENT_HISTORY_QUERY, (psid,))
 
 
-def get_pickset(psid, conn=None):
+def get_pickset(psid, conn=None) -> Pickset:
     """
     Parameters: ps.id
     Returns: 
@@ -153,7 +153,7 @@ def get_login(email, pin, conn=None):
     return result[0][0]
 
 
-def get_email_pin(email, conn=None):
+def get_email_pin(email, conn=None) -> str:
     EMAIL_EXISTS_QUERY = "SELECT pin FROM participant WHERE email=%s LIMIT 1"
     conn = filter_conn(conn)
     result = conn.exec_fetch(EMAIL_EXISTS_QUERY, (email, ), fetchall=False)

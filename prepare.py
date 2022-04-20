@@ -1,6 +1,12 @@
-# This script will be run to setup everything before the server starts
+# This script will be run to setup everything and test before the server starts
 import os
 import sass
+
+from db.conn import Conn
+from picksets.pickset import Pickset
+from players.player import Player
+from tournament.tournament_calculations import calculate_standings
+from tournament.tournament_retriever import get_api_tournament
 
 WEB_DIR = 'web'
 
@@ -32,5 +38,66 @@ def compile_sass():
                             print("Compiled SASS into", css_filename)
 
 
+def test_connection():
+    conn = None
+    conn = Conn()
+
+    results = conn.exec_fetch("SELECT * FROM participant")
+    
+    return len(results) > 0
+
+
+def test_standings_calculations():
+    picksets = [
+        Pickset(
+            id=1,
+            picks=[Player(id=1), Pickset(id=4), Pickset(id=5), Pickset(id=9)]
+        ),
+        Pickset(
+            id=2,
+            picks=[Player(id=1), Pickset(id=2), Pickset(id=3), Pickset(id=6)]
+        ),
+        Pickset(
+            id=3,
+            picks=[Player(id=2), Pickset(id=4), Pickset(id=5), Pickset(id=7)]
+        ),
+        Pickset(
+            id=4,
+            picks=[Player(id=1), Pickset(id=4), Pickset(id=7), Pickset(id=9)]
+        )
+    ]
+    
+    players = [
+        Player(id=2, points=100),
+        Player(id=1, points=75),
+        Player(id=7, points=65),
+        Player(id=3, points=60),
+        Player(id=4, points=55)
+    ]
+    
+    picksets = calculate_standings(players, picksets)
+        
+    assert picksets[0].id == 2
+    assert picksets[0].points == 235
+    
+    assert picksets[1].id == 3
+    assert picksets[1].points == 220
+
+    assert picksets[2].id == 4
+    assert picksets[2].points == 195
+    
+    assert picksets[3].id == 1
+    assert picksets[3].points == 130
+
+
+def test_api():
+    assert get_api_tournament(19540) is not None
+
 if __name__ == "__main__":
     compile_sass()
+    
+    # Tests
+    test_connection()
+    test_standings_calculations()
+    test_api()
+    

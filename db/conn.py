@@ -6,7 +6,7 @@ from config import DATABASE_URL
 
 
 class Conn:
-    def __init__(self, use_local=False):
+    def __init__(self):
         if " " not in DATABASE_URL:
             db_url = urlparse(DATABASE_URL)
 

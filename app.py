@@ -3,7 +3,6 @@ from flask import Flask, render_template, redirect, url_for, request, jsonify
 from requests import get as http_get
 import logging
 from cronjobs import start_jobs
-from globalcache import GlobalCache
 from helper import CURRENT_YEAR
 from jinjafilters import register_filters
 
