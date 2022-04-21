@@ -1,9 +1,9 @@
 {% macro helper_scripts() %}
     <script>
     // Loaders
-    const ripple_html = "<div class='lds-ripple absolutely-centered'><div></div><div></div></div>";
-    const roller_html = "<div class=\"lds-roller absolutely-centered\"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>";
-    const circle_html = " <div class=\"lds-circle absolutely-centered\"><div></div></div>";
+        const ripple_html = "<div class='lds-ripple absolutely-centered'><div></div><div></div></div>";
+        const roller_html = "<div class=\"lds-roller absolutely-centered\"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>";
+        const circle_html = " <div class=\"lds-circle absolutely-centered\"><div></div></div>";
         function out(message) {
             console.log(message);
         }
@@ -97,7 +97,18 @@
             <div class="menu">
                 <ul class="menu-list">
                     {% for item in nav_menu %}
-                    <li class="has-text-centered"><a class="mobile-nav-item is-size-3" href="{{ item[0] }}">{{ item[1] }}</a></li>
+                    <li>
+                        <a class="mobile-nav-item is-size-3" href="{{ item[0] }}">
+                            <div class="level is-mobile">
+                                <div class="level-left">
+                                    {{ item[1] }}
+                                </div>
+                                <div class="level-right">
+                                    <span class="icon"><i class="fas fa-{{ item[2] }}"></i></span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
