@@ -53,6 +53,10 @@ class Conn:
 
     def commit(self):
         self.conn.commit()
+    
+    
+    def mogrify(self, query, args=None):
+        return self.cur.mogrify(query, args)
 
     def wherify(self, where=()):
         if where and not isinstance(where[0], (list, tuple)):

@@ -5,7 +5,7 @@ import json
 from pprint import pprint
 from datetime import datetime
 from db.db_helper import filter_conn
-from helper import func_find, CURRENT_YEAR, request_json
+from helper.helpers import func_find, CURRENT_YEAR, request_json
 from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks
 from players.player import Player

@@ -3,7 +3,7 @@ from email.message import EmailMessage
 import smtplib
 from pprint import pprint
 
-from helper import CURRENT_YEAR
+from helper.helpers import CURRENT_YEAR
 
 class Postman:
     MAIL_SERVER = os.getenv('GOLF_POOL_EMAIL_SERVER')

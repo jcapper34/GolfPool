@@ -1,6 +1,6 @@
 from typing import List
 from db.db_helper import filter_conn
-from helper import CURRENT_YEAR
+from helper.helpers import CURRENT_YEAR
 from picksets.pickset import Pickset
 from players.player import Player
 from mailer.postman import Postman

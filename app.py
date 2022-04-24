@@ -3,8 +3,8 @@ from flask import Flask, render_template, redirect, url_for, request, jsonify
 from requests import get as http_get
 import logging
 from cronjobs import start_jobs
-from helper import CURRENT_YEAR
-from jinjafilters import register_filters
+from helper.helpers import CURRENT_YEAR
+from web.jinjafilters import register_filters
 
 from web.picks.picks_routes import mod as picks_mod
 from web.results.results_routes import mod as results_mod

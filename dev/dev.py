@@ -4,10 +4,11 @@ import requests
 from config import ALL_PLAYERS_URL, OWGR_STAT_ID, PGA_PHOTO_URL, STATS_URL
 
 from db.db_helper import filter_conn
-from helper import CURRENT_YEAR, func_find, splash, request_json
+from helper.helpers import CURRENT_YEAR, func_find, splash, request_json
 from db.conn import Conn
+from picksets.pickset_getters import get_all_picks
 from players.player import Player
-from tournament.tournament_calculations import calculate_api_standings
+from tournament.tournament_calculations import calculate_api_standings, calculate_standings
 from tournament.tournament import Tournament
 from tournament.tournament_retriever import get_api_tournament
 
@@ -125,93 +126,6 @@ def insert_levels(year=CURRENT_YEAR):
             pid = results[0]
             conn.exec(
                 "INSERT INTO level_xref (player_id, season_year, level) VALUES(%s,%s,%s)", (pid, year, level_num))
-
-    conn.commit()
-
-
-def db_upload_leaderboard_individual(tournament, do_commit=True, conn=None):
-    conn = filter_conn(conn)
-
-    tournament.fill_api_leaderboard()
-
-    conn.exec('INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING',
-              (tournament.year,))  # Insert season
-
-    conn.exec("DELETE FROM event_leaderboard_xref CASCADE WHERE tournament_id=%s AND season_year=%s",
-              (tournament.tid, tournament.year))
-    conn.exec('INSERT INTO event (tournament_id, season_year) VALUES (%s, %s) ON CONFLICT DO NOTHING',
-              (tournament.tid, tournament.year))  # Insert season
-
-    leaderboard_insert_query = "INSERT INTO event_leaderboard_xref (tournament_id, season_year, position, score, points, player_id) VALUES "
-
-    for player in tournament.players:
-        conn.exec("INSERT INTO player (id, name) VALUES (%s,%s) ON CONFLICT DO NOTHING",
-                  (player.id, player.name))
-        values_query = conn.cur.mogrify(" (%s,%s,%s,%s,%s,%s),",
-                                        (tournament.tid, tournament.year, player.pos, player.total, player.points, player.id))
-        leaderboard_insert_query += values_query.decode()
-
-    conn.exec(leaderboard_insert_query[:-1] + " ON CONFLICT DO NOTHING")
-
-    if do_commit:
-        conn.commit()
-
-    print("Inserted leaderboard: %s - %d" % (tournament.name, tournament.year))
-
-
-def db_upload_leaderboard(year, conn=None):
-    conn = filter_conn(conn)
-
-    major_results = [Tournament(year=year, channel_tid=e['key'], tournament_name=e['name'])
-                     for e in func_find(api_events, lambda event: event['major'] and 'players' not in event['name'], limit=4)]
-    print([(m.channel_tid, m.name) for m in major_results])
-    assert len(major_results) == 4
-    assert all(['players' not in m.name.lower() for m in major_results])
-
-    return
-
-    for major in major_results:
-        lower_name = major.name.lower()
-        if 'masters' in lower_name:
-            major.tid = '014'
-        elif 'us open' in lower_name or 'u.s. open' in lower_name:
-            major.tid = '026'
-        elif 'the open' in lower_name:
-            major.tid = '100'
-        elif 'championship' in lower_name:
-            major.tid = '033'
-        else:
-            raise AttributeError("Can't find tid for %s" % major.name)
-
-        db_upload_leaderboard_individual(major, do_commit=False, conn=conn)
-
-    conn.commit()
-
-
-def db_upload_standings_individual(channel_tid, tid, year, conn=None):
-    conn = filter_conn(conn)
-
-    tournament = get_api_tournament(channel_tid=channel_tid)
-    tournament.tid = tid
-    tournament.year = year
-    calculate_api_standings(tournament, get_picks=True, conn=conn)
-
-    conn.exec('INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING',
-              (tournament.year,))  # Insert season
-
-    conn.exec("DELETE FROM event_standings_xref CASCADE WHERE tournament_id=%s AND season_year=%s",
-              (tournament.tid, tournament.year))
-    conn.exec('INSERT INTO event (tournament_id, season_year) VALUES (%s, %s) ON CONFLICT DO NOTHING',
-              (tournament.tid, tournament.year))  # Insert season
-
-    standings_insert_query = "INSERT INTO event_standings_xref (tournament_id, season_year, pickset_id, position, points) VALUES "
-
-    for pickset in tournament.picksets:
-        values_query = conn.cur.mogrify(" (%s,%s,%s,%s,%s),",
-                                        (tournament.tid, tournament.year, pickset.id, pickset.pos, pickset.points))
-        standings_insert_query += values_query.decode()
-
-    conn.exec(standings_insert_query[:-1] + " ON CONFLICT DO NOTHING")
 
     conn.commit()
 

@@ -1,6 +1,6 @@
 from typing import List
 from db.db_helper import filter_conn
-from helper import func_find
+from helper.helpers import func_find
 from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks
 from players.player import Player
@@ -33,7 +33,7 @@ def calculate_standings(players: List[Player], picksets: List[Pickset]) -> List[
     return rank(picksets)
 
 
-def rank(picksets) -> List[Pickset]: 
+def rank(picksets: List[Pickset]) -> List[Pickset]: 
     '''
     Give Picksets their positions after calculating standings
     

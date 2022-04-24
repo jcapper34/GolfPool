@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 import os
-from pprint import pprint
 import shutil
 from threading import Thread
 from dateutil.parser import isoparse
@@ -11,9 +10,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 from config import EVENTS_URL, XL_DIR
 from db.conn import Conn
-from db.db_helper import filter_conn
-from globalcache import GlobalCache
-from helper import CURRENT_YEAR
+from helper.globalcache import GlobalCache
+from helper.helpers import CURRENT_YEAR
 from picksets.pickset_getters import get_all_picks
 from tournament.tournament_calculations import calculate_standings
 from tournament.tournament_retriever import get_api_tournament
@@ -102,12 +100,12 @@ def update_last_major():
                     picksets = calculate_standings(tournament.players, get_all_picks(CURRENT_YEAR, conn=conn))
                     standings_insert_query = "INSERT INTO event_standings_xref (tournament_id, season_year, pickset_id, position, points) VALUES "
 
-                    for pickset in picksets:
-                        values_query = conn.cur.mogrify(" (%s,%s,%s,%s,%s),",
-                                                        (tid, CURRENT_YEAR, pickset.id, pickset.pos, pickset.points))
-                        standings_insert_query += values_query.decode()
+                    standings_insert_query += ','.join((conn.cur.mogrify(" (%s,%s,%s,%s,%s)",
+                                                (tid, CURRENT_YEAR, pickset.id, pickset.pos, pickset.points)).decode()
+                                               for pickset in picksets))
 
-                    conn.exec(standings_insert_query[:-1])
+                    
+                    conn.exec(standings_insert_query)
                     conn.commit()
                     logging.info("%s was uploaded to DB", event.get("name"))
 
@@ -129,8 +127,9 @@ def xl_cleanup():
     expiration_delta = timedelta(hours=1)
     dt = datetime.now()
     
-    for filename in os.listdir(XL_DIR):
-        filepath = os.path.join(XL_DIR, filename)
-        if os.path.isdir(filepath):
-            if os.path.getmtime(filepath) + expiration_delta.total_seconds() < dt.timestamp():
-                shutil.rmtree(filepath, ignore_errors=False, onerror=None)
+    if os.path.exists(XL_DIR):
+        for filename in os.listdir(XL_DIR):
+            filepath = os.path.join(XL_DIR, filename)
+            if os.path.isdir(filepath):
+                if os.path.getmtime(filepath) + expiration_delta.total_seconds() < dt.timestamp():
+                    shutil.rmtree(filepath, ignore_errors=False, onerror=None)

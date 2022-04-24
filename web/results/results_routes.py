@@ -8,7 +8,7 @@ from flask import Blueprint, render_template, request, get_template_attribute, j
 from config import PICKS_LOCKED, XL_DIR, TOURNAMENT_NAME_MAP
 
 from db.conn import Conn
-from helper import func_find, CURRENT_YEAR
+from helper.helpers import func_find, CURRENT_YEAR
 from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks, get_picks, get_tournament_history
 from players.player import Player
@@ -60,12 +60,13 @@ def results_live():
 def results_past(year, tid):
     conn = Conn()
 
-    past_events = get_past_events()
 
     # Get Database Rankings
     tournament_name = TOURNAMENT_NAME_MAP[tid] if tid != 'cumulative' else "Cumulative"
     tournament = Tournament(name=tournament_name, year=year, tid=tid)
     tournament.players = get_db_rankings(tid, year, conn=conn)
+    
+    past_events = get_past_events(conn=conn)
     
     # If tournament not found in DB
     if tournament.players is None:
@@ -142,7 +143,6 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
     # Get API results
     if tid is None:
         tournament = get_api_tournament(channel_tid)
-        # tournament.year = year
         leaderboard_player = func_find(
             tournament.players, lambda pl: pl.id == player.id)
         player.merge_attributes(asdict(leaderboard_player))

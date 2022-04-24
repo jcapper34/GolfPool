@@ -5,7 +5,7 @@ from config import GOLFERS_URL, OWGR_STAT_ID, PICKS_LOCKED, STATS_URL
 
 # My function imports
 from db.conn import Conn
-from helper import CURRENT_YEAR, splash
+from helper.helpers import CURRENT_YEAR, splash
 from mailer.postman import Postman
 from picksets.pickset import Pickset
 from picksets.pickset_submission import submit_change_picks, submit_picks

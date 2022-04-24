@@ -1,6 +1,6 @@
 {% macro helper_scripts() %}
     <script>
-    // Loaders
+        // Loaders
         const ripple_html = "<div class='lds-ripple absolutely-centered'><div></div><div></div></div>";
         const roller_html = "<div class=\"lds-roller absolutely-centered\"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>";
         const circle_html = " <div class=\"lds-circle absolutely-centered\"><div></div></div>";
@@ -99,11 +99,11 @@
                     {% for item in nav_menu %}
                     <li>
                         <a class="mobile-nav-item is-size-3" href="{{ item[0] }}">
-                            <div class="level is-mobile">
-                                <div class="level-left">
+                            <div class="columns is-mobile">
+                                <div class="column is-half">
                                     {{ item[1] }}
                                 </div>
-                                <div class="level-right">
+                                <div class="column is-half has-text-right">
                                     <span class="icon"><i class="fas fa-{{ item[2] }}"></i></span>
                                 </div>
                             </div>

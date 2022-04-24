@@ -4,8 +4,8 @@ from datetime import datetime
 
 from config import LEADERBOARD_URL, POINT_MAP
 from db.db_helper import filter_conn
-from globalcache import GlobalCache
-from helper import request_json
+from helper.globalcache import GlobalCache
+from helper.helpers import request_json
 from picksets.pickset import Pickset
 from players.player import Player
 from tournament.tournament import Tournament

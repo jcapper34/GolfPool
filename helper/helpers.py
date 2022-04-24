@@ -48,6 +48,7 @@ def request_json(url) -> Dict:
 
     with open(url) as f:
         return json.load(f)
+    
 
 
 def obj_to_json(obj) -> str:
