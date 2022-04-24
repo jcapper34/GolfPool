@@ -1,5 +1,4 @@
 # Puts in list of players by level
-from pprint import pprint
 
 
 def level_separate(players):

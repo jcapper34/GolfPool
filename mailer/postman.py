@@ -1,7 +1,6 @@
 import os
 from email.message import EmailMessage
 import smtplib
-from pprint import pprint
 
 from helper.helpers import CURRENT_YEAR
 

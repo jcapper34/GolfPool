@@ -1,10 +1,9 @@
 from dataclasses import asdict
-import json
 import math
 import os
 import uuid
 
-from flask import Blueprint, render_template, request, get_template_attribute, jsonify, session, Response, redirect, url_for
+from flask import Blueprint, get_template_attribute, jsonify, redirect, render_template, request, session, url_for
 from config import PICKS_LOCKED, XL_DIR, TOURNAMENT_NAME_MAP
 
 from db.conn import Conn

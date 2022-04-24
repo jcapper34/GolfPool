@@ -1,8 +1,6 @@
 from typing import List
-from db.db_helper import filter_conn
 from helper.helpers import func_find
 from picksets.pickset import Pickset
-from picksets.pickset_getters import get_all_picks
 from players.player import Player
 
 

@@ -1,14 +1,11 @@
 from dataclasses import asdict
-import json
 from flask import blueprints
 from flask.json import jsonify
-from requests import api
 from config import PICKS_LOCKED
 from helper.helpers import CURRENT_YEAR
 
 from picksets.pickset_getters import get_all_picks
 from tournament.tournament_calculations import calculate_standings
-from tournament.tournament import Tournament
 from tournament.tournament_retriever import get_api_tournament
 
 

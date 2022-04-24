@@ -1,17 +1,14 @@
 # Library imports
-from pprint import pprint
 from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for, get_template_attribute
 from config import GOLFERS_URL, OWGR_STAT_ID, PICKS_LOCKED, STATS_URL
 
 # My function imports
 from db.conn import Conn
-from helper.helpers import CURRENT_YEAR, splash
+from helper.helpers import CURRENT_YEAR
 from mailer.postman import Postman
-from picksets.pickset import Pickset
 from picksets.pickset_submission import submit_change_picks, submit_picks
 from picksets.pickset_getters import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks, get_pickset
 from players.player_getters import get_levels_db
-from tournament.tournament import Tournament
 from tournament.tournament_retriever import get_db_rankings
 
 mod = Blueprint("picks", __name__, template_folder='templates',

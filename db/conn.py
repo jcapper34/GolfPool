@@ -1,4 +1,3 @@
-from lib2to3.pgen2.pgen import DFAState
 import psycopg2
 import psycopg2.extras
 from urllib.parse import parse_qs, urlparse

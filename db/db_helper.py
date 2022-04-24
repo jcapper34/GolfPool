@@ -1,4 +1,3 @@
-import psycopg2
 from db.conn import Conn
 
 def filter_conn(conn):

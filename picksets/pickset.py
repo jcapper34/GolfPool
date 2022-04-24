@@ -1,12 +1,7 @@
 from dataclasses import asdict, dataclass
-from db.conn import Conn
-from db.db_helper import filter_conn
-from helper.helpers import CURRENT_YEAR, func_find
-from mailer.postman import Postman
-from players import player
+from helper.helpers import func_find
 from typing import List, ClassVar
 
-from players.players_helper import level_separate
 
 
 @dataclass

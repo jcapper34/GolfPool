@@ -1,11 +1,5 @@
-import json
-import logging
-from db.conn import Conn
-from db.db_helper import filter_conn
-from helper.helpers import func_find, CURRENT_YEAR
-from picksets import pickset
 
-from typing import List, ClassVar
+from typing import List
 from dataclasses import dataclass, asdict
 
 

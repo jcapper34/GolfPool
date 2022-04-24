@@ -1,5 +1,3 @@
-from config import STATS_URL
-import players
 
 def register_filters(app):
     

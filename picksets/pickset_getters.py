@@ -1,5 +1,4 @@
 from typing import List
-from db.conn import Conn
 
 from db.db_helper import filter_conn
 from helper.helpers import CURRENT_YEAR

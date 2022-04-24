@@ -1,5 +1,3 @@
-import json
-from typing import Dict
 from datetime import datetime
 
 from config import LEADERBOARD_URL, POINT_MAP
