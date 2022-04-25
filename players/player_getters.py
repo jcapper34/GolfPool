@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 from db.db_helper import filter_conn
 from helper.helpers import CURRENT_YEAR
 from picksets.pickset import Pickset
@@ -13,7 +13,7 @@ GET_LEVELS_QUERY = """
                     JOIN player AS pl ON pl.id = lx.player_id
                 WHERE lx.season_year = %s
             """
-def get_levels_db(year, separate=True, conn=None):
+def get_levels_db(year, separate=True, conn=None) -> List:
     conn = filter_conn(conn)
     results = conn.exec_fetch(GET_LEVELS_QUERY, (year,))
     players = [Player(id=row['player_id'], name=row['name'], level=row['level'], photo_url=row['photo_url']) for row in results]
@@ -51,7 +51,7 @@ GET_WHO_PICKED_QUERY = """SELECT ps.id AS psid, (pa.name || COALESCE(' - ' || ps
                     JOIN participant pa on ps.participant_id = pa.id
                     WHERE px.player_id = %s AND ps.season_year = %s
                     ORDER BY name"""
-def who_picked_player(pid, year=CURRENT_YEAR, conn=None):
+def who_picked_player(pid, year=CURRENT_YEAR, conn=None) -> List[Pickset]:
     conn = filter_conn(conn)
 
     results = conn.exec_fetch(GET_WHO_PICKED_QUERY, (pid, year))

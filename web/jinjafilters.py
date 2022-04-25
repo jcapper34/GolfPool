@@ -2,11 +2,11 @@
 def register_filters(app):
     
     @app.template_filter('are_levels_defined')
-    def are_levels_defined(players):
+    def are_levels_defined(players) -> bool:
         return any([pl.level != 4 for pl in players])
     
     @app.template_filter('positionDisplay')
-    def positionDisplay(player):
+    def positionDisplay(player) -> str:
         if player.pos is None:
             return '-'
         if player.status:

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 from config import LEADERBOARD_URL, POINT_MAP
 from db.db_helper import filter_conn
@@ -43,7 +44,7 @@ def get_api_tournament(channel_tid=None) -> Tournament:
     return tournament
 
 
-def get_db_rankings(tid, year, conn=None):
+def get_db_rankings(tid, year, conn=None) -> List[Player]:
     # Parameters: year, tid
     # Returns: pid, name, points, pos ORDERED BY points
     GET_DB_RANKINGS_QUERY = """
@@ -69,7 +70,7 @@ def get_db_rankings(tid, year, conn=None):
     return None
 
 
-def get_db_standings(tid, year, conn=None):
+def get_db_standings(tid, year, conn=None) -> List[Pickset]:
     # Parameters: year, tid
     # Returns: pos, psid, name, points ORDERED & RANKED BY pos
     GET_DB_STANDINGS_QUERY = """
@@ -95,7 +96,7 @@ def get_db_standings(tid, year, conn=None):
 
 
 # Used to get all season years that have been stored in DB
-def get_past_events(conn=None):
+def get_past_events(conn=None) -> dict:
     PAST_EVENTS_QUERY = """
         SELECT season_year, tournament.id, tournament.name from event 
             JOIN tournament ON event.tournament_id = tournament.id

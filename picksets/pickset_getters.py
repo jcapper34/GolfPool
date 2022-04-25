@@ -54,7 +54,7 @@ def get_all_picks(year, separate=False, conn=None) -> List[Pickset]:
     return pickset_list
 
 
-def get_tournament_history(psid, year=CURRENT_YEAR, conn=None):
+def get_tournament_history(psid, year=CURRENT_YEAR, conn=None) -> List:
     """
     Parameters: season_year, ps.id
     Returns: tournament.name, pos, points
@@ -133,7 +133,7 @@ def get_most_picked(year, conn=None) -> List[Player]:
     return [Player(id=row['id'], name=row['name'], level=row['lev'], num_picked=row['num_picked']) for row in results]
 
 
-def get_login(email, pin, conn=None):
+def get_login(email, pin, conn=None) -> int:
     # Parameters: email, pin, year
     # Returns: ps.id
     GET_LOGIN_QUERY = """

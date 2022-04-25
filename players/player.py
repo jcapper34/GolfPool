@@ -1,5 +1,5 @@
 
-from typing import List
+from typing import Any, List
 from dataclasses import dataclass, asdict
 
 
@@ -30,24 +30,24 @@ class Player:
     photo_url: str = None
     country_flag: str = None
 
-    def set_attributes(self, attr_map):
+    def set_attributes(self, attr_map) -> None:
         for key, val in attr_map.items():
             setattr(self, key, val)
             
-    def merge_attributes(self, attr_map):
+    def merge_attributes(self, attr_map) -> None:
         for key, val in attr_map.items():
             if getattr(self, key) is None:
                 setattr(self, key, val)
 
     """ Overrides """
-    def __str__(self):
+    def __str__(self) -> str:
         return "Player: [id=%s, name='%s']" % (self.id, self.name)
 
-    def __hash__(self):         # So 'in' keyword can be used
+    def __hash__(self) -> Any:         # So 'in' keyword can be used
         return int(self.id)
 
-    def __eq__(self, other):    # Allows for comparison
+    def __eq__(self, other) -> bool:    # Allows for comparison
         return self.id == other.id and self.name == other.name
 
-    def __dict__(self):
+    def __dict__(self) -> dict:
         return asdict(self)

@@ -1,6 +1,6 @@
 from db.conn import Conn
 
-def filter_conn(conn):
+def filter_conn(conn) -> Conn:
     '''
     Starts a database connection if conn is not None
     '''

@@ -5,7 +5,7 @@ from picksets.pickset import Pickset
 from players.player import Player
 from mailer.postman import Postman
 
-def submit_picks(name, email, pin, form_picks, send_email=True, year=CURRENT_YEAR, conn=None):
+def submit_picks(name, email, pin, form_picks, send_email=True, year=CURRENT_YEAR, conn=None) -> bool:
     conn = filter_conn(conn)
     # Get main levels
     picks = extract_form_picks(form_picks)
@@ -23,7 +23,7 @@ def submit_picks(name, email, pin, form_picks, send_email=True, year=CURRENT_YEA
 
     return psid
 
-def submit_change_picks(pid, name, email, pin, form_picks, conn=None):
+def submit_change_picks(pid, name, email, pin, form_picks, conn=None) -> bool:
     conn = filter_conn(conn)
 
     # Get main levels
@@ -42,7 +42,7 @@ def submit_change_picks(pid, name, email, pin, form_picks, conn=None):
     return True
 
 
-def extract_form_picks(form_picks):
+def extract_form_picks(form_picks) -> List:
     picks = []  # Set of lists of type Player
     for level in form_picks:
         level_players = []
@@ -54,7 +54,7 @@ def extract_form_picks(form_picks):
 
     return picks
 
-def validate_picks(picks, year=CURRENT_YEAR, conn=None):
+def validate_picks(picks, year=CURRENT_YEAR, conn=None) -> bool:
     if len(picks) != len(Pickset.PICKS_ALLOWED):  ## Check for correct number of levels
         return False
 
@@ -89,7 +89,7 @@ INSERT_PICKSET_QUERY = """
     INSERT INTO pickset (participant_id, season_year) VALUES (%s,%s)
     RETURNING id
 """
-def db_inserts(name, email, pin, picks, year=CURRENT_YEAR, conn=None):
+def db_inserts(name, email, pin, picks, year=CURRENT_YEAR, conn=None) -> int:
     conn = filter_conn(conn)   # Make connection
 
     """ Insert participant if doesn't exist """
@@ -107,7 +107,7 @@ def db_inserts(name, email, pin, picks, year=CURRENT_YEAR, conn=None):
 
     return pid
 
-def db_insert_picks(pid, picks, conn=None):
+def db_insert_picks(pid, picks, conn=None) -> None:
     # Redefine Variables
     conn = filter_conn(conn)
 
@@ -126,7 +126,7 @@ def db_insert_picks(pid, picks, conn=None):
     conn.exec(query[:-1])  # DB picks insert
 
 
-def db_update_picks(pid, picks, conn=None):
+def db_update_picks(pid, picks, conn=None) -> None:
     conn = filter_conn(conn)
 
     conn.exec("DELETE FROM picks_xref WHERE pickset_id=%s", (pid,))   # Delete previous picks

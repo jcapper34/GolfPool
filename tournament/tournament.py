@@ -20,7 +20,7 @@ class Tournament:
     ### DATABASE FILLS ###
 
     """ MERGES """
-    def merge_all_picks(self, all_picks):
+    def merge_all_picks(self, all_picks) -> None:
         for pickset in self.picksets:
             ps2 = func_find(all_picks, lambda ps: ps.id == pickset.id)
             pickset.picks = ps2.picks

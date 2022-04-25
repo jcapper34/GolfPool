@@ -17,7 +17,7 @@ from tournament.tournament_calculations import calculate_standings
 from tournament.tournament_retriever import get_api_tournament
 
 
-def start_jobs():
+def start_jobs() -> None:
     """
     Starts the Database Jobs
     """
@@ -36,7 +36,7 @@ def start_jobs():
     scheduler.start()
 
 
-def resolve_major(title):
+def resolve_major(title) -> str:
     """
     Pretty sloppy way of determining the tid from the major name
     """
@@ -53,7 +53,7 @@ def resolve_major(title):
     return tid
 
 
-def update_last_major():
+def update_last_major() -> None:
     """
     _summary_
     """
@@ -119,7 +119,7 @@ def update_last_major():
     logging.info("Cron Job Finished")
 
 
-def xl_cleanup():
+def xl_cleanup() -> None:
     """
     Delete any excel generated files that are expired
     """

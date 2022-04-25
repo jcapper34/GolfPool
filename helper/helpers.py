@@ -2,12 +2,12 @@ import json
 import inspect
 from pprint import pprint
 from datetime import datetime
-from typing import Dict
+from typing import Any, Dict
 
 import requests
 
 """ FUNCTIONS """
-def splash(obj):
+def splash(obj) -> None:
     if isinstance(obj, list):
         obj = [val.__str__() for val in obj]
     elif isinstance(obj, dict):
@@ -16,7 +16,7 @@ def splash(obj):
     pprint(obj)
 
 
-def func_find(obj, func, limit=1, get_index=False):
+def func_find(obj, func, limit=1, get_index=False) -> Any:
     found = []
     num_found = 0
     for i in range(len(obj)):
