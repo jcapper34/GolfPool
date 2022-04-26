@@ -59,3 +59,10 @@ def who_picked_player(pid, year=CURRENT_YEAR) -> List[Pickset]:
         picked_by = [Pickset(id=row['psid'], name=row['name']) for row in results]
 
     return picked_by
+
+
+def get_player_photo(pid) -> str:
+    with db_pool.get_conn() as conn:
+        photo = conn.exec_fetch(
+            "SELECT photo_url FROM player WHERE id=%s", (pid,), fetchall=False)[0]
+        return photo

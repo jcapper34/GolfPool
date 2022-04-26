@@ -10,7 +10,7 @@ from helper.helpers import func_find, CURRENT_YEAR
 from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks, get_picks, get_tournament_history
 from players.player import Player
-from players.player_getters import get_tournament_player_db, who_picked_player
+from players.player_getters import get_player_photo, get_tournament_player_db, who_picked_player
 from tournament.tournament_calculations import calculate_standings
 from tournament.tournament import Tournament
 from tournament.tournament_retriever import get_api_tournament, get_db_rankings, get_db_standings, get_past_events
@@ -130,7 +130,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
 
     player = Player(id=pid)
     player.picked_by = who_picked_player(player.id, year=year)
-
+    
     # Get API results
     if tid is None:
         tournament = get_api_tournament(channel_tid)
@@ -140,6 +140,10 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
         player.status = leaderboard_player.status
         player.scorecards = func_find(
             tournament.scorecards, lambda sc: sc['golferId'] == player.id, limit=4)
+        
+        # See if photo is available from DB
+        photo = get_player_photo(pid)
+        player.photo_url = photo if photo is not None else player.photo_url
     # Get DB Results
     else:
         tournament_results = get_tournament_player_db(
