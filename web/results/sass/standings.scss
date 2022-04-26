@@ -166,6 +166,7 @@ body.modal-open {
     .player-modal-image {
         height: 180px !important;
         width: 180px !important;
+        overflow: hidden;
     }
 }
 
