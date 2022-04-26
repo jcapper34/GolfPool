@@ -1,11 +1,12 @@
 from typing import Any, ByteString
 import psycopg2
 import psycopg2.extras
+from psycopg2.extensions import connection
 from psycopg2.pool import SimpleConnectionPool
 from urllib.parse import parse_qs, urlparse
 
 class Conn:
-    def __init__(self, pgconn, conn_pool: SimpleConnectionPool = None) -> None:
+    def __init__(self, pgconn: connection, conn_pool: SimpleConnectionPool = None) -> None:
         self.pgconn = pgconn
         self.conn_pool = conn_pool
         self.new_cursor()

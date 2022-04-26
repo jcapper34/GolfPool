@@ -1,7 +1,7 @@
 from psycopg2.pool import SimpleConnectionPool
 from urllib.parse import parse_qs, urlparse
 from config import DATABASE_URL
-from db.conn import Conn
+from db.connection import Conn
 
 
 class ConnectionPool:

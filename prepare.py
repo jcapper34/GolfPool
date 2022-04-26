@@ -2,7 +2,7 @@
 import os
 import sass
 
-from db.conn import Conn
+from db.connection import Conn
 from db.connection_pool import db_pool
 from picksets.pickset import Pickset
 from players.player import Player

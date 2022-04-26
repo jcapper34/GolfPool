@@ -1,4 +1,4 @@
-from db.conn import Conn
+from db.connection import Conn
 from helper.helpers import func_find
 from picksets.pickset_getters import get_all_picks
 import xlsxwriter as xlsx
