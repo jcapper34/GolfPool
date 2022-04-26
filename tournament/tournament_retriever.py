@@ -2,12 +2,12 @@ from datetime import datetime
 from typing import List
 
 from config import LEADERBOARD_URL, POINT_MAP
-from db.db_helper import filter_conn
 from helper.globalcache import GlobalCache
 from helper.helpers import request_json
 from picksets.pickset import Pickset
 from players.player import Player
 from tournament.tournament import Tournament
+from db.connection_pool import db_pool
 
 
 def get_api_tournament(channel_tid=None) -> Tournament:
@@ -59,10 +59,11 @@ def get_db_rankings(tid, year, conn=None) -> List[Player]:
         GROUP BY pl.id, pl.name)
         SELECT * FROM leaderboard WHERE points > 0
     """
-    conn = filter_conn(conn)
-
-    raw_players = conn.exec_fetch(GET_DB_RANKINGS_QUERY, (
-        year, tid if tid != 'cumulative' else None))
+    
+    raw_players = None
+    with db_pool.get_conn() as conn:
+        raw_players = conn.exec_fetch(GET_DB_RANKINGS_QUERY, (
+            year, tid if tid != 'cumulative' else None))
 
     if raw_players:
         return [Player(**p) for p in raw_players]
@@ -84,10 +85,11 @@ def get_db_standings(tid, year, conn=None) -> List[Pickset]:
             GROUP BY ps.id, name
             ORDER BY SUM(esx.points) DESC
     """
-    conn = filter_conn(conn)
 
-    results = conn.exec_fetch(GET_DB_STANDINGS_QUERY,
-                              (year, tid if tid != 'cumulative' else None))
+    results = None
+    with db_pool.get_conn() as conn:
+        results = conn.exec_fetch(GET_DB_STANDINGS_QUERY,
+                                (year, tid if tid != 'cumulative' else None))
     if results:
         return [Pickset(id=row['psid'], name=row['name'],
                                 points=row['points'], pos=row['pos']) for row in results]
@@ -102,8 +104,9 @@ def get_past_events(conn=None) -> dict:
             JOIN tournament ON event.tournament_id = tournament.id
             ORDER BY season_year DESC
     """
-    conn = filter_conn(conn)
-    results = conn.exec_fetch(PAST_EVENTS_QUERY)
+    results = None
+    with db_pool.get_conn() as conn:
+        results = conn.exec_fetch(PAST_EVENTS_QUERY)
 
     year_tourny = {}
     for row in results:

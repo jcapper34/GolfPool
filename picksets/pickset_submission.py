@@ -1,19 +1,19 @@
 from typing import List
-from db.db_helper import filter_conn
 from helper.helpers import CURRENT_YEAR
 from picksets.pickset import Pickset
 from players.player import Player
 from mailer.postman import Postman
+from db.connection_pool import db_pool
 
-def submit_picks(name, email, pin, form_picks, send_email=True, year=CURRENT_YEAR, conn=None) -> bool:
-    conn = filter_conn(conn)
+
+def submit_picks(name, email, pin, form_picks, send_email=True, year=CURRENT_YEAR) -> bool:
     # Get main levels
     picks = extract_form_picks(form_picks)
 
-    if not validate_picks(picks, conn=conn):   # Make sure picks are valid
+    if not validate_picks(picks):   # Make sure picks are valid
         return False
 
-    psid = db_inserts(name, email, pin, picks, year, conn=conn)
+    psid = db_inserts(name, email, pin, picks, year)
 
     # Send Email
     if send_email:
@@ -23,16 +23,16 @@ def submit_picks(name, email, pin, form_picks, send_email=True, year=CURRENT_YEA
 
     return psid
 
-def submit_change_picks(pid, name, email, pin, form_picks, conn=None) -> bool:
-    conn = filter_conn(conn)
+
+def submit_change_picks(pid, name, email, pin, form_picks) -> bool:
 
     # Get main levels
     picks = extract_form_picks(form_picks)
 
-    if not validate_picks(picks, conn=conn):   # Make sure picks are valid
+    if not validate_picks(picks):   # Make sure picks are valid
         return False
 
-    db_update_picks(pid, picks, conn=conn)
+    db_update_picks(pid, picks)
 
     # Send email
     postman = Postman((email,))
@@ -48,14 +48,16 @@ def extract_form_picks(form_picks) -> List:
         level_players = []
         for p in level:  # Iterate through form inputted players
             player_data = p.split('*')
-            level_players.append(Player(name=player_data[0], id=player_data[1]))
+            level_players.append(
+                Player(name=player_data[0], id=player_data[1]))
 
         picks.append(level_players)
 
     return picks
 
-def validate_picks(picks, year=CURRENT_YEAR, conn=None) -> bool:
-    if len(picks) != len(Pickset.PICKS_ALLOWED):  ## Check for correct number of levels
+
+def validate_picks(picks, year=CURRENT_YEAR) -> bool:
+    if len(picks) != len(Pickset.PICKS_ALLOWED):  # Check for correct number of levels
         return False
 
     for i in range(len(picks)):
@@ -64,7 +66,11 @@ def validate_picks(picks, year=CURRENT_YEAR, conn=None) -> bool:
             return False
 
     """ Ensure that level 4 players are not in levels 1-3 """
-    results = conn.exec_fetch("SELECT player_id FROM level_xref WHERE season_year=%s", (year,))
+    results = None
+    with db_pool.get_conn() as conn:
+        results = conn.exec_fetch(
+            "SELECT player_id FROM level_xref WHERE season_year=%s", (year,))
+
     level_pids = [x[0] for x in results]
 
     if any([int(p.id) in level_pids for p in picks[3]]):
@@ -72,65 +78,69 @@ def validate_picks(picks, year=CURRENT_YEAR, conn=None) -> bool:
 
     return True
 
-""" 
-Parameters: name, email, pin
-Returns: participant.id
-"""
-INSERT_PARTICIPANT_QUERY = """
-    INSERT INTO participant (name, email, pin) VALUES (%s,%s,%s)
-    ON CONFLICT(name, email) DO UPDATE SET name=EXCLUDED.name, pin=EXCLUDED.pin
-    RETURNING id
-"""
-"""
-Parameters: participant_id, season_year
-Returns: pickset.id
-"""
-INSERT_PICKSET_QUERY = """
-    INSERT INTO pickset (participant_id, season_year) VALUES (%s,%s)
-    RETURNING id
-"""
-def db_inserts(name, email, pin, picks, year=CURRENT_YEAR, conn=None) -> int:
-    conn = filter_conn(conn)   # Make connection
 
-    """ Insert participant if doesn't exist """
-    results = conn.exec_fetch(INSERT_PARTICIPANT_QUERY, (name, email, pin))
-    partid = results[0][0]
+def db_inserts(name, email, pin, picks, year=CURRENT_YEAR) -> int:
+    """ 
+    Parameters: name, email, pin
+    Returns: participant.id
+    """
+    INSERT_PARTICIPANT_QUERY = """
+        INSERT INTO participant (name, email, pin) VALUES (%s,%s,%s)
+        ON CONFLICT(name, email) DO UPDATE SET name=EXCLUDED.name, pin=EXCLUDED.pin
+        RETURNING id
+    """
+    """
+    Parameters: participant_id, season_year
+    Returns: pickset.id
+    """
+    INSERT_PICKSET_QUERY = """
+        INSERT INTO pickset (participant_id, season_year) VALUES (%s,%s)
+        RETURNING id
+    """
+    pid = None
+    with db_pool.get_conn() as conn:
+        """ Insert participant if doesn't exist """
+        results = conn.exec_fetch(INSERT_PARTICIPANT_QUERY, (name, email, pin))
+        partid = results[0][0]
 
-    """ Insert pickset """
-    results = conn.exec_fetch(INSERT_PICKSET_QUERY, (partid, year))
-    pid = results[0][0]
+        """ Insert pickset """
+        results = conn.exec_fetch(INSERT_PICKSET_QUERY, (partid, year))
+        pid = results[0][0]
 
-    """ Insert picks """
-    db_insert_picks(pid, picks, conn=conn)
+        """ Insert picks """
+        db_insert_picks(pid, picks, conn=conn)
 
-    conn.commit()   # Make sure to commit changes
+        conn.commit()   # Make sure to commit changes
 
     return pid
 
-def db_insert_picks(pid, picks, conn=None) -> None:
-    # Redefine Variables
-    conn = filter_conn(conn)
 
+def db_insert_picks(pid, picks, conn) -> None:
+    '''
+    The connection should already be wrapped using a "with" statement before this function is called
+    '''
     if isinstance(picks[0], List):  # Un-separate picks if they are separated
         picks = [pl for level_players in picks for pl in level_players]
 
     query = "INSERT INTO picks_xref (player_id, pickset_id) VALUES"
     for picked_player in picks:
         # Create new db player if doesn't exist
-        conn.exec("INSERT INTO player (id, name) VALUES (%s, %s) ON CONFLICT DO NOTHING", (picked_player.id, picked_player.name))
+        conn.exec("INSERT INTO player (id, name) VALUES (%s, %s) ON CONFLICT DO NOTHING",
+                  (picked_player.id, picked_player.name))
 
         # Add to picks insert query
-        s = conn.cur.mogrify(" (%s, %s),", (picked_player.id, pid)).decode("utf-8")
+        s = conn.cur.mogrify(
+            " (%s, %s),", (picked_player.id, pid)).decode("utf-8")
         query = ''.join((query, s))
 
     conn.exec(query[:-1])  # DB picks insert
 
 
-def db_update_picks(pid, picks, conn=None) -> None:
-    conn = filter_conn(conn)
+def db_update_picks(pid, picks) -> None:
+    with db_pool.get_conn() as conn:
+        conn.exec("DELETE FROM picks_xref WHERE pickset_id=%s",
+                (pid,))   # Delete previous picks
 
-    conn.exec("DELETE FROM picks_xref WHERE pickset_id=%s", (pid,))   # Delete previous picks
+        db_insert_picks(pid, picks, conn=conn)  # Insert new picks
 
-    db_insert_picks(pid, picks, conn=conn)  # Insert new picks
-
-    conn.commit()
+        conn.commit()

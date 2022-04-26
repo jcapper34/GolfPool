@@ -1,5 +1,5 @@
 from typing import Dict, Tuple, List
-from db.db_helper import filter_conn
+from db.connection_pool import db_pool
 from helper.helpers import CURRENT_YEAR
 from picksets.pickset import Pickset
 from players.player import Player
@@ -13,10 +13,11 @@ GET_LEVELS_QUERY = """
                     JOIN player AS pl ON pl.id = lx.player_id
                 WHERE lx.season_year = %s
             """
-def get_levels_db(year, separate=True, conn=None) -> List:
-    conn = filter_conn(conn)
-    results = conn.exec_fetch(GET_LEVELS_QUERY, (year,))
-    players = [Player(id=row['player_id'], name=row['name'], level=row['level'], photo_url=row['photo_url']) for row in results]
+def get_levels_db(year, separate=True) -> List:
+    players = None
+    with db_pool.get_conn() as conn:
+        results = conn.exec_fetch(GET_LEVELS_QUERY, (year,))
+        players = [Player(id=row['player_id'], name=row['name'], level=row['level'], photo_url=row['photo_url']) for row in results]
 
     if separate:
         return level_separate(players)
@@ -31,12 +32,12 @@ SELECT position AS pos, score AS total, points, tournament_id AS tid, 18 AS thru
     JOIN player p on elx.player_id = p.id
     WHERE p.id = %s AND elx.season_year=%s
 """
-def get_tournament_player_db(pid, year, conn=None) -> Tuple[Dict]:
-    conn = filter_conn(conn)
-    
+def get_tournament_player_db(pid, year) -> Tuple[Dict]:    
     player = Player(id=pid)
-
-    all_tournament_results = list(conn.exec_fetch(GET_TOURNAMENT_DATA_QUERY, (pid, year)))
+    
+    all_tournament_results = None
+    with db_pool.get_conn() as conn:
+        all_tournament_results = list(conn.exec_fetch(GET_TOURNAMENT_DATA_QUERY, (pid, year)))
 
     # tournament_results = dict(func_find(all_tournament_results, lambda t: t['tid'] == tid))
     # del tournament_results['tid']   # Don't need this property anymore
@@ -51,11 +52,10 @@ GET_WHO_PICKED_QUERY = """SELECT ps.id AS psid, (pa.name || COALESCE(' - ' || ps
                     JOIN participant pa on ps.participant_id = pa.id
                     WHERE px.player_id = %s AND ps.season_year = %s
                     ORDER BY name"""
-def who_picked_player(pid, year=CURRENT_YEAR, conn=None) -> List[Pickset]:
-    conn = filter_conn(conn)
-
-    results = conn.exec_fetch(GET_WHO_PICKED_QUERY, (pid, year))
-
-    picked_by = [Pickset(id=row['psid'], name=row['name']) for row in results]
+def who_picked_player(pid, year=CURRENT_YEAR) -> List[Pickset]:
+    picked_by = None
+    with db_pool.get_conn() as conn:
+        results = conn.exec_fetch(GET_WHO_PICKED_QUERY, (pid, year))
+        picked_by = [Pickset(id=row['psid'], name=row['name']) for row in results]
 
     return picked_by

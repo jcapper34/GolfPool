@@ -9,7 +9,7 @@ from pytz import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 from config import EVENTS_URL, XL_DIR
-from db.conn import Conn
+from db.connection_pool import db_pool
 from helper.globalcache import GlobalCache
 from helper.helpers import CURRENT_YEAR
 from picksets.pickset_getters import get_all_picks
@@ -69,48 +69,47 @@ def update_last_major() -> None:
             eventEnd = isoparse(event.get("endDate"))
 
             if event.get("winnerKey"):
-                conn = Conn()
+                with db_pool.get_conn() as conn:
+                    inDb = conn.exec_fetch(
+                        "SELECT EXISTS (SELECT 1 FROM event_leaderboard_xref WHERE tournament_id=%s AND season_year=%s)", (tid, eventEnd.year), fetchall=False)[0]
+                    if not inDb:
+                        print(event.get("name"), "is being uploaded to DB")
+                        tournament = get_api_tournament(channel_tid)
 
-                inDb = conn.exec_fetch(
-                    "SELECT EXISTS (SELECT 1 FROM event_leaderboard_xref WHERE tournament_id=%s AND season_year=%s)", (tid, eventEnd.year), fetchall=False)[0]
-                if not inDb:
-                    print(event.get("name"), "is being uploaded to DB")
-                    tournament = get_api_tournament(channel_tid)
+                        # Insert season
+                        conn.exec(
+                            "INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING", (eventEnd.year,))
 
-                    # Insert season
-                    conn.exec(
-                        "INSERT INTO season VALUES (%s) ON CONFLICT DO NOTHING", (eventEnd.year,))
+                        # Insert Event
+                        conn.exec('INSERT INTO event (tournament_id, season_year) VALUES (%s, %s) ON CONFLICT DO NOTHING',
+                                (tid, CURRENT_YEAR))  # Insert event
 
-                    # Insert Event
-                    conn.exec('INSERT INTO event (tournament_id, season_year) VALUES (%s, %s) ON CONFLICT DO NOTHING',
-                              (tid, CURRENT_YEAR))  # Insert event
+                        # Insert the leaderboard entries
+                        leaderboard_insert_query = "INSERT INTO event_leaderboard_xref (tournament_id, season_year, position, score, points, player_id) VALUES "
+                        for player in tournament.players:
+                            conn.exec("INSERT INTO player (id, name) VALUES (%s,%s) ON CONFLICT DO NOTHING",
+                                    (player.id, player.name))
+                            values_query = conn.cur.mogrify(" (%s,%s,%s,%s,%s,%s),",
+                                                            (tid, eventEnd.year, player.pos, player.total, player.points, player.id))
+                            leaderboard_insert_query += values_query.decode()
 
-                    # Insert the leaderboard entries
-                    leaderboard_insert_query = "INSERT INTO event_leaderboard_xref (tournament_id, season_year, position, score, points, player_id) VALUES "
-                    for player in tournament.players:
-                        conn.exec("INSERT INTO player (id, name) VALUES (%s,%s) ON CONFLICT DO NOTHING",
-                                  (player.id, player.name))
-                        values_query = conn.cur.mogrify(" (%s,%s,%s,%s,%s,%s),",
-                                                        (tid, eventEnd.year, player.pos, player.total, player.points, player.id))
-                        leaderboard_insert_query += values_query.decode()
+                        conn.exec(leaderboard_insert_query[:-1])
 
-                    conn.exec(leaderboard_insert_query[:-1])
+                        # Insert standings entries
+                        picksets = calculate_standings(tournament.players, get_all_picks(CURRENT_YEAR))
+                        standings_insert_query = "INSERT INTO event_standings_xref (tournament_id, season_year, pickset_id, position, points) VALUES "
 
-                    # Insert standings entries
-                    picksets = calculate_standings(tournament.players, get_all_picks(CURRENT_YEAR, conn=conn))
-                    standings_insert_query = "INSERT INTO event_standings_xref (tournament_id, season_year, pickset_id, position, points) VALUES "
+                        standings_insert_query += ','.join((conn.cur.mogrify(" (%s,%s,%s,%s,%s)",
+                                                    (tid, CURRENT_YEAR, pickset.id, pickset.pos, pickset.points)).decode()
+                                                for pickset in picksets))
 
-                    standings_insert_query += ','.join((conn.cur.mogrify(" (%s,%s,%s,%s,%s)",
-                                                (tid, CURRENT_YEAR, pickset.id, pickset.pos, pickset.points)).decode()
-                                               for pickset in picksets))
+                        
+                        conn.exec(standings_insert_query)
+                        conn.commit()
+                        logging.info("%s was uploaded to DB", event.get("name"))
 
-                    
-                    conn.exec(standings_insert_query)
-                    conn.commit()
-                    logging.info("%s was uploaded to DB", event.get("name"))
-
-                else:
-                    logging.info("%s is already in DB", event.get("name"))
+                    else:
+                        logging.info("%s is already in DB", event.get("name"))
 
             if dt > eventStart:
                 GlobalCache.current_tid = channel_tid

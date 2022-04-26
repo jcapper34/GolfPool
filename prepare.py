@@ -3,6 +3,7 @@ import os
 import sass
 
 from db.conn import Conn
+from db.connection_pool import db_pool
 from picksets.pickset import Pickset
 from players.player import Player
 from tournament.tournament_calculations import calculate_standings
@@ -39,10 +40,8 @@ def compile_sass():
 
 
 def test_connection():
-    conn = None
-    conn = Conn()
-
-    results = conn.exec_fetch("SELECT * FROM participant")
+    with db_pool.get_conn() as conn:
+        results = conn.exec_fetch("SELECT * FROM participant")
     
     return len(results) > 0
 

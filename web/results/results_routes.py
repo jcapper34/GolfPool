@@ -6,7 +6,6 @@ import uuid
 from flask import Blueprint, get_template_attribute, jsonify, redirect, render_template, request, session, url_for
 from config import PICKS_LOCKED, XL_DIR, TOURNAMENT_NAME_MAP
 
-from db.conn import Conn
 from helper.helpers import func_find, CURRENT_YEAR
 from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks, get_picks, get_tournament_history
@@ -57,15 +56,12 @@ def results_live():
 
 @mod.route("/<int:year>/<tid>")
 def results_past(year, tid):
-    conn = Conn()
-
-
     # Get Database Rankings
     tournament_name = TOURNAMENT_NAME_MAP[tid] if tid != 'cumulative' else "Cumulative"
     tournament = Tournament(name=tournament_name, year=year, tid=tid)
-    tournament.players = get_db_rankings(tid, year, conn=conn)
+    tournament.players = get_db_rankings(tid, year)
     
-    past_events = get_past_events(conn=conn)
+    past_events = get_past_events()
     
     # If tournament not found in DB
     if tournament.players is None:
@@ -74,10 +70,10 @@ def results_past(year, tid):
         else:
             return "<p class='has-text-centered'>No results to show</p>"
 
-    tournament.picksets = get_db_standings(tid, year, conn=conn)
+    tournament.picksets = get_db_standings(tid, year)
 
     # Merge all picks with tournament
-    all_picks = get_all_picks(year, conn=conn)
+    all_picks = get_all_picks(year)
     tournament.merge_all_picks(all_picks)
 
     if request.args.get('main_section_only') is not None:   # For quick tab switching
@@ -96,13 +92,11 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
     psid = request.args.get("psid")
     channel_tid = request.args.get("channel_tid")
 
-    conn = Conn()
-
     pickset = Pickset(psid)
-    pickset.picks = get_picks(psid, separate=False, conn=conn)
+    pickset.picks = get_picks(psid, separate=False)
 
     # Get tournament history from DB
-    pickset.tournament_history = get_tournament_history(psid, conn=conn)
+    pickset.tournament_history = get_tournament_history(psid)
 
     tournament = None
     if tid is None:
@@ -112,7 +106,7 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
     else:
         tournament_name = TOURNAMENT_NAME_MAP[tid] if tid != 'cumulative' else "Cumulative"
         tournament = Tournament(name=tournament_name, year=year, tid=tid)
-        tournament.players = get_db_rankings(tid, year, conn=conn)  # Get Standings from DB
+        tournament.players = get_db_rankings(tid, year)  # Get Standings from DB
         pickset.merge_tournament(tournament)
 
     for pick in pickset.picks:
@@ -134,10 +128,8 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
     pid = int(request.args.get("pid"))
     channel_tid = request.args.get("channel_tid")
 
-    conn = Conn()
-
     player = Player(id=pid)
-    player.picked_by = who_picked_player(player.id, year=year, conn=conn)
+    player.picked_by = who_picked_player(player.id, year=year)
 
     # Get API results
     if tid is None:
@@ -151,7 +143,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
     # Get DB Results
     else:
         tournament_results = get_tournament_player_db(
-            pid, year, conn=conn)
+            pid, year)
         player.season_history = tournament_results
         player.photo_url = tournament_results[0]['photo_url']
         if tid != "cumulative":

@@ -37,10 +37,9 @@ def picks_make():
 
 @mod.route("/season-history")
 def picks_get_season_history():
-    conn = Conn()
     season_history = []
     for year in range(2015, CURRENT_YEAR):
-        players = get_db_rankings(tid='cumulative', year=year, conn=conn)
+        players = get_db_rankings(tid='cumulative', year=year)
         season_history.append(
             (year, {pl.id: pl.pos for pl in players}))
 
@@ -81,9 +80,8 @@ def picks_confirmation():
         return redirect("index")
 
     # Get pickset
-    conn = Conn()
-    pickset = get_pickset(psid, conn=conn)
-    pickset.picks = get_picks(psid, conn=conn)
+    pickset = get_pickset(psid)
+    pickset.picks = get_picks(psid)
 
     return render_template("make/picks-confirmation.html", pickset=pickset)
 
@@ -99,15 +97,13 @@ def picks_change():
     if psid is None:  # If not logged in
         return render_template('change/change-picks-login.html')
 
-    conn = Conn()   # Will be used more than once
-
     # Get pickset
-    pickset = get_pickset(psid, conn=conn)
-    pickset.picks = get_picks(psid, conn=conn)
+    pickset = get_pickset(psid)
+    pickset.picks = get_picks(psid)
 
     return render_template("change/change-picks.html",
                            level_players=get_levels_db(
-                               CURRENT_YEAR, conn=conn),
+                               CURRENT_YEAR),
                            pickset=pickset,
                            year=CURRENT_YEAR,
                            OWGR_URL=STATS_URL % (19, CURRENT_YEAR),

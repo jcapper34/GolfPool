@@ -15,8 +15,8 @@ def write_picks_worksheet(workbook, ws_name, tid, year, picksets, conn=None):
     worksheet = workbook.add_worksheet(ws_name)
 
     tournament = Tournament(year=year, tid=tid)
-    tournament.players = get_db_rankings(tid, year, conn=conn)
-    tournament.picksets = get_db_standings(tid, year, conn=conn)
+    tournament.players = get_db_rankings(tid, year)
+    tournament.picksets = get_db_standings(tid, year)
     
     # Don't generate if standings don't exist
     if tournament.players is None or tournament.picksets is None:
@@ -74,13 +74,11 @@ def write_picks_worksheet(workbook, ws_name, tid, year, picksets, conn=None):
 
 
 def write_picks_workbook(tid_list, year, filename):
-    conn = Conn()
-
     workbook = xlsx.Workbook(filename)
 
-    picksets = get_all_picks(year, separate=False, conn=conn)
+    picksets = get_all_picks(year, separate=False)
 
     for tid, tournament_name in tid_list:
-        write_picks_worksheet(workbook, tournament_name, tid, year, picksets, conn=conn)
+        write_picks_worksheet(workbook, tournament_name, tid, year, picksets)
 
     workbook.close()
