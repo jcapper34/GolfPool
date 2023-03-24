@@ -83,5 +83,5 @@ ROUTING_ALIASES = (
     ("/standings/<int:year>/<tid>", "results.results_past")
 )
 
-SRC_LOCAL = bool(eval(os.getenv("SRC_LOCAL", True)))
-PICKS_LOCKED = bool(eval(os.getenv("PICKS_LOCKED", True)))
+SRC_LOCAL = bool(eval(os.getenv("SRC_LOCAL", "True")))
+PICKS_LOCKED = bool(eval(os.getenv("PICKS_LOCKED", "True")))
