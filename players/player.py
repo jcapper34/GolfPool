@@ -8,7 +8,6 @@ class Player:
     # General
     id: str
     name: str = None
-    tour_id: int = None
     level: int = None
 
     # Tournament

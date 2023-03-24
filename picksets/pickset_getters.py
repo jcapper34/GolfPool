@@ -9,9 +9,9 @@ from db.connection_pool import db_pool
 
 def get_all_picks(year, separate=False) -> List[Pickset]:
     # Parameters: year
-    # Returns: psid, psname, pid, pl.name, level, pl.tour_id
+    # Returns: psid, psname, pid, pl.name, level
     GET_ALL_PICKS_QUERY = """
-        SELECT ps.id AS psid, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, px.player_id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.tour_id
+        SELECT ps.id AS psid, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, px.player_id AS pid, pl.name, COALESCE(lx.level, 4) AS level
             FROM picks_xref AS px
             JOIN pickset AS ps
                 ON px.pickset_id = ps.id
@@ -35,7 +35,7 @@ def get_all_picks(year, separate=False) -> List[Pickset]:
     pickset_map = {}
     for row in results:
         player = Player(id=row['pid'], name=row['name'],
-                        level=row['level'], tour_id=row['tour_id'])
+                        level=row['level'])
         psid = row['psid']
         if pickset_map.get(psid) is None:
             pickset_map[psid] = Pickset(
@@ -90,10 +90,10 @@ def get_pickset(psid) -> Pickset:
 def get_picks(psid=None, separate=True) -> List:
     """
     Parameters: ps.id
-    Returns: pid, pl.name, level, psname, pa.email, pa.pin, pl.tour_id
+    Returns: pid, pl.name, level, psname, pa.email, pa.pin
     """
     GET_PICKS_QUERY = """
-        SELECT pl.id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.photo_url, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, pa.email, pa.pin, pl.tour_id FROM picks_xref AS px
+        SELECT pl.id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.photo_url, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, pa.email, pa.pin FROM picks_xref AS px
             JOIN player pl
             ON px.player_id = pl.id
             JOIN pickset ps
@@ -109,7 +109,7 @@ def get_picks(psid=None, separate=True) -> List:
         results = conn.exec_fetch(GET_PICKS_QUERY, (psid,))
 
         picks = [Player(row['pid'], name=row['name'], level=row['level'],
-                        tour_id=row['tour_id'], photo_url=row['photo_url']) for row in results]
+                        photo_url=row['photo_url']) for row in results]
     
     if not separate:
         return picks

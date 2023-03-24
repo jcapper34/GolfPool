@@ -3,7 +3,7 @@ import os
 # =======================
 # Database Credentials
 # =======================
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_CONNECTION_STRING = os.getenv("DB_CONNECTION_STRING")
 
 # =======================
 # Point Map

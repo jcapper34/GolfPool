@@ -125,7 +125,7 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
 @mod.route("/live/get-player-modal")
 @mod.route("/<int:year>/<tid>/get-player-modal")
 def get_player_modal(year=CURRENT_YEAR, tid=None):
-    pid = int(request.args.get("pid"))
+    pid = request.args.get("pid")
     channel_tid = request.args.get("channel_tid")
 
     player = Player(id=pid)

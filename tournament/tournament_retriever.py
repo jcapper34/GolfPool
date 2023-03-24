@@ -10,7 +10,7 @@ from tournament.tournament import Tournament
 from db.connection_pool import db_pool
 
 
-def get_api_tournament(channel_tid=None) -> Tournament:
+def get_api_tournament(channel_tid=None, year=None) -> Tournament:
     channel_tid = int(channel_tid) if channel_tid and channel_tid is not None else GlobalCache.current_tid
     api_data = request_json(LEADERBOARD_URL % channel_tid)
     api_tournament = api_data['result']
@@ -19,12 +19,11 @@ def get_api_tournament(channel_tid=None) -> Tournament:
 
     tournament = Tournament()
     tournament.channel_tid = channel_tid
-    tournament.year = datetime.strptime(
-        api_data['latestOddsUpdate'], "%B %d, %Y").year
+    tournament.year = year
     tournament.channel_tid = api_tournament.get('eventKey')
     tournament.scorecards = api_tournament['scorecards']
 
-    tournament.players = [Player(id=pl['golferId'],
+    tournament.players = [Player(id=str(pl['golferId']),
                                  name=pl['firstName'] + " " + pl['lastName'],
                                  pos=pl['position'] if pl['sortHelp'] is not None and pl['sortHelp'] < 1000 else None,
                                  points=POINT_MAP[str(
