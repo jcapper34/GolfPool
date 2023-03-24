@@ -5,25 +5,44 @@ from db.connection import Conn
 
 
 class ConnectionPool:
+    """
+    Class that manages a pool of connections to the postgres database
+    Should be treated as a singleton
+    """
+    
     def __init__(self, min_conn=1, max_conn=5) -> None:
-        username = os.getenv("DB_USER")
-        password = os.getenv("DB_PASSWORD")
-        database = os.getenv("DB_NAME")
-        hostname = os.getenv("DB_HOSTNAME")
-        port = os.getenv("DB_PORT")
-        sslmode = os.getenv("DB_SSLMODE")
-        print("Connecting to db username=%s password=%s database=%s host=%s port=%s sslmode=%s" % 
-            (username, password, database, hostname, port, sslmode))
-        self.connection_pool = SimpleConnectionPool(min_conn, max_conn,
-            database=database,
-            user=username,
-            password=password,
-            host=hostname,
-            port=port,
-            sslmode=sslmode
+        self.min_conn = min_conn
+        self.max_conn = max_conn
+        
+        self.username = os.getenv("DB_USER")
+        self.password = os.getenv("DB_PASSWORD")
+        self.database = os.getenv("DB_NAME")
+        self.hostname = os.getenv("DB_HOSTNAME")
+        self.port = os.getenv("DB_PORT")
+        self.sslmode = os.getenv("DB_SSLMODE")
+
+    def connect(self):
+        self.connection_pool = SimpleConnectionPool(
+            self.min_conn,
+            self.max_conn,
+            database = self.database,
+            user = self.username,
+            password = self.password,
+            host = self.hostname,
+            port = self.port,
+            sslmode = self.sslmode
         )
+
+        print("Connecting to db username=%s password=%s database=%s host=%s port=%s sslmode=%s" % 
+            (self.username, self.password, self.database, self.hostname, self.port, self.sslmode))
     
     def get_conn(self) -> Conn:
+        """
+        Grab db connection from pool. Will connect if no connection has been created yet
+        """
+        if getattr(self, "connection_pool", None) is None:
+            self.connect()
+
         pgconn = self.connection_pool.getconn()
         return Conn(pgconn, self.connection_pool)
 
