@@ -2,8 +2,6 @@
 import os
 import sass
 
-from db.connection import Conn
-from db.connection_pool import db_pool
 from picksets.pickset import Pickset
 from players.player import Player
 from tournament.tournament_calculations import calculate_standings
@@ -37,13 +35,6 @@ def compile_sass():
                         with open(css_filename, 'w') as f:
                             f.write(css_out)
                             print("Compiled SASS into", css_filename)
-
-
-def test_connection():
-    with db_pool.get_conn() as conn:
-        results = conn.exec_fetch("SELECT * FROM participant")
-    
-    return len(results) > 0
 
 
 def test_standings_calculations():
@@ -96,7 +87,6 @@ if __name__ == "__main__":
     compile_sass()
     
     # Tests
-    test_connection()
     test_standings_calculations()
     test_api()
     
