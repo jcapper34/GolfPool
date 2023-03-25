@@ -53,11 +53,16 @@ def results_live():
 
 # Past Standings
 
-
+@mod.route("/<int:year>")
 @mod.route("/<int:year>/<tid>")
-def results_past(year, tid):
+def results_past(year, tid=None):
     # Get Database Rankings
-    tournament_name = TOURNAMENT_NAME_MAP[tid] if tid != 'cumulative' else "Cumulative"
+    if tid is None or tid.lower() == 'cumulative':
+        tournament_name = "Cumulative"
+        tid = "cumulative"
+    else:
+        tournament_name = TOURNAMENT_NAME_MAP[tid]
+    
     tournament = Tournament(name=tournament_name, year=year, tid=tid)
     tournament.players = get_db_rankings(tid, year)
     
@@ -66,7 +71,7 @@ def results_past(year, tid):
     # If tournament not found in DB
     if tournament.players is None:
         if request.args.get('main_section_only') is None:
-            return render_template("locked-standings.html", tournament=tournament, past_events=past_events)
+            return render_template("standings-not-found.html", tournament=tournament, past_events=past_events)
         else:
             return "<p class='has-text-centered'>No results to show</p>"
 

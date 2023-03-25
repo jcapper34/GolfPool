@@ -4,7 +4,7 @@ params:
 #}
 {% extends "base.html" %}
 
-{% block title %}Golf Pool | Standings Locked{% endblock %}
+{% block title %}Golf Pool | Standings Not Found{% endblock %}
 {% block hero_title %}Standings{% endblock %}
 
 {% block add_head %}
@@ -20,8 +20,8 @@ params:
             {{ standings_menu(tournament.tid, tournament.year, event_years) }}
         </div>
         <section id="standings-main-section" class="section column">
-            {% from "helper.macro.html" import locked %}
-            {{ locked() }}
+            {% from "helper.macro.html" import standings_not_found %}
+            {{ standings_not_found() }}
         </section>
     </div>
 {% endblock %}
