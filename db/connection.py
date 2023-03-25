@@ -9,7 +9,6 @@ class Conn:
     def __init__(self, pgconn: connection, conn_pool: SimpleConnectionPool = None) -> None:
         self.pgconn = pgconn
         self.conn_pool = conn_pool
-        self.new_cursor()
 
     def new_cursor(self, use_dict=True) -> None:
         if use_dict:
@@ -51,6 +50,7 @@ class Conn:
             self.cur.close()
         
     def __enter__(self) -> Any:
+        self.new_cursor()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:

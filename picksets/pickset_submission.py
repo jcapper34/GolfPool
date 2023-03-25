@@ -97,7 +97,7 @@ def db_inserts(name, email, pin, picks, year=CURRENT_YEAR) -> int:
         INSERT INTO pickset (participant_id, season_year) VALUES (%s,%s)
         RETURNING id
     """
-    pid = None
+    psid = None
     with db_pool.get_conn() as conn:
         """ Insert participant if doesn't exist """
         results = conn.exec_fetch(INSERT_PARTICIPANT_QUERY, (name, email, pin))
@@ -105,17 +105,17 @@ def db_inserts(name, email, pin, picks, year=CURRENT_YEAR) -> int:
 
         """ Insert pickset """
         results = conn.exec_fetch(INSERT_PICKSET_QUERY, (partid, year))
-        pid = results[0][0]
+        psid = results[0][0]
 
         """ Insert picks """
-        db_insert_picks(pid, picks, conn=conn)
+        db_insert_picks(psid, picks, conn=conn)
 
         conn.commit()   # Make sure to commit changes
 
-    return pid
+    return psid
 
 
-def db_insert_picks(pid, picks, conn) -> None:
+def db_insert_picks(psid, picks, conn) -> None:
     '''
     The connection should already be wrapped using a "with" statement before this function is called
     '''
@@ -130,7 +130,7 @@ def db_insert_picks(pid, picks, conn) -> None:
 
         # Add to picks insert query
         s = conn.cur.mogrify(
-            " (%s, %s),", (picked_player.id, pid)).decode("utf-8")
+            " (%s, %s),", (picked_player.id, psid)).decode("utf-8")
         query = ''.join((query, s))
 
     conn.exec(query[:-1])  # DB picks insert
