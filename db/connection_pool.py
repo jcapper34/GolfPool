@@ -1,4 +1,4 @@
-import os
+from config import *
 from psycopg2.pool import SimpleConnectionPool
 from urllib.parse import parse_qs, urlparse
 from db.connection import Conn
@@ -14,12 +14,12 @@ class ConnectionPool:
         self.min_conn = min_conn
         self.max_conn = max_conn
         
-        self.username = os.getenv("DB_USER")
-        self.password = os.getenv("DB_PASSWORD")
-        self.database = os.getenv("DB_NAME")
-        self.hostname = os.getenv("DB_HOSTNAME")
-        self.port = os.getenv("DB_PORT")
-        self.sslmode = os.getenv("DB_SSLMODE")
+        self.username = DB_USER
+        self.password = DB_PASSWORD
+        self.database = DB_NAME
+        self.hostname = DB_HOSTNAME
+        self.port = DB_PORT
+        self.sslmode = DB_SSLMODE
 
     def connect(self):
         self.connection_pool = SimpleConnectionPool(

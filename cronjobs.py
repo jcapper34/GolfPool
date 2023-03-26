@@ -8,10 +8,10 @@ import logging
 from pytz import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
-from config import EVENTS_URL, XL_DIR
+from config import EVENTS_URL, INDIVIDUAL_GOLFER_URL, XL_DIR
 from db.connection_pool import db_pool
 from helper.globalcache import GlobalCache
-from helper.helpers import CURRENT_YEAR
+from helper.helpers import CURRENT_YEAR, request_json
 from picksets.pickset_getters import get_all_picks
 from tournament.tournament_calculations import calculate_standings
 from tournament.tournament_retriever import get_api_tournament
@@ -23,7 +23,7 @@ def start_jobs() -> None:
     """
     scheduler = BackgroundScheduler(timezone=timezone("US/Pacific"))
 
-    job_funcs = [update_last_major, xl_cleanup]
+    job_funcs = [update_last_major, xl_cleanup, backfill_photos]
     for job_func in job_funcs:
         # Call job async
         Thread(target=job_func, args=[]).start()
@@ -142,3 +142,23 @@ def xl_cleanup() -> None:
             if os.path.isdir(filepath):
                 if os.path.getmtime(filepath) + expiration_delta.total_seconds() < dt.timestamp():
                     shutil.rmtree(filepath, ignore_errors=False, onerror=None)
+
+
+def backfill_photos():
+    with db_pool.get_conn() as conn:
+        players = conn.exec_fetch("SELECT * FROM player WHERE photo_url is NULL")
+
+        # Batch if necessary
+        batch_size = 20
+        if len(players) >= batch_size:
+            players = players[:batch_size]
+
+        for player in players:
+            player_json = request_json(INDIVIDUAL_GOLFER_URL % player['id'])
+            photo_url = player_json.get("bioImageUrl")
+            if photo_url is not None:
+                conn.exec("UPDATE player SET photo_url = %s WHERE id = %s", (photo_url, player['id']))
+                logging.info("Update photo for %s", player['name'])
+        
+        conn.commit()
+        logging.info("Commited player photos to database")
