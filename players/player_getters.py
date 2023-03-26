@@ -28,7 +28,7 @@ def get_levels_db(year, separate=True) -> List:
 # Parameters: pid, year
 # Returns: pos, score, points, tid, thru, photo_url
 GET_TOURNAMENT_DATA_QUERY = """
-SELECT position AS pos, score AS total, points, tournament_id AS tid, 18 AS thru, p.photo_url FROM event_leaderboard_xref AS elx
+SELECT position AS pos, score AS total, points, tournament_id AS tid, 18 AS thru, p.photo_url, p.tour_id FROM event_leaderboard_xref AS elx
     JOIN player p on elx.player_id = p.id
     WHERE p.id = %s AND elx.season_year=%s
 """

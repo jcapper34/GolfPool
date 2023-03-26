@@ -8,7 +8,7 @@ from flask import Blueprint, get_template_attribute, jsonify, redirect, render_t
 from config import LIVE_TOURNAMENT_OVERRIDE_ID, LIVE_TOURNAMENT_OVERRIDE_YEAR, PICKS_LOCKED, XL_DIR, TOURNAMENT_NAME_MAP, UNLOCK_ALL_PAGES
 
 from helper.globalcache import GlobalCache
-from helper.helpers import func_find, CURRENT_YEAR
+from helper.helpers import func_find, CURRENT_YEAR, resolve_photo
 from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks, get_picks, get_tournament_history
 from players.player import Player
@@ -176,13 +176,14 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
         tournament_results = get_tournament_player_db(
             pid, year)
         player.season_history = tournament_results
-        player.photo_url = tournament_results[0]['photo_url']
+        player.photo_url = resolve_photo(tournament_results[0]['photo_url'], tournament_results[0]['tour_id'])
         if tid != "cumulative":
             current_results = func_find(tournament_results, lambda t: t['tid'] == tid)
             if current_results is None:
                 return "Invalid tournament id was specified" # TODO: Return error
             current_results = dict(current_results)
             del current_results['tid']
+            del current_results['tour_id']
             player.merge_attributes(current_results)
 
     player_modal = get_template_attribute("modal.macro.html", "player_modal")
