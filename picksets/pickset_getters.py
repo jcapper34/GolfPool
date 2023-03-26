@@ -1,6 +1,6 @@
 from typing import List
 
-from helper.helpers import CURRENT_YEAR
+from helper.helpers import CURRENT_YEAR, resolve_photo
 from picksets.pickset import Pickset
 from players.player import Player
 
@@ -93,7 +93,7 @@ def get_picks(psid=None, separate=True) -> List:
     Returns: pid, pl.name, level, psname, pa.email, pa.pin
     """
     GET_PICKS_QUERY = """
-        SELECT pl.id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.photo_url, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, pa.email, pa.pin FROM picks_xref AS px
+        SELECT pl.id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.photo_url, pl.tour_id, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, pa.email, pa.pin FROM picks_xref AS px
             JOIN player pl
             ON px.player_id = pl.id
             JOIN pickset ps
@@ -109,7 +109,8 @@ def get_picks(psid=None, separate=True) -> List:
         results = conn.exec_fetch(GET_PICKS_QUERY, (psid,))
 
         picks = [Player(row['pid'], name=row['name'], level=row['level'],
-                        photo_url=row['photo_url']) for row in results]
+                photo_url=resolve_photo(row['photo_url'], row['tour_id']))
+                    for row in results]
     
     if not separate:
         return picks

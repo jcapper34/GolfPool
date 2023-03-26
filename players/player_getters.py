@@ -1,6 +1,6 @@
 from typing import Dict, Tuple, List
 from db.connection_pool import db_pool
-from helper.helpers import CURRENT_YEAR
+from helper.helpers import CURRENT_YEAR, resolve_photo
 from picksets.pickset import Pickset
 from players.player import Player
 from players.players_helper import level_separate
@@ -9,7 +9,7 @@ from players.players_helper import level_separate
 # Parameters: year
 # Returns: lx.player_id, pl.name, lx.level, pl.photo_url
 GET_LEVELS_QUERY = """
-                SELECT lx.player_id AS player_id, pl.name, lx.level, pl.photo_url FROM level_xref AS lx
+                SELECT lx.player_id AS player_id, pl.name, lx.level, pl.photo_url, pl.tour_id FROM level_xref AS lx
                     JOIN player AS pl ON pl.id = lx.player_id
                 WHERE lx.season_year = %s
             """
@@ -17,7 +17,7 @@ def get_levels_db(year, separate=True) -> List:
     players = None
     with db_pool.get_conn() as conn:
         results = conn.exec_fetch(GET_LEVELS_QUERY, (year,))
-        players = [Player(id=row['player_id'], name=row['name'], level=row['level'], photo_url=row['photo_url']) for row in results]
+        players = [Player(id=row['player_id'], name=row['name'], level=row['level'], photo_url=resolve_photo(row['photo_url'], row['tour_id'])) for row in results]
 
     if separate:
         return level_separate(players)
@@ -63,6 +63,7 @@ def who_picked_player(pid, year=CURRENT_YEAR) -> List[Pickset]:
 
 def get_player_photo(pid) -> str:
     with db_pool.get_conn() as conn:
-        photo = conn.exec_fetch(
-            "SELECT photo_url FROM player WHERE id=%s", (pid,), fetchall=False)[0]
-        return photo
+        result = conn.exec_fetch(
+            "SELECT photo_url, tour_id FROM player WHERE id=%s", (pid,), fetchall=False)
+        
+        return resolve_photo(result['photo_url'], result['tour_id'])

@@ -33,7 +33,7 @@ class ConnectionPool:
             sslmode = self.sslmode
         )
 
-        print("Connecting to db username=%s password=%s database=%s host=%s port=%s sslmode=%s" % 
+        print("Connected to db username=%s password=%s database=%s host=%s port=%s sslmode=%s" % 
             (self.username, self.password, self.database, self.hostname, self.port, self.sslmode))
     
     def get_conn(self) -> Conn:

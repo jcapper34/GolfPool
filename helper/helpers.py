@@ -6,6 +6,8 @@ from typing import Any, Dict
 
 import requests
 
+from config import TOUR_PHOTO_URL
+
 """ FUNCTIONS """
 def splash(obj) -> None:
     if isinstance(obj, list):
@@ -57,6 +59,16 @@ def obj_to_json(obj) -> str:
         a[0].startswith('__') and a[0].endswith('__'))}
     return json.dumps(properties)
 
- 
+
+def resolve_photo(channel_photo, tour_id):
+    """
+    If tour_id is not null, then use the tour photo. Otherwise use channel photo
+    """
+    if tour_id is None:
+        return channel_photo
+    
+    return TOUR_PHOTO_URL % tour_id
+
+
 """ CONSTANTS """
 CURRENT_YEAR = int(datetime.now().year)
