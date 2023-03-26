@@ -77,7 +77,7 @@ def get_pickset(psid) -> Pickset:
     Returns: 
     """
     GET_PICKSET_QUERY = """
-        SELECT pa.name, pa.email, pa.pin FROM participant as pa
+        SELECT pa.name, pa.email, ps.pin FROM participant as pa
             JOIN pickset ps
             ON ps.participant_id = pa.id
             WHERE ps.id = %s
@@ -90,10 +90,10 @@ def get_pickset(psid) -> Pickset:
 def get_picks(psid=None, separate=True) -> List:
     """
     Parameters: ps.id
-    Returns: pid, pl.name, level, psname, pa.email, pa.pin
+    Returns: pid, pl.name, level, psname, pa.email, ps.pin
     """
     GET_PICKS_QUERY = """
-        SELECT pl.id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.photo_url, pl.tour_id, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, pa.email, pa.pin FROM picks_xref AS px
+        SELECT pl.id AS pid, pl.name, COALESCE(lx.level, 4) AS level, pl.photo_url, pl.tour_id, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, pa.email, ps.pin FROM picks_xref AS px
             JOIN player pl
             ON px.player_id = pl.id
             JOIN pickset ps
@@ -143,7 +143,7 @@ def get_login(email, pin) -> int:
     GET_LOGIN_QUERY = """
         SELECT ps.id FROM participant AS pa
             JOIN pickset ps on pa.id = ps.participant_id
-            WHERE pa.email = %s AND pa.pin = %s AND ps.season_year = %s
+            WHERE pa.email = %s AND ps.pin = %s AND ps.season_year = %s
             LIMIT 1
     """
     with db_pool.get_conn() as conn:

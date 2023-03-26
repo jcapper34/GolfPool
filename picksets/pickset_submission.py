@@ -81,30 +81,30 @@ def validate_picks(picks, year=CURRENT_YEAR) -> bool:
 
 def db_inserts(name, email, pin, picks, year=CURRENT_YEAR) -> int:
     """ 
-    Parameters: name, email, pin
+    Parameters: name, email
     Returns: participant.id
     """
     INSERT_PARTICIPANT_QUERY = """
-        INSERT INTO participant (name, email, pin) VALUES (%s,%s,%s)
-        ON CONFLICT(name, email) DO UPDATE SET name=EXCLUDED.name, pin=EXCLUDED.pin
+        INSERT INTO participant (name, email) VALUES (%s,%s)
+        ON CONFLICT(name, email) DO UPDATE SET name=EXCLUDED.name
         RETURNING id
     """
     """
-    Parameters: participant_id, season_year
+    Parameters: participant_id, season_year, pin
     Returns: pickset.id
     """
     INSERT_PICKSET_QUERY = """
-        INSERT INTO pickset (participant_id, season_year) VALUES (%s,%s)
+        INSERT INTO pickset (participant_id, season_year, pin) VALUES (%s,%s,%s)
         RETURNING id
     """
     psid = None
     with db_pool.get_conn() as conn:
         """ Insert participant if doesn't exist """
-        results = conn.exec_fetch(INSERT_PARTICIPANT_QUERY, (name, email, pin))
+        results = conn.exec_fetch(INSERT_PARTICIPANT_QUERY, (name, email))
         partid = results[0][0]
 
         """ Insert pickset """
-        results = conn.exec_fetch(INSERT_PICKSET_QUERY, (partid, year))
+        results = conn.exec_fetch(INSERT_PICKSET_QUERY, (partid, year, pin))
         psid = results[0][0]
 
         """ Insert picks """

@@ -31,7 +31,7 @@ function submit_login() {
             window.alert("Unable to connect to server. Please try again later");
             button.removeClass('is-loading');
         }
-    })
+    });
 }
 
 function check_enter(event) {

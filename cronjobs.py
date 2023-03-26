@@ -155,16 +155,18 @@ def backfill_photos():
         if len(players) >= batch_size:
             players = players[:batch_size]
 
+        num_updates = 0
         for player in players:
             player_json = request_json(INDIVIDUAL_GOLFER_URL % player['id'])
             photo_url = player_json.get("bioImageUrl")
             if photo_url is not None:
                 conn.exec("UPDATE player SET photo_url = %s WHERE id = %s", (photo_url, player['id']))
                 logging.info("[backfill_photos] Update photo for %s", player['name'])
+                num_updates += 1
         
         if players:
             conn.commit()
-            logging.info("[backfill_photos] Committed %d player photos to database" % len(players))
+            logging.info("[backfill_photos] Committed %d player photos to database" % num_updates)
         
         logging.info("[backfill_photos] Finished job")
 
