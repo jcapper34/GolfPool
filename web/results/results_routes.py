@@ -5,7 +5,7 @@ import os
 import uuid
 
 from flask import Blueprint, get_template_attribute, jsonify, redirect, render_template, request, session, url_for
-from config import LIVE_TOURNAMENT_OVERRIDE_ID, LIVE_TOURNAMENT_OVERRIDE_YEAR, XL_DIR, TOURNAMENT_NAME_MAP
+from config import LIVE_TOURNAMENT_OVERRIDE_ID, LIVE_TOURNAMENT_OVERRIDE_YEAR, PICKS_LOCKED, XL_DIR, TOURNAMENT_NAME_MAP, UNLOCK_ALL_PAGES
 
 from helper.globalcache import GlobalCache
 from helper.helpers import func_find, CURRENT_YEAR
@@ -32,6 +32,13 @@ def results_home():
     
 @mod.route("/live")
 def results_live():
+    # Block if picks are not locked yet
+    if not PICKS_LOCKED and not UNLOCK_ALL_PAGES:
+        if request.args.get('main_section_only') is None:
+            return render_template("standings-not-found.html", past_events=get_past_events()), HTTPStatus.NOT_FOUND
+        else:
+            return "<p class='has-text-centered'>No results to show</p>"  
+    
     # Override live tournament if applicable
     # Otherwise try to get tournament metadata from cache
     if LIVE_TOURNAMENT_OVERRIDE_ID is not None and LIVE_TOURNAMENT_OVERRIDE_YEAR is not None:
@@ -45,6 +52,7 @@ def results_live():
 
     tournament = get_api_tournament(channel_tid=channel_tid, year=year)
     tournament.picksets = calculate_standings(tournament.players, get_all_picks(year))
+    tournament.year = year
 
     if request.args.get("refresh") is not None:    # If refresh
         standings_macro = get_template_attribute(
@@ -85,7 +93,7 @@ def results_past(year, tid=None):
     # If tournament not found in DB
     if tournament.players is None:
         if request.args.get('main_section_only') is None:
-            return render_template("standings-not-found.html", tournament=tournament, past_events=past_events)
+            return render_template("standings-not-found.html", past_events=past_events), HTTPStatus.NOT_FOUND
         else:
             return "<p class='has-text-centered'>No results to show</p>"
 

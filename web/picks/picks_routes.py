@@ -1,5 +1,6 @@
 # Library imports
 from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for, get_template_attribute
+from http import HTTPStatus
 from config import GOLFERS_URL, OWGR_STAT_ID, PICKS_LOCKED, STATS_URL, UNLOCK_ALL_PAGES
 
 # My function imports
@@ -31,7 +32,8 @@ def picks_index():
 def picks_make():
     # Make sure you don't allow picks to be made if picks are locked
     if not UNLOCK_ALL_PAGES and PICKS_LOCKED:
-        return render_template('locked-page.html', title="Make Picks")
+        return render_template('locked-page.html', title="Make Picks"), HTTPStatus.FORBIDDEN
+    
     return render_template("make/make-picks.html", level_players=get_levels_db(CURRENT_YEAR), OWGR_URL=STATS_URL % (OWGR_STAT_ID, CURRENT_YEAR), API_PLAYERS_URL=GOLFERS_URL, year=CURRENT_YEAR)
 
 
@@ -91,7 +93,7 @@ def picks_confirmation():
 def picks_change():
     # Make sure you don't allow pick changes if picks are locked
     if not UNLOCK_ALL_PAGES and PICKS_LOCKED:
-        return render_template('locked-page.html', title="Change Picks")
+        return render_template('locked-page.html', title="Change Picks"), HTTPStatus.FORBIDDEN
 
     psid = session.get('psid')
     if psid is None:  # If not logged in
@@ -115,7 +117,7 @@ def picks_change():
 def picks_change_login():
     # Make sure you don't allow changes if picks are locked
     if not UNLOCK_ALL_PAGES and PICKS_LOCKED:
-        return render_template('locked-page.html', title="Change Picks")
+        return render_template('locked-page.html', title="Change Picks"), HTTPStatus.FORBIDDEN
     email = request.form.get('email').lower()
     pin = request.form.get('pin')
     psid = get_login(email, pin)
