@@ -15,3 +15,9 @@ venv/
 
 # Generated Files
 **/static/generated/
+
+# Database backups
+db/backups/
+
+# Dev files
+dev/
