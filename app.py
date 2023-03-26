@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+from http import HTTPStatus
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 from requests import get as http_get
 import logging
@@ -38,7 +39,7 @@ app.register_blueprint(api_mod, url_prefix='/api')
 register_filters(app)
 
 # ========================
-# Start Database Jobs
+# Start Cron Jobs
 # ========================
 start_jobs()
 
@@ -82,15 +83,15 @@ def api_retriever():
 # ========================
 # Error Pages
 # ========================
-@app.errorhandler(404)
+@app.errorhandler(HTTPStatus.NOT_FOUND)
 def page_not_found(e):
     # note that we set the 404 status explicitly
-    return render_template('404.html'), 404
+    return render_template('404.html'), HTTPStatus.NOT_FOUND
 
-@app.errorhandler(500)
+@app.errorhandler(HTTPStatus.INTERNAL_SERVER_ERROR)
 def page_not_found(e):
     # note that we set the 500 status explicitly
-    return render_template('500.html'), 500
+    return render_template('500.html'), HTTPStatus.INTERNAL_SERVER_ERROR
 
 # ========================
 # Jinja Globals

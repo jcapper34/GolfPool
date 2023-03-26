@@ -1,6 +1,18 @@
 import os
 
 # =======================
+# Helpers
+# =======================
+def parse_bool(val):
+    if isinstance(val, bool):
+        return val
+
+    try:
+        return bool(eval(val))
+    except Exception:
+        return None
+
+# =======================
 # Database Credentials
 # =======================
 DATABASE_CONNECTION_STRING = os.getenv("DB_CONNECTION_STRING")
@@ -83,5 +95,18 @@ ROUTING_ALIASES = (
     ("/standings/<int:year>/<tid>", "results.results_past")
 )
 
-SRC_LOCAL = bool(eval(os.getenv("SRC_LOCAL", "True")))
-PICKS_LOCKED = bool(eval(os.getenv("PICKS_LOCKED", "True")))
+SRC_LOCAL = parse_bool(os.getenv("SRC_LOCAL", True))
+PICKS_LOCKED = parse_bool(os.getenv("PICKS_LOCKED", True))
+UNLOCK_ALL_PAGES = parse_bool(os.getenv("UNLOCK_ALL_PAGES", False))
+
+# Database credentials
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_NAME = os.getenv("DB_NAME")
+DB_HOSTNAME = os.getenv("DB_HOSTNAME")
+DB_PORT = os.getenv("DB_PORT")
+DB_SSLMODE = os.getenv("DB_SSLMODE")
+
+# If you want to override which tournament is used for live
+LIVE_TOURNAMENT_OVERRIDE_ID = os.getenv("LIVE_TOURNAMENT_OVERRIDE_ID")
+LIVE_TOURNAMENT_OVERRIDE_YEAR = os.getenv("LIVE_TOURNAMENT_OVERRIDE_YEAR")

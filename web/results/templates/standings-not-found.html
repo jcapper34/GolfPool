@@ -17,11 +17,20 @@ params:
     <div id="main-columns" class="columns">
         <div class="column is-2">
             {% from 'standings.macro.html' import standings_menu %}
-            {{ standings_menu(tournament.tid, tournament.year, event_years) }}
+            {{ standings_menu(tournament.tid, tournament.year, past_events) }}
         </div>
         <section id="standings-main-section" class="section column">
             {% from "helper.macro.html" import standings_not_found %}
             {{ standings_not_found() }}
         </section>
     </div>
+{% endblock %}
+
+{% block add_below %}
+<script>
+const channelTid = null;
+</script>
+<script src="/results/static/js/standings.js?v=1.1"></script>
+<script src="/results/static/js/standings-modal.js?v=1.1"></script>
+<script src="/results/static/js/standings-live.js?v=1.1"></script>
 {% endblock %}

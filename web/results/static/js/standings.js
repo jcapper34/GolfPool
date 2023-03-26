@@ -40,6 +40,7 @@ function switch_tournament(a_element) {
         // Re-attach handlers
         attach_prompt_modal();
         attach_filter_checkbox();
+        putTimeStamp();
     });
 }
 

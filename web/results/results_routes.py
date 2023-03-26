@@ -1,11 +1,13 @@
 from dataclasses import asdict
+from http import HTTPStatus
 import math
 import os
 import uuid
 
 from flask import Blueprint, get_template_attribute, jsonify, redirect, render_template, request, session, url_for
-from config import PICKS_LOCKED, XL_DIR, TOURNAMENT_NAME_MAP
+from config import LIVE_TOURNAMENT_OVERRIDE_ID, LIVE_TOURNAMENT_OVERRIDE_YEAR, XL_DIR, TOURNAMENT_NAME_MAP
 
+from helper.globalcache import GlobalCache
 from helper.helpers import func_find, CURRENT_YEAR
 from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks, get_picks, get_tournament_history
@@ -30,8 +32,18 @@ def results_home():
     
 @mod.route("/live")
 def results_live():
-    year = CURRENT_YEAR if PICKS_LOCKED else CURRENT_YEAR - 1    
-    tournament = get_api_tournament()
+    # Override live tournament if applicable
+    # Otherwise try to get tournament metadata from cache
+    if LIVE_TOURNAMENT_OVERRIDE_ID is not None and LIVE_TOURNAMENT_OVERRIDE_YEAR is not None:
+        channel_tid = LIVE_TOURNAMENT_OVERRIDE_ID
+        year = LIVE_TOURNAMENT_OVERRIDE_YEAR
+    elif GlobalCache.live_tournament is not None:
+        channel_tid = GlobalCache.live_tournament.tid
+        year = GlobalCache.live_tournament.year
+    else:
+        raise RuntimeError
+
+    tournament = get_api_tournament(channel_tid=channel_tid, year=year)
     tournament.picksets = calculate_standings(tournament.players, get_all_picks(year))
 
     if request.args.get("refresh") is not None:    # If refresh
@@ -60,8 +72,10 @@ def results_past(year, tid=None):
     if tid is None or tid.lower() == 'cumulative':
         tournament_name = "Cumulative"
         tid = "cumulative"
-    else:
+    elif tid in TOURNAMENT_NAME_MAP:
         tournament_name = TOURNAMENT_NAME_MAP[tid]
+    else:
+        return "Tournament not found", HTTPStatus.BAD_REQUEST
     
     tournament = Tournament(name=tournament_name, year=year, tid=tid)
     tournament.players = get_db_rankings(tid, year)
@@ -105,7 +119,7 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
 
     tournament = None
     if tid is None:
-        tournament = get_api_tournament()
+        tournament = get_api_tournament(channel_tid)
         pickset.merge_tournament(tournament)
 
     else:

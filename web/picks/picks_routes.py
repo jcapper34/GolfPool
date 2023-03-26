@@ -1,6 +1,6 @@
 # Library imports
 from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for, get_template_attribute
-from config import GOLFERS_URL, OWGR_STAT_ID, PICKS_LOCKED, STATS_URL
+from config import GOLFERS_URL, OWGR_STAT_ID, PICKS_LOCKED, STATS_URL, UNLOCK_ALL_PAGES
 
 # My function imports
 from db.connection import Conn
@@ -9,7 +9,7 @@ from mailer.postman import Postman
 from picksets.pickset_submission import submit_change_picks, submit_picks
 from picksets.pickset_getters import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks, get_pickset
 from players.player_getters import get_levels_db
-from tournament.tournament_retriever import get_db_rankings
+from tournament.tournament_retriever import get_db_rankings, get_past_events
 
 mod = Blueprint("picks", __name__, template_folder='templates',
                       static_folder='static')   # Register Blueprint
@@ -30,7 +30,7 @@ def picks_index():
 @mod.route("/make")
 def picks_make():
     # Make sure you don't allow picks to be made if picks are locked
-    if PICKS_LOCKED:
+    if not UNLOCK_ALL_PAGES and PICKS_LOCKED:
         return render_template('locked-page.html', title="Make Picks")
     return render_template("make/make-picks.html", level_players=get_levels_db(CURRENT_YEAR), OWGR_URL=STATS_URL % (OWGR_STAT_ID, CURRENT_YEAR), API_PLAYERS_URL=GOLFERS_URL, year=CURRENT_YEAR)
 
@@ -38,7 +38,7 @@ def picks_make():
 @mod.route("/season-history")
 def picks_get_season_history():
     season_history = []
-    for year in range(2015, CURRENT_YEAR):
+    for year in get_past_events():
         players = get_db_rankings(tid='cumulative', year=year)
         season_history.append(
             (year, {pl.id: pl.pos for pl in players}))
@@ -90,7 +90,7 @@ def picks_confirmation():
 @mod.route("/change")
 def picks_change():
     # Make sure you don't allow pick changes if picks are locked
-    if PICKS_LOCKED:
+    if not UNLOCK_ALL_PAGES and PICKS_LOCKED:
         return render_template('locked-page.html', title="Change Picks")
 
     psid = session.get('psid')
@@ -114,7 +114,7 @@ def picks_change():
 @mod.route("/change/submit-login", methods=['POST'])
 def picks_change_login():
     # Make sure you don't allow changes if picks are locked
-    if PICKS_LOCKED:
+    if not UNLOCK_ALL_PAGES and PICKS_LOCKED:
         return render_template('locked-page.html', title="Change Picks")
     email = request.form.get('email').lower()
     pin = request.form.get('pin')
@@ -186,16 +186,19 @@ def picks_submit_changes():
 @mod.route("/poolwide/<int:year>")
 def picks_poolwide(year=CURRENT_YEAR):
     # Make sure you don't show current year picks if picks aren't locked
-    if not PICKS_LOCKED and year == CURRENT_YEAR:
-        year = CURRENT_YEAR - 1
+    if not UNLOCK_ALL_PAGES:
+        if not PICKS_LOCKED and year == CURRENT_YEAR:
+            year = CURRENT_YEAR - 1
+    
     return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))
 
 # Most picked macro
 @mod.route("/most-picked/<int:year>")
 def picks_most(year=CURRENT_YEAR):
     # Make sure you don't show current year picks if picks aren't locked
-    if not PICKS_LOCKED and year == CURRENT_YEAR:
-        year = CURRENT_YEAR - 1
+    if not UNLOCK_ALL_PAGES:
+        if not PICKS_LOCKED and year == CURRENT_YEAR:
+            year = CURRENT_YEAR - 1
     most_picked_macro = get_template_attribute(
         "poolwide/poolwide-picks.macro.html", "most_picked_tab")
     return most_picked_macro(get_most_picked(year))

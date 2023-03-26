@@ -53,14 +53,17 @@ def resolve_major(title) -> str:
     return tid
 
 
-def update_last_major() -> None:
+def update_last_major(year=CURRENT_YEAR) -> None:
     """
     _summary_
     """
 
     dt = datetime.now()
-    events = requests.get(EVENTS_URL % CURRENT_YEAR).json()
+    events = requests.get(EVENTS_URL % year).json()
+    logging.info("Found %d events from API in year %d" % (len(events), year))
 
+    # Walk through events backwards to find majors
+    major_channel_tids = []
     for event in reversed(events):
         if event.get("major"):
             channel_tid = event.get("key")
@@ -68,12 +71,14 @@ def update_last_major() -> None:
             eventStart = isoparse(event.get("startDate"))
             eventEnd = isoparse(event.get("endDate"))
 
+            major_channel_tids.append(channel_tid)
+
             if event.get("winnerKey"):
                 with db_pool.get_conn() as conn:
                     inDb = conn.exec_fetch(
-                        "SELECT EXISTS (SELECT 1 FROM event_leaderboard_xref WHERE tournament_id=%s AND season_year=%s)", (tid, eventEnd.year), fetchall=False)[0]
+                        "SELECT EXISTS (SELECT FROM event_leaderboard_xref WHERE tournament_id=%s AND season_year=%s)", (tid, eventEnd.year), fetchall=False)[0]
                     if not inDb:
-                        print(event.get("name"), "is being uploaded to DB")
+                        logging.info(event.get("name"), "is being uploaded to DB")
                         tournament = get_api_tournament(channel_tid)
 
                         # Insert season
@@ -82,7 +87,7 @@ def update_last_major() -> None:
 
                         # Insert Event
                         conn.exec('INSERT INTO event (tournament_id, season_year) VALUES (%s, %s) ON CONFLICT DO NOTHING',
-                                (tid, CURRENT_YEAR))  # Insert event
+                                (tid, year))  # Insert event
 
                         # Insert the leaderboard entries
                         leaderboard_insert_query = "INSERT INTO event_leaderboard_xref (tournament_id, season_year, position, score, points, player_id) VALUES "
@@ -96,11 +101,11 @@ def update_last_major() -> None:
                         conn.exec(leaderboard_insert_query[:-1])
 
                         # Insert standings entries
-                        picksets = calculate_standings(tournament.players, get_all_picks(CURRENT_YEAR))
+                        picksets = calculate_standings(tournament.players, get_all_picks(year))
                         standings_insert_query = "INSERT INTO event_standings_xref (tournament_id, season_year, pickset_id, position, points) VALUES "
 
                         standings_insert_query += ','.join((conn.cur.mogrify(" (%s,%s,%s,%s,%s)",
-                                                    (tid, CURRENT_YEAR, pickset.id, pickset.pos, pickset.points)).decode()
+                                                    (tid, year, pickset.id, pickset.pos, pickset.points)).decode()
                                                 for pickset in picksets))
 
                         
@@ -111,11 +116,16 @@ def update_last_major() -> None:
                     else:
                         logging.info("%s is already in DB", event.get("name"))
 
+            # Set the tournament_id of the current major
             if dt > eventStart:
-                GlobalCache.current_tid = channel_tid
-                break
+                GlobalCache.set_live_tournament(channel_tid, year)
+        
+    # Default current_tid to be the first major of the year
+    if GlobalCache.live_tournament is None:
+        GlobalCache.set_live_tournament(major_channel_tids.pop(), year)
 
     logging.info("Cron Job Finished")
+    logging.info("Current tid set to %s" % GlobalCache.live_tournament.tid)
 
 
 def xl_cleanup() -> None:
