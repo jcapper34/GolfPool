@@ -65,7 +65,7 @@ function revert_picks() {
     /* Revert main levels */
     $(".player-checkbox").each(function() {
         let checkbox = $(this);
-        const pid = parseInt(checkbox.val().split("*")[1]);
+        const pid = checkbox.val().split("*")[1];
         checkbox.prop('checked', initialMainLevels.includes(pid));  //Will check if included in picks
 
         // Manually need to call effects
