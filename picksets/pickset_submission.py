@@ -4,6 +4,7 @@ from picksets.pickset import Pickset
 from players.player import Player
 from mailer.postman import Postman
 from db.connection_pool import db_pool
+from players.player_getters import get_level_limits
 
 
 def submit_picks(name, email, pin, form_picks, send_email=True, year=CURRENT_YEAR) -> bool:
@@ -57,12 +58,13 @@ def extract_form_picks(form_picks) -> List:
 
 
 def validate_picks(picks, year=CURRENT_YEAR) -> bool:
-    if len(picks) != len(Pickset.PICKS_ALLOWED):  # Check for correct number of levels
+    level_limits = get_level_limits(year)
+    if len(picks) != len(level_limits):  # Check for correct number of levels
         return False
 
     for i in range(len(picks)):
         level_players = picks[i]
-        if len(level_players) != Pickset.PICKS_ALLOWED[i]:
+        if len(level_players) != level_limits[i]:
             return False
 
     """ Ensure that level 4 players are not in levels 1-3 """

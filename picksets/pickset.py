@@ -22,9 +22,6 @@ class Pickset:
     pos: int = None
     tournament_history: List = None
 
-    """ CONSTANTS """
-    PICKS_ALLOWED: ClassVar[List[int]] = [3, 3, 2, 2]
-
     def get_pids(self) -> List:
         return [p.id for level_players in self.picks for p in level_players]
 

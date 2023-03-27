@@ -22,10 +22,8 @@ Params:
             {# General Information Section #}
             {{ mp_macs.general_section() }}
 
-            {# Levels 1-3 Section #}
-            {% set num_picks = [3,3,2] %}
-            {% for n in num_picks %}
-                {{ mp_macs.main_level_field(loop.index, n, level_players[loop.index0]) }}
+            {% for players_in_level in level_players %}
+                {{ mp_macs.main_level_field(loop.index, level_limits[loop.index0], players_in_level) }}
             {% endfor %}
 
             {# Levels 4 Section #}

@@ -24,6 +24,14 @@ def get_levels_db(year, separate=True) -> List:
 
     return players
 
+# Parameters: year
+# Returns: pick_limit
+GET_LEVEL_LIMITS_QUERY = """
+    SELECT pick_limit FROM level_limit_xref WHERE season_year = %s
+"""
+def get_level_limits(year):
+    with db_pool.get_conn() as conn:
+        return [r[0] for r in conn.exec_fetch(GET_LEVEL_LIMITS_QUERY, (year,))]
 
 # Parameters: pid, year
 # Returns: pos, score, points, tid, thru, photo_url

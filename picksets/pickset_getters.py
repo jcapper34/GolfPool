@@ -84,6 +84,9 @@ def get_pickset(psid) -> Pickset:
     """
     with db_pool.get_conn() as conn:
         results = conn.exec_fetch(GET_PICKSET_QUERY, (psid,), fetchall=False)
+        if not results or results is None:
+            return None
+        
         return Pickset(id=psid, name=results['name'], email=results['email'], pin=results['pin'])
     
 
