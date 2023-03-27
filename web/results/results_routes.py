@@ -77,7 +77,7 @@ def results_live():
 @mod.route("/<int:year>/<tid>")
 def results_past(year, tid=None):
     # Get Database Rankings
-    if tid is None or tid.lower() == 'cumulative':
+    if tid is None or tid.casefold() == 'cumulative':
         tournament_name = "Cumulative"
         tid = "cumulative"
     elif tid in TOURNAMENT_NAME_MAP:

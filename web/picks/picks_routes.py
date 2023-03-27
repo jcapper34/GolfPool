@@ -58,7 +58,7 @@ def picks_submit():
     # Extract Form
     # Ensure name is capitalized
     name = request.form.get("name").strip().title()
-    email = request.form.get("email").lower()
+    email = request.form.get("email").casefold()
     pin = request.form.get("pin")
     form_picks = [request.form.getlist("level-1"),
                   request.form.getlist("level-2"),
@@ -108,7 +108,7 @@ def picks_change():
 
     # Pickset not found means it has been deleted. Thus, log out
     if pickset is None:
-        session.clear()
+        return redirect(url_for("picks.picks_change_logout"))
 
     pickset.picks = get_picks(psid)
     return render_template("change/change-picks.html",
@@ -126,7 +126,7 @@ def picks_change_login():
     # Make sure you don't allow changes if picks are locked
     if not UNLOCK_ALL_PAGES and PICKS_LOCKED:
         return render_template('locked-page.html', title="Change Picks"), HTTPStatus.FORBIDDEN
-    email = request.form.get('email').lower()
+    email = request.form.get('email').casefold()
     pin = request.form.get('pin')
     psid = get_login(email, pin)
     resp = {"success": True}
@@ -178,7 +178,7 @@ def picks_submit_changes():
     try:
         change_success = submit_change_picks(pid=f.get("psid"),
                                              name=f.get("name"),
-                                             email=f.get("email").lower(),
+                                             email=f.get("email").casefold(),
                                              pin=f.get("pin"),
                                              form_picks=[f.getlist('level-'+str(l)) for l in range(1, 5)])
 

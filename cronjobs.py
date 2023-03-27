@@ -40,7 +40,7 @@ def resolve_major(title) -> str:
     """
     Pretty sloppy way of determining the tid from the major name
     """
-    title = title.lower()
+    title = title.casefold()
     if "masters" in title:
         tid = '014'
     elif ("us" in title or 'u.s' in title) and 'open' in title:
@@ -177,7 +177,7 @@ def backfill_tour_ids():
 
     with db_pool.get_conn() as conn:
         db_players = conn.exec_fetch("SELECT * FROM player WHERE tour_id is NULL")
-        player_hash = {p['name'].lower():p['id'] for p in db_players}
+        player_hash = {p['name'].casefold():p['id'] for p in db_players}
         logging.info("[backfill_tour_ids] Fetched %d players from database" % len(db_players))
 
         # Batch if necessary
@@ -189,8 +189,8 @@ def backfill_tour_ids():
         for api_player in players_json:
             tour_id = api_player.get('pid')
             api_name = ' '.join([api_player.get('nameF'), api_player.get('nameL')])
-            if api_name.lower() in player_hash:
-                db_player_id = player_hash[api_name.lower()]
+            if api_name.casefold() in player_hash:
+                db_player_id = player_hash[api_name.casefold()]
                 conn.exec("UPDATE player SET tour_id = %s WHERE id = %s", (tour_id, db_player_id))
                 logging.info("[backfill_tour_ids] Updated tour id for %s", api_name)
                 num_updates += 1

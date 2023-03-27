@@ -43,7 +43,7 @@ def func_find(obj, func, limit=1, get_index=False) -> Any:
 
 def request_json(url) -> Dict:
     try:
-        if 'http' in url.lower():
+        if 'http' in url.casefold():
             return requests.get(url).json()
     except json.JSONDecodeError as e:
         raise

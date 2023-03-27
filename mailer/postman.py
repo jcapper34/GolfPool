@@ -22,12 +22,13 @@ class Postman:
         msg['Subject'] = self.message_subject
         msg.set_content(self.message_body)
 
-
         with smtplib.SMTP(self.MAIL_SERVER, port=self.MAIL_PORT) as smtp_server:
             smtp_server.ehlo()
             smtp_server.starttls()
             smtp_server.login(self.SENDER_EMAIL, self.SENDER_PASSWORD)
             smtp_server.send_message(msg)
+
+        print("Email sent successfully to %s" % str(self.recipients))        
 
     def make_picks_message(self, ps_name, ps_pin, picks, update=False) -> None: #Picks must be level separated
         self.message_body = "Name: %s\n" % ps_name
