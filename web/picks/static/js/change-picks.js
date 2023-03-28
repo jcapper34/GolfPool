@@ -76,7 +76,7 @@ function revert_picks() {
     $("#level-4-picks").find("tr").each(function() {
        remove_level_4($(this));
     });
-    for(let i = 0; i < 2; i++) {add_level_4(initialLevel4Names[i], initialLevel4Ids[i]);}   // Revert Level 4s
+    for(let i = 0; i < LEVEL_4_ALLOWED; i++) {add_level_4(initialLevel4Names[i], initialLevel4Ids[i]);}   // Revert Level 4s
 }
 
 $(document).ready(function() {

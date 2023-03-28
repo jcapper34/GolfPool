@@ -59,7 +59,8 @@ def extract_form_picks(form_picks) -> List:
 
 def validate_picks(picks, year=CURRENT_YEAR) -> bool:
     level_limits = get_level_limits(year)
-    if len(picks) != len(level_limits):  # Check for correct number of levels
+    num_levels = len(level_limits)
+    if len(picks) != num_levels:  # Check for correct number of levels
         return False
 
     for i in range(len(picks)):
@@ -75,7 +76,7 @@ def validate_picks(picks, year=CURRENT_YEAR) -> bool:
 
     level_pids = [x[0] for x in results]
 
-    if any([int(p.id) in level_pids for p in picks[3]]):
+    if any([int(p.id) in level_pids for p in picks[-1]]):
         return False
 
     return True

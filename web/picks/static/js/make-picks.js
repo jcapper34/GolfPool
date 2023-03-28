@@ -317,8 +317,8 @@ function add_level_4(name, pid) {
 
     let picksTable = $("#level-4-picks");
     let numPicked = picksTable.find("tr").length;
-    if(numPicked < 2 ) {
-        if(numPicked === 1)
+    if(numPicked < LEVEL_4_ALLOWED ) {
+        if(numPicked === LEVEL_4_ALLOWED - 1)
             textInput.prop('disabled', true);
         picksTable.append("<tr>" +
             "<td>" + name + "</td>" +
@@ -338,13 +338,25 @@ function remove_level_4(trElement) {
     // Update num picked text
     const numPicked = $("#level-4-picks").find("tr").length;
     $(".level-4-field").closest(".box").find(".num-picked").text(numPicked);
+}
 
+function are_duplicates(inputArray) {
+    var value_set = new Set();
+    for (let i = 0; i < inputArray.length; i++) {
+        const val = inputArray.eq(i).val();
+        if (value_set.has(val))
+        {
+            return true;
+        }
+        value_set.add(val);
+    }
 
+    return false;
 }
 
 function check_all_level_4() {
     const level4Inputs = $("input[name='level-4']");
-    if(level4Inputs.length !== 2 || level4Inputs.eq(0).val() === level4Inputs.eq(1).val())   // Check if correct number and the picks don't match
+    if(level4Inputs.length !== LEVEL_4_ALLOWED || are_duplicates(level4Inputs))   // Check if correct number and the picks don't match
         return false;
 
     let valid = true;

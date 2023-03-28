@@ -14,8 +14,6 @@ from tournament.tournament_retriever import get_db_rankings, get_past_events
 mod = Blueprint("picks", __name__, template_folder='templates',
                       static_folder='static')   # Register Blueprint
 
-HIDE_PICKS = True
-
 """ ROUTES """
 
 # Root of Picks Module

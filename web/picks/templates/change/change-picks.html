@@ -33,7 +33,7 @@ params: level_players, pickset, year, OWGR_RANKINGS
             {% endfor %}
 
             {# Levels 4 Section #}
-            {{ mp_macs.level_4_section(pickset.picks[3]) }}
+            {{ mp_macs.level_4_section(level_limits[-1], pickset.picks[3]) }}
 
             {# Submission Section #}
             <section class="section">
@@ -63,7 +63,7 @@ const initialMainLevels = {{ (pickset.picks[0]|map(attribute='id')|list + pickse
 const initialLevel4Ids = {{ pickset.picks[3]|map(attribute='id')|list|tojson }};
 const initialLevel4Names = {{ pickset.picks[3]|map(attribute='name')|list|tojson }};
 
-
+const LEVEL_4_ALLOWED = {{ level_limits[-1] }};
 const API_PLAYERS_URL = "{{ API_PLAYERS_URL }}";
 </script>
 <script src="/picks/static/js/make-picks.js?v=1.4"></script>

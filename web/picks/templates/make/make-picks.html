@@ -27,7 +27,7 @@ Params:
             {% endfor %}
 
             {# Levels 4 Section #}
-            {{ mp_macs.level_4_section() }}
+            {{ mp_macs.level_4_section(level_limits[-1]) }}
 
             {# Submission Section #}
             <section class="section">
@@ -46,6 +46,7 @@ Params:
 {# Vars for Script #}
 var OWGR_URL = '{{ OWGR_URL }}';
 var API_PLAYERS_URL = '{{ API_PLAYERS_URL }}';
+const LEVEL_4_ALLOWED = {{ level_limits[-1] }};
 </script>
 <script src="/picks/static/js/make-picks.js?v=2.1"></script>
 {% endblock %}
