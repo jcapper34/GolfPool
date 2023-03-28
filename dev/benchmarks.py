@@ -7,7 +7,6 @@ import requests
 APP_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 sys.path.insert(0, APP_ROOT)
 
-from db.conn import Conn
 from picksets.pickset_getters import get_all_picks
 from tournament.tournament_calculations import calculate_standings
 from tournament.tournament_retriever import get_api_tournament

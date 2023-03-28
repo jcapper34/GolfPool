@@ -26,7 +26,7 @@ Params:
 {% endblock %}
 
 {% block body %}
-    {{ tabs.all_picks_tab(all_picks) }}
+    {{ tabs.all_picks_tab(all_picks, level_limits) }}
 
     <section id="most-picked-section" class="section has-background-light"></section>    {# Will be ajaxed in #}
 {% endblock %}

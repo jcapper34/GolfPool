@@ -198,7 +198,7 @@ def picks_poolwide(year=CURRENT_YEAR):
         if not PICKS_LOCKED and year == CURRENT_YEAR:
             year = CURRENT_YEAR - 1
     
-    return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year))
+    return render_template('poolwide/poolwide-picks.html', year=year, all_picks=get_all_picks(year), level_limits=get_level_limits(year))
 
 # Most picked macro
 @mod.route("/most-picked/<int:year>")
