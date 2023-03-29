@@ -5,7 +5,7 @@ import os
 import uuid
 
 from flask import Blueprint, get_template_attribute, jsonify, redirect, render_template, request, session, url_for
-from config import LIVE_TOURNAMENT_OVERRIDE_ID, LIVE_TOURNAMENT_OVERRIDE_YEAR, PICKS_LOCKED, XL_DIR, TOURNAMENT_NAME_MAP, UNLOCK_ALL_PAGES
+from config import LIVE_TOURNAMENT_OVERRIDE_ID, LIVE_TOURNAMENT_OVERRIDE_YEAR, PICKS_LOCKED, POINT_MAP, XL_DIR, TOURNAMENT_NAME_MAP, UNLOCK_ALL_PAGES
 
 from helper.globalcache import GlobalCache
 from helper.helpers import func_find, CURRENT_YEAR, resolve_photo
@@ -189,6 +189,10 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
     player_modal = get_template_attribute("modal.macro.html", "player_modal")
     return player_modal(player)
 
+
+@mod.route("/<int:year>/point-map", methods=['GET'])
+def get_point_map(year):
+    return jsonify(POINT_MAP)
 
 @mod.route("/<int:year>/<tid>/generate-xl")
 def excel_generation_request(year, tid):
