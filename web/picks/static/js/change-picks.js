@@ -49,16 +49,33 @@ function submit_change_picks(form) {
 
     if (!check_entire_form(false)) {
         window.alert("Form requirements not met");
-        return false;
+        button.removeClass('is-loading');
+        return;
     }
     $.post('submit-changes', form.serialize(), function (response) {
         window.alert(response);
+    }).done(function() {
+        // Update page to have current state of picks in db. 
+        // Note "initialMainLevels" and "initialLevel4Ids" were defined in html
+        initialMainLevels =  form.find(":checked").map(function(v, c) { 
+            return c.value.split("*")[1] 
+        }).get();
+        
+        initialLevel4Ids = [];
+        initialLevel4Names = [];
+        let level4Inputs = form.find("input[name='level-4']");
+        level4Inputs.each(function() {
+            const sep = $(this).val().split("*");
+            initialLevel4Names.push(sep[0]);
+            initialLevel4Ids.push(sep[1]);
+        });
+
     }).fail(function() {
         window.alert("Server Error: Please try again later");
-    }).done(function() {
+    }).always(function() {
         button.removeClass('is-loading');
     });
-    return false;
+    return;
 }
 
 function revert_picks() {
