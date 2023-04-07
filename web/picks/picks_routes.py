@@ -68,12 +68,12 @@ def picks_submit():
         # Submit pickset, will return pickset id
         psid = submit_picks(name, email, pin, form_picks)
         if not psid:  # If form not in correct format
-            return "Error: Picks not submitted correctly.", 500
+            return "Error: Picks not submitted correctly.", HTTPStatus.BAD_REQUEST
     except AppException as e:
         return e.message, e.status
     except Exception as e:   # If internal error
         print(e)
-        return "Server Error: Please try again later", 500
+        return "Server Error: Please try again later", HTTPStatus.INTERNAL_SERVER_ERROR
 
     session['psid'] = psid  # Set session
     return redirect(url_for('picks.picks_confirmation'))
