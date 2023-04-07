@@ -1,6 +1,7 @@
 # Library imports
 from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for, get_template_attribute
 from http import HTTPStatus
+from appexceptions import AppException
 from config import GOLFERS_URL, OWGR_STAT_ID, PICKS_LOCKED, STATS_URL, UNLOCK_ALL_PAGES
 
 # My function imports
@@ -68,6 +69,8 @@ def picks_submit():
         psid = submit_picks(name, email, pin, form_picks)
         if not psid:  # If form not in correct format
             return "Error: Picks not submitted correctly.", 500
+    except AppException as e:
+        return e.message, e.status
     except Exception as e:   # If internal error
         print(e)
         return "Server Error: Please try again later", 500

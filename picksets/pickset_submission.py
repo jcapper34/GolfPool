@@ -1,4 +1,8 @@
+from http import HTTPStatus
 from typing import List
+
+import psycopg2
+from appexceptions import ConflictingPicksetException
 from helper.helpers import CURRENT_YEAR
 from picksets.pickset import Pickset
 from players.player import Player
@@ -107,10 +111,13 @@ def db_inserts(name, email, pin, picks, year=CURRENT_YEAR) -> int:
         partid = results[0][0]
 
         """ Insert pickset """
-        results = conn.exec_fetch(INSERT_PICKSET_QUERY, (partid, year, pin))
-        psid = results[0][0]
+        try:
+            results = conn.exec_fetch(INSERT_PICKSET_QUERY, (partid, year, pin))
+        except psycopg2.errors.UniqueViolation:
+            raise ConflictingPicksetException("Pickset with that name and email already exists for this season. You may have accidentally sent multiple submissions!", HTTPStatus.BAD_REQUEST) 
 
         """ Insert picks """
+        psid = results[0][0]
         db_insert_picks(psid, picks, conn=conn)
 
         conn.commit()   # Make sure to commit changes
