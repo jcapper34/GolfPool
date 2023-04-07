@@ -114,7 +114,7 @@ def db_inserts(name, email, pin, picks, year=CURRENT_YEAR) -> int:
         try:
             results = conn.exec_fetch(INSERT_PICKSET_QUERY, (partid, year, pin))
         except psycopg2.errors.UniqueViolation:
-            raise ConflictingPicksetException("Pickset with that name and email already exists for this season. You may have accidentally sent multiple submissions!", HTTPStatus.BAD_REQUEST) 
+            raise ConflictingPicksetException("Pickset with that name and email already exists for this season. You may have accidentally sent multiple submissions") 
 
         """ Insert picks """
         psid = results[0][0]

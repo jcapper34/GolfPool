@@ -1,7 +1,7 @@
 # Library imports
 from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for, get_template_attribute
 from http import HTTPStatus
-from appexceptions import AppException
+from appexceptions import AppException, PicksetNotFoundException
 from config import GOLFERS_URL, OWGR_STAT_ID, PICKS_LOCKED, STATS_URL, UNLOCK_ALL_PAGES
 
 # My function imports
@@ -105,10 +105,10 @@ def picks_change():
         return render_template('change/change-picks-login.html')
 
     # Get pickset
-    pickset = get_pickset(psid)
-
-    # Pickset not found means it has been deleted. Thus, log out
-    if pickset is None:
+    try:
+        pickset = get_pickset(psid)
+    except PicksetNotFoundException:
+        # Pickset not found means it has been deleted. Thus, log out
         return redirect(url_for("picks.picks_change_logout"))
 
     pickset.picks = get_picks(psid)

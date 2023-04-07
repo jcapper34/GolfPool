@@ -1,4 +1,5 @@
 from typing import List
+from appexceptions import PicksetNotFoundException
 
 from helper.helpers import CURRENT_YEAR, resolve_photo
 from picksets.pickset import Pickset
@@ -85,7 +86,7 @@ def get_pickset(psid) -> Pickset:
     with db_pool.get_conn() as conn:
         results = conn.exec_fetch(GET_PICKSET_QUERY, (psid,), fetchall=False)
         if not results or results is None:
-            return None
+            raise PicksetNotFoundException()
         
         return Pickset(id=psid, name=results['name'], email=results['email'], pin=results['pin'])
     

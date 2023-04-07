@@ -3,6 +3,7 @@ from http import HTTPStatus
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 from requests import get as http_get
 import logging
+from appexceptions import AppException
 from cronjobs import start_jobs
 from helper.helpers import CURRENT_YEAR
 from web.jinjafilters import register_filters
@@ -84,14 +85,20 @@ def api_retriever():
 # Error Pages
 # ========================
 @app.errorhandler(HTTPStatus.NOT_FOUND)
-def page_not_found(e):
+def page_notfound_handler(e):
     # note that we set the 404 status explicitly
     return render_template('404.html'), HTTPStatus.NOT_FOUND
 
 @app.errorhandler(HTTPStatus.INTERNAL_SERVER_ERROR)
-def page_not_found(e):
+def internal_error_handler(e):
     # note that we set the 500 status explicitly
     return render_template('500.html'), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.errorhandler(AppException)
+def app_exception_handler(e: AppException):
+    logging.error("[%ed] %s", e.status.value, e.message)
+    return e.message, e.status
+
 
 # ========================
 # Jinja Globals
