@@ -1,14 +1,19 @@
-import os
+import os, sys
+
+base_dir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(base_dir + "/..") # Hack to import from root
+
 from helper.helpers import *
-from db.conn import Conn
+from db.connection_pool import db_pool
 import xlsxwriter as xlsx
 from pprint import pprint
 
 from picksets.pickset_getters import get_all_picks
 from tournament.tournament import Tournament
+from tournament.tournament_retriever import get_db_rankings, get_db_standings
 
 
-def write_picks_worksheet(workbook, w_name, tid, picksets, conn=None):
+def write_picks_worksheet(workbook, w_name, tid, picksets):
     bold_center_format = workbook.add_format({'align': 'center', "bold": True})
     italic_format = workbook.add_format({'italic': True})
     points_cell_format = workbook.add_format({'align':'left'})
@@ -18,8 +23,8 @@ def write_picks_worksheet(workbook, w_name, tid, picksets, conn=None):
     tournament = None
     if tid is not None:
         tournament = Tournament(year=year, tid=tid)
-        tournament.fill_db_rankings(conn=conn)
-        tournament.fill_db_standings(conn=conn)
+        tournament.players = get_db_rankings(tid, year)
+        tournament.picksets = get_db_standings(tid, year)
         tournament.merge_all_picks(picksets)
         picksets = tournament.picksets
 
@@ -70,27 +75,25 @@ def write_picks_worksheet(workbook, w_name, tid, picksets, conn=None):
 
 
 def write_picks_workbook(year, filename):
-    conn = Conn()
-
     workbook = xlsx.Workbook(filename)
 
     worksheet_names = {
-        # "Picks": None,
-        "Masters": "014",
+        "Picks": None,
+        # "Masters": "014",
         # "PGA Championship": "033",
         # "US Open": "026",
         # "British Open": "100"
     }
-    picksets = get_all_picks(year, separate=False, conn=conn)
+    picksets = get_all_picks(year, separate=False)
 
     for w_name, tid in worksheet_names.items():
-        write_picks_worksheet(workbook, w_name, tid, picksets, conn=conn)
+        write_picks_worksheet(workbook, w_name, tid, picksets)
 
     workbook.close()
 
 
 if __name__ == "__main__":
-    year = 2020
-    filename = os.path.join('xlsx', 'masters-%d.xlsx' % year)
+    year = 2023
+    filename = os.path.join('xlsx', 'picks-%d.xlsx' % year)
 
     write_picks_workbook(year, filename)
