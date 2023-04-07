@@ -18,6 +18,3 @@ venv/
 
 # Database backups
 db/backups/
-
-# Dev files
-dev/
