@@ -11,13 +11,13 @@ from db.connection_pool import db_pool
 
 
 def get_api_tournament(channel_tid, year=None) -> Tournament:
-    # Use arguments, if exist
-    # Otherwise use cache
-    # Otherwise error
     channel_tid = int(channel_tid)
 
     api_data = request_json(LEADERBOARD_URL % channel_tid)
-    api_tournament = api_data['result']
+    api_tournament = api_data.get('result')
+    if not api_tournament or api_tournament is None:
+        return None # Tournament has no results
+
     leaderboard = api_tournament['golfers']
 
     tournament = Tournament()

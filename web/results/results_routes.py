@@ -32,25 +32,34 @@ def results_home():
     
 @mod.route("/live")
 def results_live():
+    block_response = None
     # Block if picks are not locked yet
     if not PICKS_LOCKED and not UNLOCK_ALL_PAGES:
-        if request.args.get('main_section_only') is None:
-            return render_template("standings-not-found.html", past_events=get_past_events()), HTTPStatus.NOT_FOUND
-        else:
-            return "<p class='has-text-centered'>No results to show</p>"  
-    
-    # Override live tournament if applicable
-    # Otherwise try to get tournament metadata from cache
-    if LIVE_TOURNAMENT_OVERRIDE_ID is not None and LIVE_TOURNAMENT_OVERRIDE_YEAR is not None:
-        channel_tid = LIVE_TOURNAMENT_OVERRIDE_ID
-        year = LIVE_TOURNAMENT_OVERRIDE_YEAR
-    elif GlobalCache.live_tournament is not None:
-        channel_tid = GlobalCache.live_tournament.tid
-        year = GlobalCache.live_tournament.year
+        block_response = "Tournament results not available", HTTPStatus.NOT_FOUND
     else:
-        raise RuntimeError
+        # Override live tournament if applicable
+        # Otherwise try to get tournament metadata from cache
+        if LIVE_TOURNAMENT_OVERRIDE_ID is not None and LIVE_TOURNAMENT_OVERRIDE_YEAR is not None:
+            channel_tid = LIVE_TOURNAMENT_OVERRIDE_ID
+            year = LIVE_TOURNAMENT_OVERRIDE_YEAR
+        elif GlobalCache.live_tournament is not None:
+            channel_tid = GlobalCache.live_tournament.tid
+            year = GlobalCache.live_tournament.year
+        else:
+            raise RuntimeError
 
-    tournament = get_api_tournament(channel_tid=channel_tid, year=year)
+        tournament = get_api_tournament(channel_tid=channel_tid, year=year)
+        if tournament is None:
+            block_response = "No tournament results found on source (www.golfchannel.com)", HTTPStatus.OK
+
+    if block_response is not None:
+        if request.args.get('main_section_only') is None:
+            return render_template("standings-blocked.html", message=block_response[0], past_events=get_past_events()), block_response[1]
+        else:
+            tournament_blocked_macro = get_template_attribute(
+                "helper.macro.html", "standings_blocked")
+            return tournament_blocked_macro(message=block_response[0]), block_response[1]
+
     tournament.picksets = calculate_standings(tournament.players, get_all_picks(year))
     tournament.year = year
 
@@ -83,7 +92,7 @@ def results_past(year, tid=None):
     elif tid in TOURNAMENT_NAME_MAP:
         tournament_name = TOURNAMENT_NAME_MAP[tid]
     else:
-        return "Tournament not found", HTTPStatus.BAD_REQUEST
+        return "Tournament id is invalid", HTTPStatus.BAD_REQUEST
     
     tournament = Tournament(name=tournament_name, year=year, tid=tid)
     tournament.players = get_db_rankings(tid, year)
@@ -92,10 +101,13 @@ def results_past(year, tid=None):
     
     # If tournament not found in DB
     if tournament.players is None:
+        message="Tournament not found"
         if request.args.get('main_section_only') is None:
-            return render_template("standings-not-found.html", past_events=past_events), HTTPStatus.NOT_FOUND
+            return render_template("standings-blocked.html", message=message, past_events=past_events), HTTPStatus.NOT_FOUND
         else:
-            return "<p class='has-text-centered'>No results to show</p>"
+            tournament_blocked_macro = get_template_attribute(
+                "helper.macro.html", "standings_blocked")
+            return tournament_blocked_macro(message=message), HTTPStatus.NOT_FOUND
 
     tournament.picksets = get_db_standings(tid, year)
 

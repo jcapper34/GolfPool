@@ -4,7 +4,7 @@ params:
 #}
 {% extends "base.html" %}
 
-{% block title %}Golf Pool | Standings Not Found{% endblock %}
+{% block title %}Golf Pool | Standings{% endblock %}
 {% block hero_title %}Standings{% endblock %}
 
 {% block add_head %}
@@ -20,8 +20,8 @@ params:
             {{ standings_menu(none, none, past_events) }}
         </div>
         <section id="standings-main-section" class="section column">
-            {% from "helper.macro.html" import standings_not_found %}
-            {{ standings_not_found() }}
+            {% from "helper.macro.html" import standings_blocked %}
+            {{ standings_blocked(message) }}
         </section>
     </div>
 {% endblock %}

@@ -50,9 +50,9 @@
 </section>
 {% endmacro %}
 
-{% macro standings_not_found() %}
+{% macro standings_blocked(message="Tournament results not found") %}
 <section class="section">
-    <p class="has-text-centered">Tournament results not found</p>
+    <p class="has-text-centered">{{ message }}</p>
     <br>
     <h1 class="has-text-centered" style="font-size: 50px"><span class="icon"><i class="fas fa-exclamation"></i></span></h1>
 </section>
