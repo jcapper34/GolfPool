@@ -3,14 +3,17 @@ import os
 # =======================
 # Helpers
 # =======================
-def parse_bool(val):
+def get_bool(key: str, default: bool):
+    val = os.getenv(key, default)
+    
     if isinstance(val, bool):
         return val
 
     try:
-        return bool(eval(val))
+        return bool(eval(val.capitalize()))
     except Exception:
         return None
+
 
 # =======================
 # Database Credentials
@@ -94,9 +97,9 @@ ROUTING_ALIASES = (
     ("/standings/<int:year>/<tid>", "results.results_past")
 )
 
-SRC_LOCAL = parse_bool(os.getenv("SRC_LOCAL", True))
-PICKS_LOCKED = parse_bool(os.getenv("PICKS_LOCKED", True))
-UNLOCK_ALL_PAGES = parse_bool(os.getenv("UNLOCK_ALL_PAGES", False))
+SRC_LOCAL = get_bool("SRC_LOCAL", True)
+PICKS_LOCKED = get_bool("PICKS_LOCKED", True)
+UNLOCK_ALL_PAGES = get_bool("UNLOCK_ALL_PAGES", False)
 
 # Database credentials
 DB_USER = os.getenv("DB_USER")

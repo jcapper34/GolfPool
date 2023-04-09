@@ -18,7 +18,8 @@ from tournament.tournament import Tournament
 from tournament.tournament_retriever import get_api_tournament, get_db_rankings, get_db_standings, get_past_events
 from tournament.xl_generator import write_picks_workbook
 
-mod = Blueprint("results", __name__, template_folder='templates',
+mod = Blueprint("results", __name__, 
+                template_folder='templates',
                 static_folder='static')   # Register blueprint
 
 """ LIVE ROUTES """
@@ -29,6 +30,7 @@ mod = Blueprint("results", __name__, template_folder='templates',
 @mod.route("/")
 def results_home():
     return redirect(url_for('results.results_live'))
+
     
 @mod.route("/live")
 def results_live():
@@ -205,6 +207,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
 @mod.route("/<int:year>/point-map", methods=['GET'])
 def get_point_map(year):
     return jsonify(POINT_MAP)
+
 
 @mod.route("/<int:year>/<tid>/generate-xl")
 def excel_generation_request(year, tid):
