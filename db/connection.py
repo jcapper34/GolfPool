@@ -57,6 +57,3 @@ class Conn:
         self.cur.close()
         if self.conn_pool is not None:
             self.conn_pool.putconn(self.pgconn)
-        
-    def __del__(self) -> None:
-        self.close()

@@ -1,5 +1,6 @@
+import atexit
 from config import *
-from psycopg2.pool import SimpleConnectionPool
+from psycopg2.pool import SimpleConnectionPool, ThreadedConnectionPool
 from urllib.parse import parse_qs, urlparse
 from db.connection import Conn
 
@@ -22,16 +23,28 @@ class ConnectionPool:
         self.sslmode = DB_SSLMODE
 
     def connect(self):
-        self.connection_pool = SimpleConnectionPool(
-            self.min_conn,
-            self.max_conn,
-            database = self.database,
-            user = self.username,
-            password = self.password,
-            host = self.hostname,
-            port = self.port,
-            sslmode = self.sslmode
-        )
+        if ENABLE_THREADED_DB_CONN:
+            self.connection_pool = ThreadedConnectionPool(
+                self.min_conn,
+                self.max_conn,
+                database = self.database,
+                user = self.username,
+                password = self.password,
+                host = self.hostname,
+                port = self.port,
+                sslmode = self.sslmode
+            )
+        else:
+            self.connection_pool = SimpleConnectionPool(
+                self.min_conn,
+                self.max_conn,
+                database = self.database,
+                user = self.username,
+                password = self.password,
+                host = self.hostname,
+                port = self.port,
+                sslmode = self.sslmode
+            )
 
         print("Connected to db username=%s password=%s database=%s host=%s port=%s sslmode=%s" % 
             (self.username, self.password, self.database, self.hostname, self.port, self.sslmode))
@@ -45,5 +58,12 @@ class ConnectionPool:
 
         pgconn = self.connection_pool.getconn()
         return Conn(pgconn, self.connection_pool)
+    
+    def close(self) -> None:
+        if getattr(self, "connection_pool", None) is not None:
+            print("Closing connection pool")
+            self.connection_pool.closeall()
 
+# Global connection pool
 db_pool = ConnectionPool()
+atexit.register(lambda: db_pool.close()) # Make sure pool always closes when program exits

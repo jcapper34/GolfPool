@@ -12,7 +12,7 @@ def get_bool(key: str, default: bool):
     try:
         return bool(eval(val.capitalize()))
     except Exception:
-        return None
+        return default
 
 
 # =======================
@@ -112,3 +112,6 @@ DB_SSLMODE = os.getenv("DB_SSLMODE")
 # If you want to override which tournament is used for live
 LIVE_TOURNAMENT_OVERRIDE_ID = os.getenv("LIVE_TOURNAMENT_OVERRIDE_ID")
 LIVE_TOURNAMENT_OVERRIDE_YEAR = os.getenv("LIVE_TOURNAMENT_OVERRIDE_YEAR")
+
+# Feature controls
+ENABLE_THREADED_DB_CONN = get_bool("ENABLE_THREADED_DB_CONN", True)
