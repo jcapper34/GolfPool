@@ -11,22 +11,25 @@ from picksets.pickset_getters import get_all_picks, get_login, get_most_picked, 
 from players.player_getters import get_level_limits, get_levels_db
 from tournament.tournament_retriever import get_db_rankings, get_past_events
 
-mod = Blueprint("picks", __name__, template_folder='templates',
-                      static_folder='static')   # Register Blueprint
+mod = Blueprint("picks", __name__, 
+                template_folder='templates',
+                static_folder='static')   # Register Blueprint
 
 """ ROUTES """
 
-# Root of Picks Module
-
-
 @mod.route("/")
 def picks_index():
+    """
+    Root of Picks Module
+    """
     return "<a href='%s'>Make Picks</a><br><a href='%s'>Change Picks</a>" % (url_for('picks.picks_make'), url_for('picks.picks_change'))
 
 
-# Make Picks Page
 @mod.route("/make")
 def picks_make():
+    """
+    Make Picks Page
+    """
     # Make sure you don't allow picks to be made if picks are locked
     if not UNLOCK_ALL_PAGES and PICKS_LOCKED:
         return render_template('locked-page.html', title="Make Picks"), HTTPStatus.FORBIDDEN
@@ -50,9 +53,11 @@ def picks_get_season_history():
     return jsonify(season_history)
 
 
-# Make Picks Submission
 @mod.route("/submit", methods=['POST'])
 def picks_submit():
+    """
+    Make Picks Submission
+    """
     # Extract Form
     # Ensure name is capitalized
     name = request.form.get("name").strip().title()
@@ -67,10 +72,10 @@ def picks_submit():
         # Submit pickset, will return pickset id
         psid = submit_picks(name, email, pin, form_picks)
         if not psid:  # If form not in correct format
-            return "Error: Picks not submitted correctly.", 500
+            return "Error: Picks not submitted correctly.", HTTPStatus.BAD_REQUEST
     except Exception as e:   # If internal error
         print(e)
-        return "Server Error: Please try again later", 500
+        return "Server Error: Please try again later", HTTPStatus.INTERNAL_SERVER_ERROR
 
     session['psid'] = psid  # Set session
     return redirect(url_for('picks.picks_confirmation'))
@@ -106,7 +111,7 @@ def picks_change():
 
     # Pickset not found means it has been deleted. Thus, log out
     if pickset is None:
-        return redirect(url_for("picks.picks_change_logout"))
+        return redirect(url_for("picks.picks_change_logout"), code=HTTPStatus.NOT_FOUND.value)
 
     pickset.picks = get_picks(psid)
     return render_template("change/change-picks.html",
@@ -145,7 +150,7 @@ def picks_forgot_pin():
     email = request.form.get('email')
     pin = get_email_pin(email)
     if pin is None:
-        return "Email does not exist"
+        return "Email does not exist", HTTPStatus.NOT_FOUND
 
     postman = Postman(recipients=(email,))
     postman.message_subject += " | Your PIN"
@@ -171,7 +176,7 @@ def picks_submit_changes():
     f = request.form
 
     if session.get("psid") != int(f.get("psid")):
-        return "Your session has expired, please log back in"
+        return "Your session has expired, please log back in", 440 # Code for Login Timeout (not in HttpStatus module)
 
     try:
         change_success = submit_change_picks(pid=f.get("psid"),
@@ -181,10 +186,10 @@ def picks_submit_changes():
                                              form_picks=[f.getlist('level-'+str(l)) for l in range(1, 5)])
 
         if not change_success:
-            return "Error: Form not filled out correctly"
+            return "Error: Form not filled out correctly", HTTPStatus.BAD_REQUEST
     except Exception as e:
         print(e)
-        return "Server Error: Please try again later"
+        return "Server Error: Please try again later", HTTPStatus.INTERNAL_SERVER_ERROR
 
     return "Picks saved successfully, please check your email"
 

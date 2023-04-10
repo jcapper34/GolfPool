@@ -88,5 +88,15 @@ def retry_util(func, max_retry=3, wait_sec=2) -> None:
             time.sleep(wait_sec)
 
 
+def default_to(val, default):
+    """
+    Return default if val is None
+    """
+    if val is None:
+        return default
+    
+    return val
+
+
 """ CONSTANTS """
 CURRENT_YEAR = int(datetime.now().year)

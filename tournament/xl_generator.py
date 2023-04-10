@@ -7,7 +7,7 @@ from tournament.tournament import Tournament
 from tournament.tournament_retriever import get_db_rankings, get_db_standings
 
 
-def write_picks_worksheet(workbook, ws_name, tid, year, picksets, conn=None):
+def write_picks_worksheet(workbook, ws_name, tid, year, picksets, conn=None) -> None:
     bold_center_format = workbook.add_format({'align': 'center', "bold": True})
     italic_format = workbook.add_format({'italic': True})
     points_cell_format = workbook.add_format({'align': 'left'})
@@ -73,7 +73,7 @@ def write_picks_worksheet(workbook, ws_name, tid, year, picksets, conn=None):
             worksheet.write(row, total_column, total)  # Write total points
 
 
-def write_picks_workbook(tid_list, year, filename):
+def write_picks_workbook(tid_list, year, filename) -> None:
     workbook = xlsx.Workbook(filename)
 
     picksets = get_all_picks(year, separate=False)

@@ -8,7 +8,7 @@ from flask import Blueprint, get_template_attribute, jsonify, redirect, render_t
 from config import LIVE_TOURNAMENT_OVERRIDE_ID, LIVE_TOURNAMENT_OVERRIDE_YEAR, PICKS_LOCKED, POINT_MAP, XL_DIR, TOURNAMENT_NAME_MAP, UNLOCK_ALL_PAGES
 
 from helper.globalcache import GlobalCache
-from helper.helpers import func_find, CURRENT_YEAR, resolve_photo
+from helper.helpers import default_to, func_find, CURRENT_YEAR, resolve_photo
 from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks, get_picks, get_tournament_history
 from players.player import Player
@@ -153,8 +153,10 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
     for pick in pickset.picks:
         if pick.pos is None:
             pick.raw_pos = math.inf
+        elif isinstance(pick.pos, int) or pick.pos[0] != 'T':
+            pick.raw_pos = int(pick.pos)
         else:
-            pick.raw_pos = int(pick.pos) if isinstance(pick.pos, int) or pick.pos[0] != 'T' else int(pick.pos[1:])
+            pick.raw_pos = int(pick.pos[1:])
     
     pickset.picks.sort(key=lambda p: (p.raw_pos, p.status))
     
@@ -184,7 +186,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
         
         # See if photo is available from DB
         photo = get_player_photo(pid)
-        player.photo_url = photo if photo is not None else player.photo_url
+        player.photo_url = default_to(photo, player.photo_url)
     # Get DB Results
     else:
         tournament_results = get_tournament_player_db(
@@ -194,7 +196,7 @@ def get_player_modal(year=CURRENT_YEAR, tid=None):
         if tid != "cumulative":
             current_results = func_find(tournament_results, lambda t: t['tid'] == tid)
             if current_results is None:
-                return "Invalid tournament id was specified" # TODO: Return error
+                return "Invalid tournament id was specified", HTTPStatus.BAD_REQUEST
             current_results = dict(current_results)
             del current_results['tid']
             del current_results['tour_id']

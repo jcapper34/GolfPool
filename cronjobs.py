@@ -146,7 +146,7 @@ def xl_cleanup() -> None:
     logging.info("[xl_cleanup] Finished job")
 
 
-def backfill_photos():
+def backfill_photos() -> None:
     with db_pool.get_conn() as conn:
         players = conn.exec_fetch("SELECT * FROM player WHERE photo_url is NULL")
 
@@ -171,7 +171,7 @@ def backfill_photos():
         logging.info("[backfill_photos] Finished job")
 
 
-def backfill_tour_ids():
+def backfill_tour_ids() -> None:
     players_json = request_json(TOUR_PLAYERS_URL).get('plrs', [])
     logging.info("[backfill_tour_ids] Fetched %d players from PGA Tour API" % len(players_json))
 

@@ -80,4 +80,4 @@ class ConnectionPool:
 
 # Global connection pool
 db_pool = ConnectionPool()
-atexit.register(lambda: db_pool.close()) # Make sure pool always closes when program exits
+atexit.register(db_pool.close) # Make sure pool always closes when program exits
