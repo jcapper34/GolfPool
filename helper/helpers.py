@@ -2,6 +2,8 @@ import json
 import inspect
 from pprint import pprint
 from datetime import datetime
+import threading
+import time
 from typing import Any, Dict
 
 import requests
@@ -40,17 +42,22 @@ def func_find(obj, func, limit=1, get_index=False) -> Any:
 
     return found
 
-
+http_lock = threading.Lock()
 def request_json(url) -> Dict:
-    try:
-        if 'http' in url.casefold():
+    """
+    Thread-safe way to get json via http or locally
+    """
+    global http_lock
+    def process_http_raw(url):
+        with http_lock:
             return requests.get(url).json()
-    except json.JSONDecodeError as e:
-        raise
-
+    
+    # Do http request
+    if 'http' in url.casefold():
+        return retry_util(lambda: process_http_raw(url))
+    
     with open(url) as f:
         return json.load(f)
-    
 
 
 def obj_to_json(obj) -> str:
@@ -60,7 +67,7 @@ def obj_to_json(obj) -> str:
     return json.dumps(properties)
 
 
-def resolve_photo(channel_photo, tour_id):
+def resolve_photo(channel_photo, tour_id) -> str:
     """
     If tour_id is not null, then use the tour photo. Otherwise use channel photo
     """
@@ -68,6 +75,17 @@ def resolve_photo(channel_photo, tour_id):
         return channel_photo
     
     return TOUR_PHOTO_URL % tour_id
+
+
+def retry_util(func, max_retry=3, wait_sec=2) -> None:
+    """
+    Retry a function until success or max retries has been exceeded
+    """
+    for attempt in range(max_retry):
+        try:
+            return func()
+        except Exception:
+            time.sleep(wait_sec)
 
 
 """ CONSTANTS """
