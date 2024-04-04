@@ -8,7 +8,7 @@ from helper.helpers import CURRENT_YEAR
 from mailer.postman import Postman
 from picksets.pickset_submission import submit_change_picks, submit_picks
 from picksets.pickset_getters import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks, get_pickset
-from players.player_getters import get_level_limits, get_levels_db
+from players.player_getters import get_final_level_suggestions, get_level_limits, get_levels_db
 from tournament.tournament_retriever import get_db_rankings, get_past_events
 
 mod = Blueprint("picks", __name__, 
@@ -50,6 +50,11 @@ def picks_get_season_history():
             (year, {pl.id: pl.pos for pl in players}))
 
     return jsonify(season_history)
+
+
+@mod.route("/final-level-suggestions/<int:year>", methods=['GET'])
+def picks_get_final_level_suggestions(year):
+    return jsonify(get_final_level_suggestions(year))
 
 
 @mod.route("/submit", methods=['POST'])

@@ -34,9 +34,18 @@ def get_levels_db(year, separate=True) -> List:
 GET_LEVEL_LIMITS_QUERY = """
     SELECT pick_limit FROM level_limit_xref WHERE season_year = %s
 """
-def get_level_limits(year):
+def get_level_limits(year) -> List:
     with db_pool.get_conn() as conn:
         return [r[0] for r in conn.exec_fetch(GET_LEVEL_LIMITS_QUERY, (year,))]
+
+
+GET_FINAL_LEVEL_SUGGESTIONS_QUERY = """
+    SELECT pl.id, pl.name FROM player AS pl 
+    WHERE NOT EXISTS (SELECT FROM level_xref WHERE player_id = pl.id AND season_year = %s)
+"""
+def get_final_level_suggestions(year) -> List:
+    with db_pool.get_conn() as conn:
+        return [dict(pl) for pl in conn.exec_fetch(GET_FINAL_LEVEL_SUGGESTIONS_QUERY, (year,))]
 
 # Parameters: pid, year
 # Returns: pos, score, points, tid, thru, photo_url

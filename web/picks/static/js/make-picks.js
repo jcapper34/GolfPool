@@ -250,28 +250,31 @@ function create_player_suggestions(input_element) {
         });
 
         $(".player-column").each(function() {   // Check if in levels 1-3
-            // out($(this).data('pid'));
             if(String($(this).data('pid')) === pid)
                 valid = false;
         });
         return valid;
     };
     const nameCheck = function(name, val) {
-        return name.substr(0, val.length).toLowerCase() === val;
+        return name.substr(0, val.length).toLowerCase() === val.toLowerCase();
     };
 
     let suggestions = [];
     let count = 0;
-    for(const i in OWGR_rankings) {
+    for(const i in FinalLevelSuggestions) {
 
-        const player = OWGR_rankings[i];
-        if(level_pids.includes(player.golferId))
+        const player = FinalLevelSuggestions[i];
+        if (level_pids.includes(player.id))
             continue;
 
-        const playerName = [player.firstName, player.lastName].join(' ');
+        if (!isValid(player.id))
+            continue
 
-        if ( (nameCheck(player.firstName, val) || nameCheck(player.lastName, val) || nameCheck(playerName, val)) && isValid(player.golferId)){
-            suggestions.push([player.golferId, playerName]); // In the form (pid, name)
+        const nameSeparated = player.name.split(" ")
+        if (nameSeparated.some(function (s) { return nameCheck(s, val); })
+            || nameCheck(player.name, val))
+        {
+            suggestions.push([player.id, player.name]); // In the form (pid, name)
             count++;
             if (count === numSuggestions)
                 break;
@@ -279,7 +282,6 @@ function create_player_suggestions(input_element) {
     }
 
     show_player_suggestions(input_element.closest('.level-4-field'), suggestions);
-
 }
 
 function show_player_suggestions(fieldElement, suggestions) {
@@ -432,6 +434,13 @@ function set_season_history() {
     });
 }
 
+let FinalLevelSuggestions;
+function set_final_level_suggestions() {
+    $.get('/picks/final-level-suggestions/' + CURRENT_YEAR, function(response) {
+        FinalLevelSuggestions = response;
+    });
+}
+
 
 /*
 MAIN FUNCTION
@@ -445,6 +454,6 @@ $(document).ready(function() {
 
     // Retrieve API Data
     set_OWGR();
-    // get_api_players();
     set_season_history();
+    set_final_level_suggestions();
 });
