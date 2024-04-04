@@ -23,7 +23,7 @@ def start_jobs() -> None:
     """
     scheduler = BackgroundScheduler(timezone=timezone("US/Pacific"))
 
-    job_funcs = [update_last_major, xl_cleanup, backfill_photos, backfill_tour_ids]
+    job_funcs = [update_last_major, xl_cleanup]
     for job_func in job_funcs:
         # Call job async
         Thread(target=job_func, args=[]).start()

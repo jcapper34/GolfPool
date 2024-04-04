@@ -38,7 +38,6 @@ def picks_make():
                            level_players=get_levels_db(CURRENT_YEAR),
                            level_limits = get_level_limits(CURRENT_YEAR),
                            OWGR_URL=STATS_URL % (OWGR_STAT_ID, CURRENT_YEAR), 
-                           API_PLAYERS_URL=GOLFERS_URL, 
                            year=CURRENT_YEAR)
 
 
@@ -120,8 +119,7 @@ def picks_change():
                             level_limits=get_level_limits(CURRENT_YEAR),
                             pickset=pickset,
                             year=CURRENT_YEAR,
-                            OWGR_URL=STATS_URL % (OWGR_STAT_ID, CURRENT_YEAR),
-                            API_PLAYERS_URL=GOLFERS_URL)
+                            OWGR_URL=STATS_URL % (OWGR_STAT_ID, CURRENT_YEAR))
 
 # Change Picks Login
 @mod.route("/change/submit-login", methods=['POST'])
