@@ -9,7 +9,7 @@ from players.players_helper import level_separate
 # Parameters: year
 # Returns: lx.player_id, pl.name, lx.level, pl.photo_url
 GET_LEVELS_QUERY = """
-                SELECT lx.player_id AS player_id, pl.name, lx.level, pl.photo_url, pl.tour_id FROM level_xref AS lx
+                SELECT lx.player_id AS player_id, pl.name, lx.level, pl.photo_url, pl.tour_id, pl.owgr_id FROM level_xref AS lx
                     JOIN player AS pl ON pl.id = lx.player_id
                 WHERE lx.season_year = %s
             """
@@ -17,7 +17,12 @@ def get_levels_db(year, separate=True) -> List:
     players = None
     with db_pool.get_conn() as conn:
         results = conn.exec_fetch(GET_LEVELS_QUERY, (year,))
-        players = [Player(id=row['player_id'], name=row['name'], level=row['level'], photo_url=resolve_photo(row['photo_url'], row['tour_id'])) for row in results]
+        players = [Player(
+            id=row['player_id'], 
+            name=row['name'], 
+            level=row['level'], 
+            photo_url=resolve_photo(row['photo_url'], row['tour_id']),
+            owgr_id=row['owgr_id']) for row in results]
 
     if separate:
         return level_separate(players)

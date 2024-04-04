@@ -63,29 +63,48 @@ TOURNAMENT_NAME_MAP = {
 }
 
 # =======================
+# Golf.com API
+# =======================
+LEADERBOARD_URL = "https://production.api.golf.com/api/v1/tournaments/full-leaderboard/%s" # Parameters: string[tid]
+EVENTS_URL = "https://production.api.golf.com/api/v1/tournament-schedule/%d/pga" # Parameters: int[year]
+GOLF_RANKINGS_URL = "https://production.api.golf.com/api/v1/rankings/official-world-ranking"
+
+# =======================
 # Golf Channel API
 # =======================
-# Parameters: int[tid]
-LEADERBOARD_URL = "https://www.golfchannel.com/api/v2/events/%d/leaderboard"
-# Parameters: int[year]
-EVENTS_URL = "https://www.golfchannel.com/api/v2/tours/1/events/%d"
-# Parameters: int[tid]
-ALL_SCORECARDS_URL = "https://www.golfchannel.com/api/v2/events/%d/scorecard"
+STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/%d" # Parameters: Stat Number, year
+INDIVIDUAL_GOLFER_URL = "https://www.golfchannel.com/api/v2/golfers/%s/full" # Parameters: pid
 
-
-# From PGA Tour Website
-TOUR_PHOTO_URL = "https://pga-tour-res.cloudinary.com/image/upload/c_fill,d_headshots_default.png,dpr_2.0,f_auto,g_face:center,h_300,q_auto,w_300/headshots_%s.png"
+# =======================
+# PGA Tour API
+# =======================
+TOUR_PHOTO_URL = "https://pga-tour-res.cloudinary.com/image/upload/c_fill,d_headshots_default.png,dpr_2.0,f_auto,g_face:center,h_300,q_auto,w_300/headshots_%s.png" # Parameters: int[pid]
 TOUR_PLAYERS_URL = "https://statdata.pgatour.com/players/player.json"
 
-# From Golf Channel Website
-ACTIVE_EVENTS_URL = "https://www.golfchannel.com/api/v2/events/active"
-STAT_CATEGORIES_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/categories"
-OWGR_STAT_ID = 19   # For OWGR ranking
-# Parameters: Stat Number, year
-STATS_URL = "https://www.golfchannel.com/api/v2/tours/1/stats/%d/%d"
-GOLFERS_URL = "https://www.golfchannel.com/api/es/fullObject"
-# Parameters: pid
-INDIVIDUAL_GOLFER_URL = "https://www.golfchannel.com/api/v2/golfers/%s/full"
+# =======================
+# OWGR API
+# =======================
+OWGR_PAGE_SIZE_MAKE_PICKS = 400
+OWGR_RANKINGS_URL = "https://apiweb.owgr.com/api/owgr/rankings/getRankings?regionId=0&pageSize=%d&pageNumber=1&countryId=0&sortString=Rank+ASC" # Parameters: int[pageSize]
+OWGR_LEADERBOARD_URL = "https://www.owgr.com/_next/data/GtoJ9xPTdmOVfHsMXSiAe/events/valspar-championship-10321.json"
+
+# Headers will emulate browser
+BROWSER_EMULATE_HEADERS = {
+    # "Host": "production.api.golf.com",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Accept-Encoding": "gzip, deflate, br",
+    "DNT": "1",
+    "Sec-GPC": "1",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Pragma": "no-cache",
+    "Cache-Control": "no-cache"
+}
 
 # =======================
 # Routing Aliases

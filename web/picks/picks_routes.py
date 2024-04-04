@@ -1,7 +1,7 @@
 # Library imports
 from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for, get_template_attribute
 from http import HTTPStatus
-from config import GOLFERS_URL, OWGR_STAT_ID, PICKS_LOCKED, STATS_URL, UNLOCK_ALL_PAGES
+from config import *
 
 # My function imports
 from helper.helpers import CURRENT_YEAR
@@ -37,7 +37,7 @@ def picks_make():
     return render_template("make/make-picks.html", 
                            level_players=get_levels_db(CURRENT_YEAR),
                            level_limits = get_level_limits(CURRENT_YEAR),
-                           OWGR_URL=STATS_URL % (OWGR_STAT_ID, CURRENT_YEAR), 
+                           OWGR_URL=OWGR_RANKINGS_URL % OWGR_PAGE_SIZE_MAKE_PICKS, 
                            year=CURRENT_YEAR)
 
 
@@ -119,7 +119,7 @@ def picks_change():
                             level_limits=get_level_limits(CURRENT_YEAR),
                             pickset=pickset,
                             year=CURRENT_YEAR,
-                            OWGR_URL=STATS_URL % (OWGR_STAT_ID, CURRENT_YEAR))
+                            OWGR_URL=OWGR_RANKINGS_URL % OWGR_PAGE_SIZE_MAKE_PICKS)
 
 # Change Picks Login
 @mod.route("/change/submit-login", methods=['POST'])

@@ -56,7 +56,7 @@ params: level_players, pickset, year, OWGR_RANKINGS
 
 {% block add_below %}
 <script>
-const OWGR_URL = '{{ OWGR_URL }}';
+const OWGR_URL = '{{ OWGR_URL|safe }}';
 
 {# Initial Picks #}
 let initialMainLevels = {{ (pickset.picks[0]|map(attribute='id')|list + pickset.picks[1]|map(attribute='id')|list + pickset.picks[2]|map(attribute='id')|list)|tojson }};

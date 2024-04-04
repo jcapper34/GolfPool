@@ -56,7 +56,7 @@
             {# Pickbox body #}
             <div class="columns is-multiline">
                 {% for player in players|sort(attribute="name") %}
-                    <div class="column is-half player-column" data-pid="{{ player.id }}">
+                    <div class="column is-half player-column" data-pid="{{ player.id }}" data-owgrid="{{ player.owgr_id }}">
                         <label>
                             <input class="player-checkbox" type="checkbox" value="{{ player.name }}*{{ player.id }}" name="level-{{ player.level }}"> {# Check if it was picked #}
                             <span class="button">{{ player.name }}</span>
@@ -68,8 +68,8 @@
                                     </figure>
                                 <div class="media-content">
                                     <table class="table is-fullwidth">
-                                        <tr><th>World Golf Ranking</th><td class="owgr-rank">-</td></tr>
-                                        <tr><th class="pool-ranking-column">Pool Ranking</th><td class="pos-history">-</td></tr>
+                                        <tr><th>OWGR Ranking</th><td class="owgr-rank">-</td></tr>
+                                        <tr><th class="pool-ranking-column">Pool Results History</th><td class="pos-history">-</td></tr>
                                     </table>
                                 </div>
                             </div>

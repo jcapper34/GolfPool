@@ -4,7 +4,7 @@ from flask import Flask, render_template, redirect, url_for, request, jsonify
 from requests import get as http_get
 import logging
 from cronjobs import start_jobs
-from helper.helpers import CURRENT_YEAR
+from helper.helpers import CURRENT_YEAR, request_json
 from web.jinjafilters import register_filters
 
 from web.picks.picks_routes import mod as picks_mod
@@ -74,9 +74,11 @@ def test_page():
 # ========================
 @app.route("/api-retriever", methods=['POST'])
 def api_retriever():
+    proxy_whitelist = {"www.golfchannel.com", "apiweb.owgr.com", "production.api.golf.com"}
+
     url = request.form.get("url")
-    if urlparse(url).netloc == 'www.golfchannel.com':   # Ensures that request goes to api
-        return jsonify(http_get(url).json())
+    if urlparse(url).netloc in proxy_whitelist:   # Ensures that request goes to api
+        return jsonify(request_json(url))
 
     return jsonify({})
 

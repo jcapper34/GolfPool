@@ -1,7 +1,6 @@
 {#
 Params:
     - level_players
-    - OWGR_URL
     - year
 #}
 {% extends "base.html" %}
@@ -42,9 +41,10 @@ Params:
         </form>
     </div>
 </div>
+
 <script>
 {# Vars for Script #}
-var OWGR_URL = '{{ OWGR_URL }}';
+const OWGR_URL = '{{ OWGR_URL|safe }}';
 const LEVEL_4_ALLOWED = {{ level_limits[-1] }};
 </script>
 <script src="/picks/static/js/make-picks.js?v=2.1"></script>

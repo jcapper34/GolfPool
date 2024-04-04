@@ -395,14 +395,15 @@ PAGE STARTUP
 */
 
 // OWGR RANKINGS. ONLY USED TO SET RANKINGS OF LEVELS
+// Players without owgr_id set will not have rank show
 let OWGR_rankings;
 function set_OWGR() {
     $.post('/api-retriever', {url: OWGR_URL}, function (response) {
-        OWGR_rankings = response;
+        OWGR_rankings = response.rankingsList;
         for (const i in OWGR_rankings) {  // Update player details
-            const player = OWGR_rankings[i];
-            let playerColumn = $(".player-column[data-pid='" + player.golferId + "']");
-            playerColumn.find('.owgr-rank').text(player.currentRank);   // Show OWGR Rank
+            const playerRanking = OWGR_rankings[i];
+            let playerColumn = $(".player-column[data-owgrid='" + playerRanking.player.id + "']");
+            playerColumn.find('.owgr-rank').text(playerRanking.rank);   // Show OWGR Rank
         }
     });
 }
