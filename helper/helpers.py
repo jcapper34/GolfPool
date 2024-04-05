@@ -7,8 +7,9 @@ import time
 from typing import Any, Dict
 
 import requests
+from unidecode import unidecode
 
-from config import TOUR_PHOTO_URL
+from config import BROWSER_EMULATE_HEADERS, TOUR_PHOTO_URL
 
 """ FUNCTIONS """
 def splash(obj) -> None:
@@ -48,12 +49,14 @@ def request_json(url) -> Dict:
     Thread-safe way to get json via http or locally
     """
     global http_lock
-    def process_http_raw(url):
+    def process_http_raw(url, include_browser_headers=True):
         with http_lock:
-            return requests.get(url).json()
+            return requests.get(
+                url, 
+                headers=BROWSER_EMULATE_HEADERS if include_browser_headers else None).json()
     
     # Do http request
-    if 'http' in url.casefold():
+    if url.casefold().startswith("http"):
         return retry_util(lambda: process_http_raw(url))
     
     with open(url) as f:
@@ -97,6 +100,36 @@ def default_to(val, default):
     
     return val
 
+def name_match(a, b):
+    """
+    Are two strings the same name
+    """
+
+    def nickname_convert(name):
+        nickname_mapper = {
+            "matt": "matthew",
+            "sam": "samuel",
+            "alex": "alexander",
+            "ben": "benjamin",
+            "cam": "cameron",
+            "dan": "daniel",
+            "mike": "michael",
+            "jeff": "jeffrey",
+            "joe": "joseph"
+        }
+        name_separated = name.split(' ')
+        first_name = name_separated[0]
+        if first_name in nickname_mapper:
+            name_separated[0] = nickname_mapper[first_name]
+
+        return ' '.join(name_separated)
+
+    def name_normalize(name):
+        for c in ('-', '\'', '.', ','):
+            name = name.replace(c, '')
+        return unidecode(nickname_convert(name.casefold()))
+
+    return name_normalize(a) == name_normalize(b)
 
 """ CONSTANTS """
 CURRENT_YEAR = int(datetime.now().year)

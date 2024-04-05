@@ -84,8 +84,8 @@ TOUR_PLAYERS_URL = "https://statdata.pgatour.com/players/player.json"
 # =======================
 # OWGR API
 # =======================
-OWGR_PAGE_SIZE_MAKE_PICKS = 400
-OWGR_RANKINGS_URL = "https://apiweb.owgr.com/api/owgr/rankings/getRankings?regionId=0&pageSize=%d&pageNumber=1&countryId=0&sortString=Rank+ASC" # Parameters: int[pageSize]
+OWGR_PAGE_SIZE_MAKE_PICKS = 250
+OWGR_RANKINGS_URL = "https://apiweb.owgr.com/api/owgr/rankings/getRankings?regionId=0&pageSize=%d&pageNumber=%d&countryId=0&sortString=Rank+ASC" # Parameters: int[pageSize], int[pageNumber]
 OWGR_LEADERBOARD_URL = "https://www.owgr.com/_next/data/GtoJ9xPTdmOVfHsMXSiAe/events/valspar-championship-10321.json"
 
 # Headers will emulate browser

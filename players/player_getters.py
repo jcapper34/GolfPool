@@ -9,7 +9,7 @@ from players.players_helper import level_separate
 # Parameters: year
 # Returns: lx.player_id, pl.name, lx.level, pl.photo_url
 GET_LEVELS_QUERY = """
-                SELECT lx.player_id AS player_id, pl.name, lx.level, pl.photo_url, pl.tour_id, pl.owgr_id FROM level_xref AS lx
+                SELECT lx.player_id AS player_id, pl.name, lx.level, pl.photo_url, pl.tour_id FROM level_xref AS lx
                     JOIN player AS pl ON pl.id = lx.player_id
                 WHERE lx.season_year = %s
             """
@@ -21,8 +21,7 @@ def get_levels_db(year, separate=True) -> List:
             id=row['player_id'], 
             name=row['name'], 
             level=row['level'], 
-            photo_url=resolve_photo(row['photo_url'], row['tour_id']),
-            owgr_id=row['owgr_id']) for row in results]
+            photo_url=resolve_photo(row['photo_url'], row['tour_id'])) for row in results]
 
     if separate:
         return level_separate(players)
@@ -39,13 +38,13 @@ def get_level_limits(year) -> List:
         return [r[0] for r in conn.exec_fetch(GET_LEVEL_LIMITS_QUERY, (year,))]
 
 
-GET_FINAL_LEVEL_SUGGESTIONS_QUERY = """
+GET_NON_LEVELED_PLAYERS_QUERY = """
     SELECT pl.id, pl.name FROM player AS pl 
     WHERE NOT EXISTS (SELECT FROM level_xref WHERE player_id = pl.id AND season_year = %s)
 """
-def get_final_level_suggestions(year) -> List:
+def get_non_leveled_players(year) -> List:
     with db_pool.get_conn() as conn:
-        return [dict(pl) for pl in conn.exec_fetch(GET_FINAL_LEVEL_SUGGESTIONS_QUERY, (year,))]
+        return [dict(pl) for pl in conn.exec_fetch(GET_NON_LEVELED_PLAYERS_QUERY, (year,))]
 
 # Parameters: pid, year
 # Returns: pos, score, points, tid, thru, photo_url

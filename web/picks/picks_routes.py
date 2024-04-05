@@ -4,11 +4,11 @@ from http import HTTPStatus
 from config import *
 
 # My function imports
-from helper.helpers import CURRENT_YEAR
+from helper.helpers import CURRENT_YEAR, request_json
 from mailer.postman import Postman
 from picksets.pickset_submission import submit_change_picks, submit_picks
 from picksets.pickset_getters import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks, get_pickset
-from players.player_getters import get_final_level_suggestions, get_level_limits, get_levels_db
+from players.player_getters import get_non_leveled_players, get_level_limits, get_levels_db
 from tournament.tournament_retriever import get_db_rankings, get_past_events
 
 mod = Blueprint("picks", __name__, 
@@ -37,7 +37,7 @@ def picks_make():
     return render_template("make/make-picks.html", 
                            level_players=get_levels_db(CURRENT_YEAR),
                            level_limits = get_level_limits(CURRENT_YEAR),
-                           OWGR_URL=OWGR_RANKINGS_URL % OWGR_PAGE_SIZE_MAKE_PICKS, 
+                           OWGR_URL=OWGR_RANKINGS_URL % (OWGR_PAGE_SIZE_MAKE_PICKS, 1), 
                            year=CURRENT_YEAR)
 
 
@@ -54,7 +54,18 @@ def picks_get_season_history():
 
 @mod.route("/final-level-suggestions/<int:year>", methods=['GET'])
 def picks_get_final_level_suggestions(year):
-    return jsonify(get_final_level_suggestions(year))
+    ranked_players = [
+        {
+            "id": str(pl["player"]["id"]),
+            "name": pl["player"]["fullName"]
+        }
+        for pl in request_json(OWGR_RANKINGS_URL % (OWGR_PAGE_SIZE_MAKE_PICKS, 1))["rankingsList"]
+    ]
+
+    players_to_add = filter(lambda player: player["id"] not in {p["id"] for p in ranked_players}, 
+                            get_non_leveled_players(year))
+
+    return jsonify(ranked_players + list(players_to_add))
 
 
 @mod.route("/submit", methods=['POST'])
@@ -124,7 +135,7 @@ def picks_change():
                             level_limits=get_level_limits(CURRENT_YEAR),
                             pickset=pickset,
                             year=CURRENT_YEAR,
-                            OWGR_URL=OWGR_RANKINGS_URL % OWGR_PAGE_SIZE_MAKE_PICKS)
+                            OWGR_URL=OWGR_RANKINGS_URL % (OWGR_PAGE_SIZE_MAKE_PICKS, 1))
 
 # Change Picks Login
 @mod.route("/change/submit-login", methods=['POST'])

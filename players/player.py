@@ -21,9 +21,6 @@ class Player:
     season_history: dict = None
     scorecards: List = None
 
-    # Owgr
-    owgr_id: str = None
-
     # Picks
     picked_by: List[str] = None
     num_picked: int = None
