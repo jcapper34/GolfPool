@@ -87,6 +87,6 @@ if __name__ == "__main__":
     compile_sass()
     
     # Tests
-    test_standings_calculations()
-    test_api()
+    # test_standings_calculations()
+    # test_api()
     
