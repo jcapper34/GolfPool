@@ -396,7 +396,20 @@ function toggle_show_pin(button) {
 PAGE STARTUP
 */
 
-// OWGR RANKINGS. ONLY USED TO SET RANKINGS OF LEVELS
+function calculate_age(birthDateStr)
+{
+    // This will account for leap years
+    var today = new Date();
+    var birthDate = new Date(birthDateStr);
+    var age = today.getFullYear() - birthDate.getFullYear();
+    var m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}
+
+// OWGR RANKINGS. Used to populate world ranking and age
 let OWGR_rankings;
 function set_OWGR() {
     $.post('/api-retriever', {url: OWGR_URL}, function (response) {
@@ -405,6 +418,7 @@ function set_OWGR() {
             const playerRanking = OWGR_rankings[i];
             let playerColumn = $(".player-column[data-pid='" + playerRanking.player.id + "']");
             playerColumn.find('.owgr-rank').text(playerRanking.rank);   // Show OWGR Rank
+            playerColumn.find('.player-age').text(calculate_age(playerRanking.player.birthDate));
         }
     });
 }
