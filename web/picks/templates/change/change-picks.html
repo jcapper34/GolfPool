@@ -51,7 +51,8 @@ params: level_players, pickset, year, OWGR_RANKINGS
         </form>
     </div>
 </div>
-
+{% import "modal.macro.html" as modal_macs  %}
+{{ modal_macs.blank_modal("player-history-modal") }}
 {% endblock %}
 
 {% block add_below %}

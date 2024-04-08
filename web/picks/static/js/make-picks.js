@@ -224,6 +224,58 @@ function player_checkbox_color_effect() {
 }
 
 /*
+Modal functions
+*/
+/* Element Caching */
+let modal = $("#player-history-modal");
+let modalCardBody = modal.find(".modal-card-body");
+function close_modal() {
+    modal.removeClass("is-active");
+}
+
+// Closes Modal when esc is pressed
+$(document).keyup(function(e) {
+    if(e.keyCode === 27) close_modal();
+});
+
+function prompt_player_history_modal(playerColumn)
+{
+    modal.addClass("is-active");
+    modal.find(".modal-card-title").text("Pool Ranking History");
+
+    let yearRow = $(document.createElement("tr"));
+    yearRow.append("<th class='has-text-centered'>Year</th>");
+
+    let posRow = $(document.createElement("tr"));
+    posRow.append("<th class='has-text-centered'>Rank</th>");
+
+    for (let i = 0; i < SeasonHistory.length; i++)
+    {
+        let season = SeasonHistory[i];
+        let year = season[0];
+        let pos = season[1][playerColumn.data("pid")];
+        if (pos === undefined)
+            pos = '-'
+
+        yearRow.append("<td class='has-text-centered'>" + year + "</td>");
+        posRow.append("<td class='has-text-centered'>" + pos + "</td>");
+    }
+
+    let table = $(document.createElement("table"));
+    table
+        .addClass("table")
+        .addClass("is-fullwidth")
+        .append(yearRow)
+        .append(posRow);
+
+    let tableWrapper = $(document.createElement("div"));
+    tableWrapper.css("overflow-x", "scroll");
+    tableWrapper.html(table);
+
+    modalCardBody.html(tableWrapper);
+}
+
+/*
 LEVEL 4 Functions
 */
 
@@ -423,27 +475,10 @@ function set_OWGR() {
     });
 }
 
+let SeasonHistory;
 function set_season_history() {
     $.get('/picks/season-history', function(response) {
-        $(".pool-ranking-column").attr("rowspan", response.length); //Set height of table
-
-        $(".player-column").each(function() {
-            const pid = $(this).data('pid');
-            let posColumn = $(this).find('.pos-history');
-            for(let i = 0; i < response.length; i++) {  // Get ranking from each year
-                const year_history = response[i];
-                const year = year_history[0];
-                let pos = '-';
-                if(year_history[1].hasOwnProperty(pid))
-                    pos = year_history[1][pid];
-
-                if(i === 0)
-                    posColumn.text([year, pos].join(": "));
-                else
-                    posColumn.closest('table').append("<tr><td>" + [year, pos].join(": ") + "</td></tr>")
-            }
-
-        });
+        SeasonHistory = response;
     });
 }
 

@@ -41,7 +41,8 @@ Params:
         </form>
     </div>
 </div>
-
+{% import "modal.macro.html" as modal_macs  %}
+{{ modal_macs.blank_modal("player-history-modal") }}
 <script>
 {# Vars for Script #}
 const CURRENT_YEAR = {{ year }};
