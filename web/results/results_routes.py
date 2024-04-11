@@ -5,7 +5,7 @@ import os
 import uuid
 
 from flask import Blueprint, get_template_attribute, jsonify, redirect, render_template, request, session, url_for
-from config import LIVE_TOURNAMENT_OVERRIDE_ID, LIVE_TOURNAMENT_OVERRIDE_YEAR, PICKS_LOCKED, POINT_MAP, XL_DIR, TOURNAMENT_NAME_MAP, UNLOCK_ALL_PAGES
+from config import LIVE_TOURNAMENT_OVERRIDE_ID, LIVE_TOURNAMENT_OVERRIDE_NAME, LIVE_TOURNAMENT_OVERRIDE_YEAR, PICKS_LOCKED, POINT_MAP, XL_DIR, TOURNAMENT_NAME_MAP, UNLOCK_ALL_PAGES
 
 from helper.globalcache import GlobalCache
 from helper.helpers import default_to, func_find, CURRENT_YEAR, resolve_photo
@@ -42,15 +42,17 @@ def results_live():
         # Override live tournament if applicable
         # Otherwise try to get tournament metadata from cache
         if LIVE_TOURNAMENT_OVERRIDE_ID is not None and LIVE_TOURNAMENT_OVERRIDE_YEAR is not None:
-            channel_tid = LIVE_TOURNAMENT_OVERRIDE_ID
+            golfcom_tid = LIVE_TOURNAMENT_OVERRIDE_ID
             year = LIVE_TOURNAMENT_OVERRIDE_YEAR
+            tournament_name = LIVE_TOURNAMENT_OVERRIDE_NAME
         elif GlobalCache.live_tournament is not None:
-            channel_tid = GlobalCache.live_tournament.tid
+            golfcom_tid = GlobalCache.live_tournament.tid
             year = GlobalCache.live_tournament.year
+            tournament_name = LIVE_TOURNAMENT_OVERRIDE_NAME
         else:
             raise RuntimeError
 
-        tournament = get_api_tournament(channel_tid=channel_tid, year=year)
+        tournament = get_api_tournament(golfcom_tid=golfcom_tid, year=year, tournament_name=tournament_name)
         if tournament is None:
             block_response = "No tournament results found on source (www.golfchannel.com)", HTTPStatus.OK
 
@@ -131,7 +133,7 @@ def results_past(year, tid=None):
 @mod.route("/<int:year>/<tid>/get-pickset-modal")
 def get_pickset_modal(year=CURRENT_YEAR, tid=None):
     psid = request.args.get("psid")
-    channel_tid = request.args.get("channel_tid")
+    golfcom_tid = request.args.get("golfcom_tid")
 
     pickset = Pickset(psid)
     pickset.picks = get_picks(psid, separate=False)
@@ -141,7 +143,7 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
 
     tournament = None
     if tid is None:
-        tournament = get_api_tournament(channel_tid)
+        tournament = get_api_tournament(golfcom_tid)
         pickset.merge_tournament(tournament)
 
     else:
@@ -169,14 +171,14 @@ def get_pickset_modal(year=CURRENT_YEAR, tid=None):
 @mod.route("/<int:year>/<tid>/get-player-modal")
 def get_player_modal(year=CURRENT_YEAR, tid=None):
     pid = request.args.get("pid")
-    channel_tid = request.args.get("channel_tid")
+    golfcom_tid = request.args.get("golfcom_tid")
 
     player = Player(id=pid)
     player.picked_by = who_picked_player(player.id, year=year)
     
     # Get API results
     if tid is None:
-        tournament = get_api_tournament(channel_tid)
+        tournament = get_api_tournament(golfcom_tid)
         leaderboard_player = func_find(
             tournament.players, lambda pl: pl.id == player.id)
         player.merge_attributes(asdict(leaderboard_player))

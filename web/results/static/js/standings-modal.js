@@ -34,7 +34,7 @@ function prompt_pickset_modal(psid, name, pos) {
     modal.find(".modal-card-title").text(pos + " | " + name);
 
     /* Get modal body */
-    $.get(window.location.href+"/get-pickset-modal", {psid:psid, channel_tid:channelTid}, function(response) {
+    $.get(window.location.href+"/get-pickset-modal", {psid:psid, golfcom_tid:golfcom_tid}, function(response) {
         modalCardBody.html(response);
     }).fail(function() {
         window.alert("Server Error: Could not load info");
@@ -129,7 +129,7 @@ function prompt_player_modal(pid, name, pos) {
     modal.find(".modal-card-title").text(pos + " | " + name);
 
     /* Get modal body */
-    $.get(window.location.href+"/get-player-modal", {pid:pid, channel_tid:channelTid}, function(response) {
+    $.get(window.location.href+"/get-player-modal", {pid:pid, golfcom_tid:golfcom_tid}, function(response) {
         modalCardBody.html(response);
     }).fail(function() {
         window.alert("Server Error: Could not load info");

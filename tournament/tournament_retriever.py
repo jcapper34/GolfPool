@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import List
+import logging
 
-from config import LEADERBOARD_URL, POINT_MAP
+from config import LEADERBOARD_URL, OWGR_LEADERBOARD_URL, POINT_MAP
 from helper.globalcache import GlobalCache
 from helper.helpers import request_json
 from picksets.pickset import Pickset
@@ -10,44 +11,37 @@ from tournament.tournament import Tournament
 from db.connection_pool import db_pool
 
 
-def get_api_tournament(channel_tid, year=None) -> Tournament:
-    channel_tid = int(channel_tid)
+def get_api_tournament(golfcom_tid, year=None, tournament_name=None) -> Tournament:
+    url = LEADERBOARD_URL % golfcom_tid
 
-    api_data = request_json(LEADERBOARD_URL % channel_tid)
-    api_tournament = api_data.get('result')
-    if not api_tournament or api_tournament is None:
+    logging.info("[get_api_tournament] Fetching %s", url)
+    api_data = request_json(url)
+    if api_data is None:
         return None # Tournament has no results
 
-    leaderboard = api_tournament['golfers']
+    api_tournament = api_data['data']
+    leaderboard = api_tournament['leaderboard']
 
     tournament = Tournament()
-    tournament.channel_tid = api_tournament.get('eventKey')
-    tournament.scorecards = api_tournament['scorecards']
+    tournament.name = tournament_name
+    tournament.golfcom_tid = golfcom_tid
+    tournament.scorecards = api_tournament.get('scorecards', [])
+    tournament.year = year
 
-    # Try to get year from api tournament
-    if year is None:
-        try:
-            tournament.year = datetime.strptime(
-                api_data.get('latestOddsUpdate'), "%B %d, %Y").year
-        except Exception:
-            tournament.year = year
-
-    tournament.players = [Player(id=str(pl['golferId']),
-                                 name=pl['firstName'] + " " + pl['lastName'],
-                                 pos=pl['position'] if pl['sortHelp'] is not None and pl['sortHelp'] < 1000 else None,
+    tournament.players = [Player(id=str(pl['playerId']),
+                                 name=' '.join([pl['Player']['firstName'], pl['Player']['lastName']]),
+                                 pos=pl['position'],
                                  points=POINT_MAP[str(
-                                     pl['sortHelp'])] if pl['sortHelp'] is not None and pl['sortHelp'] <= 20 else 0,
-                                 raw_pos=pl['sortHelp'],
-                                 total=pl['overallPar'],
-                                 thru=pl['thruHole'],
-                                 photo_url=pl['imageUrl'],
-                                 country_flag=pl['representsCountryUrl'],
-                                 status=pl['status']
+                                     pl['position'])] if pl['position'] is not None and pl['position'] <= 20 else 0,
+                                 raw_pos=pl['position'],
+                                 total=pl['score'],
+                                #  thru=pl['thruHole'],
+                                #  photo_url=pl['imageUrl'],
+                                 status=pl['playerStatus']
                                  ) for pl in leaderboard]  # Create Player objects of leaderboard
 
     # Sort so that None is at the end
     tournament.players.sort(key=lambda x: (x.raw_pos is None, x.raw_pos))
-    tournament.name = api_tournament.get("eventName")
 
     return tournament
 

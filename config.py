@@ -84,9 +84,10 @@ TOUR_PLAYERS_URL = "https://statdata.pgatour.com/players/player.json"
 # =======================
 # OWGR API
 # =======================
+OWGR_DATA_HASH = os.getenv("OWGR_DATA_HASH", "GtoJ9xPTdmOVfHsMXSiAe")
 OWGR_PAGE_SIZE_MAKE_PICKS = 250
 OWGR_RANKINGS_URL = "https://apiweb.owgr.com/api/owgr/rankings/getRankings?regionId=0&pageSize=%d&pageNumber=%d&countryId=0&sortString=Rank+ASC" # Parameters: int[pageSize], int[pageNumber]
-OWGR_LEADERBOARD_URL = "https://www.owgr.com/_next/data/GtoJ9xPTdmOVfHsMXSiAe/events/valspar-championship-10321.json"
+OWGR_LEADERBOARD_URL = "https://www.owgr.com/_next/data/" + OWGR_DATA_HASH + "/events/%d.json" # Parameters: int[tid]
 
 # Headers will emulate browser
 BROWSER_EMULATE_HEADERS = {
@@ -131,6 +132,7 @@ DB_SSLMODE = os.getenv("DB_SSLMODE")
 # If you want to override which tournament is used for live
 LIVE_TOURNAMENT_OVERRIDE_ID = os.getenv("LIVE_TOURNAMENT_OVERRIDE_ID")
 LIVE_TOURNAMENT_OVERRIDE_YEAR = os.getenv("LIVE_TOURNAMENT_OVERRIDE_YEAR")
+LIVE_TOURNAMENT_OVERRIDE_NAME = os.getenv("LIVE_TOURNAMENT_OVERRIDE_NAME")
 
 # Feature controls
 ENABLE_THREADED_DB_CONN = get_bool("ENABLE_THREADED_DB_CONN", True)

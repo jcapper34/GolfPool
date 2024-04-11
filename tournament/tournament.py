@@ -11,7 +11,7 @@ class Tournament:
     tid: int = None
     year: int = CURRENT_YEAR
     name: str = None
-    channel_tid: str = None
+    golfcom_tid: str = None
 
     players: List[Player] = None
     picksets: List[Pickset] = None

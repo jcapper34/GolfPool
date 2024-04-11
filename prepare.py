@@ -38,22 +38,23 @@ def compile_sass():
 
 
 def test_standings_calculations():
+    print("[test_standings_calculations] Starting test")
     picksets = [
         Pickset(
             id=1,
-            picks=[Player(id=1), Pickset(id=4), Pickset(id=5), Pickset(id=9)]
+            picks=[Player(id=1), Player(id=4), Player(id=5), Player(id=9)]
         ),
         Pickset(
             id=2,
-            picks=[Player(id=1), Pickset(id=2), Pickset(id=3), Pickset(id=6)]
+            picks=[Player(id=1), Player(id=2), Player(id=3), Player(id=6)]
         ),
         Pickset(
             id=3,
-            picks=[Player(id=2), Pickset(id=4), Pickset(id=5), Pickset(id=7)]
+            picks=[Player(id=2), Player(id=4), Player(id=5), Player(id=7)]
         ),
         Pickset(
             id=4,
-            picks=[Player(id=1), Pickset(id=4), Pickset(id=7), Pickset(id=9)]
+            picks=[Player(id=1), Player(id=4), Player(id=7), Player(id=9)]
         )
     ]
     
@@ -79,14 +80,17 @@ def test_standings_calculations():
     assert picksets[3].id == 1
     assert picksets[3].points == 130
 
+    print("[test_standings_calculations] Test completed successfully")
+
 
 def test_api():
-    assert get_api_tournament(19540) is not None
+    print("[test_api] Starting test")
+    assert get_api_tournament('459e9ffb-1eb4-422c-9f13-1ba8344c35aa') is not None
+    print("[test_api] Test completed successfully")
 
 if __name__ == "__main__":
     compile_sass()
     
     # Tests
-    # test_standings_calculations()
-    # test_api()
-    
+    test_standings_calculations()
+    test_api()
