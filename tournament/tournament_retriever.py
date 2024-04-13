@@ -4,11 +4,22 @@ import logging
 
 from config import LEADERBOARD_URL, OWGR_LEADERBOARD_URL, POINT_MAP
 from helper.globalcache import GlobalCache
-from helper.helpers import request_json
+from helper.helpers import func_find, request_json
 from picksets.pickset import Pickset
 from players.player import Player
 from tournament.tournament import Tournament
 from db.connection_pool import db_pool
+
+
+def get_player_thru(leaderboard_player, current_round):
+    if current_round is not None:
+        player_round = func_find(leaderboard_player.get("PlayerRounds", []), 
+                lambda r: r["sequence"] == current_round["number"])
+        
+        if player_round is not None:
+            return player_round["thru"]
+    
+    return None
 
 
 def get_api_tournament(golfcom_tid, year=None, tournament_name=None) -> Tournament:
@@ -28,6 +39,13 @@ def get_api_tournament(golfcom_tid, year=None, tournament_name=None) -> Tourname
     tournament.scorecards = api_tournament.get('scorecards', [])
     tournament.year = year
 
+    rounds = api_tournament.get("roundStatus", [])
+
+    current_round = func_find(rounds, lambda x: x.get("status") == "inprogress" or x.get("status") == "delayed")
+    common_thru = None
+    if current_round is None and all([r["status"] == "closed" for r in rounds]):
+            common_thru = 18
+
     tournament.players = [Player(id=str(pl['playerId']),
                                  name=' '.join([pl['Player']['firstName'], pl['Player']['lastName']]),
                                  pos=pl['position'],
@@ -35,7 +53,7 @@ def get_api_tournament(golfcom_tid, year=None, tournament_name=None) -> Tourname
                                      pl['position'])] if pl['position'] is not None and pl['position'] <= 20 else 0,
                                  raw_pos=pl['position'],
                                  total=pl['score'],
-                                #  thru=pl['thruHole'],
+                                 thru=common_thru if common_thru is not None else get_player_thru(pl, current_round),
                                 #  photo_url=pl['imageUrl'],
                                  status=pl['playerStatus']
                                  ) for pl in leaderboard]  # Create Player objects of leaderboard

@@ -87,4 +87,7 @@ def get_player_photo(pid) -> str:
         result = conn.exec_fetch(
             "SELECT photo_url, tour_id FROM player WHERE id=%s", (pid,), fetchall=False)
         
-        return resolve_photo(result['photo_url'], result['tour_id'])
+        if result is not None:
+            return resolve_photo(result['photo_url'], result['tour_id'])
+        
+        return None
