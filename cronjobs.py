@@ -33,46 +33,59 @@ def start_jobs() -> None:
             func, trigger=trigger, day_of_week=day_of_week, hour=hour)
 
     start_and_schedule(xl_cleanup_job, trigger='cron', day_of_week='*', hour='*')
+    start_and_schedule(update_current_major, trigger='cron', day_of_week='*', hour='0')
 
     # Start Periodic Scheduler
     scheduler.start()
 
+def resolve_major(title) -> str:
+    """
+    Sloppy way of determining the tid from the tournament name
+    """
+    title = title.casefold()
+    if "Masters Tournament".casefold() == title:
+        return '014'
+    elif "U.S. Open".casefold() == title:
+        return '026'
+    elif "The Open Championship".casefold() in title:
+        return '100'
+    elif "PGA Championship".casefold() == title:
+        return '033'
 
-def update_last_major(year=CURRENT_YEAR) -> None:
+    return None
+
+def update_current_major(year=CURRENT_YEAR) -> None:
+    events = requests.get(EVENTS_URL % year).json().get("data", [])
+    now = datetime.now()
+    for event in events:
+        name = event.get("tournamentName")
+        tid = resolve_major(name)
+        if tid is not None:
+            eventStart = isoparse(event.get("startDate"))
+            eventEnd = isoparse(event.get("endDate"))
+            if now < eventEnd:
+                GlobalCache.set_live_tournament(name, event.get("tournamentId"), year)
+                return
+
+def upload_last_major(year=CURRENT_YEAR) -> None:
     """
     _summary_
     """
 
-    def resolve_major(title) -> str:
-        """
-        Pretty sloppy way of determining the tid from the major name
-        """
-        title = title.casefold()
-        if "masters" in title:
-            tid = '014'
-        elif ("us" in title or 'u.s' in title) and 'open' in title:
-            tid = '026'
-        elif 'open' in title:
-            tid = '100'
-        else:
-            tid = '033'
-
-        return tid
-
     dt = datetime.now()
-    events = requests.get(EVENTS_URL % year).json()
+    events = requests.get(EVENTS_URL % year).json().get("data", [])
     logging.info("[update_last_major] Found %d events from API in year %d" % (len(events), year))
 
     # Walk through events backwards to find majors
-    major_channel_tids = []
+    major_golfcom_ids = []
     for event in reversed(events):
         if event.get("major"):
-            channel_tid = event.get("key")
+            golfcom_id = event.get("key")
             tid = resolve_major(event.get("name"))
             eventStart = isoparse(event.get("startDate"))
             eventEnd = isoparse(event.get("endDate"))
 
-            major_channel_tids.append(channel_tid)
+            major_golfcom_ids.append(golfcom_id)
 
             if event.get("winnerKey"):
                 with db_pool.get_conn() as conn:
@@ -80,7 +93,7 @@ def update_last_major(year=CURRENT_YEAR) -> None:
                         "SELECT EXISTS (SELECT FROM event_leaderboard_xref WHERE tournament_id=%s AND season_year=%s)", (tid, eventEnd.year), fetchall=False)[0]
                     if not inDb:
                         logging.info("[update_last_major] %s is being uploaded to DB" % event.get("name"))
-                        tournament = get_api_tournament(channel_tid)
+                        tournament = get_api_tournament(golfcom_id)
 
                         # Insert season
                         conn.exec(
@@ -119,11 +132,11 @@ def update_last_major(year=CURRENT_YEAR) -> None:
 
             # Set the tournament_id of the current major
             if dt > eventStart:
-                GlobalCache.set_live_tournament(channel_tid, year)
+                GlobalCache.set_live_tournament(golfcom_id, year)
         
     # Default current_tid to be the first major of the year
     if GlobalCache.live_tournament is None:
-        GlobalCache.set_live_tournament(major_channel_tids.pop(), year)
+        GlobalCache.set_live_tournament(major_golfcom_ids.pop(), year)
 
     logging.info("[update_last_major] Current tid set to %s" % GlobalCache.live_tournament.tid)
     logging.info("[update_last_major] Finished job")

@@ -48,7 +48,7 @@ def results_live():
         elif GlobalCache.live_tournament is not None:
             golfcom_tid = GlobalCache.live_tournament.tid
             year = GlobalCache.live_tournament.year
-            tournament_name = LIVE_TOURNAMENT_OVERRIDE_NAME
+            tournament_name = GlobalCache.live_tournament.name
         else:
             raise RuntimeError
 
