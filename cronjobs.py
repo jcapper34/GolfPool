@@ -63,7 +63,7 @@ def update_current_major(year=CURRENT_YEAR) -> None:
         if tid is not None:
             eventStart = isoparse(event.get("startDate"))
             eventEnd = isoparse(event.get("endDate"))
-            if now < eventEnd:
+            if now < eventEnd + timedelta(days=1):
                 GlobalCache.set_live_tournament(name, event.get("tournamentId"), year)
                 return
 
