@@ -4,7 +4,7 @@ import logging
 
 from config import LEADERBOARD_URL, OWGR_LEADERBOARD_URL, POINT_MAP
 from helper.globalcache import GlobalCache
-from helper.helpers import func_find, request_json
+from helpers import func_find, request_json
 from picksets.pickset import Pickset
 from players.player import Player
 from tournament.tournament import Tournament

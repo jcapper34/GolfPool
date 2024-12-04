@@ -1,6 +1,6 @@
 from typing import List
 
-from helper.helpers import CURRENT_YEAR, resolve_photo
+from helpers import CURRENT_YEAR, resolve_photo
 from picksets.pickset import Pickset
 from players.player import Player
 

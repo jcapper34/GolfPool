@@ -4,7 +4,7 @@ from config import *
 from psycopg2.pool import SimpleConnectionPool, ThreadedConnectionPool
 from urllib.parse import parse_qs, urlparse
 from db.connection import Conn
-from helper.helpers import retry_util
+from helpers import retry_util
 
 
 class ConnectionPool:

@@ -6,7 +6,7 @@ sys.path.insert(0, APP_ROOT)
 
 ### Start Test Script Here ###
 from pprint import pprint
-from helper.helpers import func_find, splash
+from helpers import func_find, splash
 from test.mailer_test import test_picks_send
 from db.conn import Conn
 from tournament.tournament import Tournament

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from helper.helpers import CURRENT_YEAR, func_find
+from helpers import CURRENT_YEAR, func_find
 from picksets.pickset import Pickset
 from players.player import Player
 

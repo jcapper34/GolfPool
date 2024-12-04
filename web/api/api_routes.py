@@ -2,7 +2,7 @@ from dataclasses import asdict
 from flask import blueprints
 from flask.json import jsonify
 from config import PICKS_LOCKED, UNLOCK_ALL_PAGES
-from helper.helpers import CURRENT_YEAR
+from helpers import CURRENT_YEAR
 
 from picksets.pickset_getters import get_all_picks
 from tournament.tournament_calculations import calculate_standings

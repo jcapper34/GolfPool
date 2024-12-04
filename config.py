@@ -18,7 +18,7 @@ def get_bool(key: str, default: bool):
 # =======================
 # Database Credentials
 # =======================
-DATABASE_CONNECTION_STRING = os.getenv("DB_CONNECTION_STRING")
+DB_CONNECTION_STRING = os.getenv("DB_CONNECTION_STRING")
 
 # =======================
 # Point Map
@@ -120,6 +120,9 @@ ROUTING_ALIASES = (
 SRC_LOCAL = get_bool("SRC_LOCAL", True)
 PICKS_LOCKED = get_bool("PICKS_LOCKED", True)
 UNLOCK_ALL_PAGES = get_bool("UNLOCK_ALL_PAGES", False)
+
+# Azure Config
+AZURE_TENANT_ID = os.getenv("AZURE_TENANT_ID")
 
 # Database credentials
 DB_USER = os.getenv("DB_USER")

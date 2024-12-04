@@ -8,7 +8,7 @@ from flask import Blueprint, get_template_attribute, jsonify, redirect, render_t
 from config import LIVE_TOURNAMENT_OVERRIDE_ID, LIVE_TOURNAMENT_OVERRIDE_NAME, LIVE_TOURNAMENT_OVERRIDE_YEAR, PICKS_LOCKED, POINT_MAP, XL_DIR, TOURNAMENT_NAME_MAP, UNLOCK_ALL_PAGES
 
 from helper.globalcache import GlobalCache
-from helper.helpers import default_to, func_find, CURRENT_YEAR, resolve_photo
+from helpers import default_to, func_find, CURRENT_YEAR, resolve_photo
 from picksets.pickset import Pickset
 from picksets.pickset_getters import get_all_picks, get_picks, get_tournament_history
 from players.player import Player

@@ -1,5 +1,5 @@
 from typing import List
-from helper.helpers import func_find
+from helpers import func_find
 from picksets.pickset import Pickset
 from players.player import Player
 

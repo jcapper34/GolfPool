@@ -11,7 +11,7 @@ import requests
 from config import *
 from db.connection_pool import db_pool
 from helper.globalcache import GlobalCache
-from helper.helpers import *
+from helpers import *
 from picksets.pickset_getters import get_all_picks
 from players.player_getters import get_levels_db
 from tournament.tournament_calculations import calculate_standings

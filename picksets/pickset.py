@@ -1,5 +1,5 @@
 from dataclasses import asdict, dataclass
-from helper.helpers import func_find
+from helpers import func_find
 from typing import List, ClassVar
 
 from players.player import Player

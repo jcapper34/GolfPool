@@ -4,7 +4,7 @@ from http import HTTPStatus
 from config import *
 
 # My function imports
-from helper.helpers import CURRENT_YEAR, request_json
+from helpers import CURRENT_YEAR, request_json
 from mailer.postman import Postman
 from picksets.pickset_submission import submit_change_picks, submit_picks
 from picksets.pickset_getters import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks, get_pickset

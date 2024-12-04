@@ -1,5 +1,5 @@
 from typing import List
-from helper.helpers import CURRENT_YEAR
+from helpers import CURRENT_YEAR
 from picksets.pickset import Pickset
 from players.player import Player
 from mailer.postman import Postman

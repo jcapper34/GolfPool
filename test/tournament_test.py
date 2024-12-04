@@ -7,7 +7,7 @@ APP_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 sys.path.insert(0, APP_ROOT)
 
 ### Start Test Script Here ###
-from helper.helpers import splash
+from helpers import splash
 import requests
 from tournament.tournament import Tournament
 
