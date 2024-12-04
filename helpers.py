@@ -1,5 +1,6 @@
 import json
 import inspect
+import logging
 from pprint import pprint
 from datetime import datetime
 import threading
@@ -84,12 +85,17 @@ def retry_util(func, max_retry=3, wait_sec=2) -> None:
     """
     Retry a function until success or max retries has been exceeded
     """
-    for attempt in range(max_retry):
+    attempt = 0
+    while True:
         try:
             return func()
-        except Exception:
-            time.sleep(wait_sec)
-
+        except Exception as e:
+            if attempt < max_retry:
+                logging.error("[retry_util] Received exception %s. Retrying...", type(e))
+                time.sleep(wait_sec)
+                attempt += 1
+            else:
+                raise e
 
 def default_to(val, default):
     """
