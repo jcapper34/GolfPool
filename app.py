@@ -4,13 +4,14 @@ from flask import Flask, render_template, redirect, url_for, request, jsonify
 from requests import get as http_get
 import logging
 from cronjobs import start_jobs
+from helper import azure_utility
 from helpers import CURRENT_YEAR, request_json
 from web.jinjafilters import register_filters
 
 from web.picks.picks_routes import mod as picks_mod
 from web.results.results_routes import mod as results_mod
 from web.api.api_routes import mod as api_mod
-from config import ROUTING_ALIASES, SRC_LOCAL
+from config import ENABLE_CRON_JOBS, ROUTING_ALIASES, SRC_LOCAL
 from flask_cors import CORS
 
 app = Flask(__name__, static_folder='web/static', template_folder='web/templates')   # Creates app
@@ -27,6 +28,11 @@ app.secret_key = b'=\x06\x9f}\x97\xe9\x88\xba\xd0\xaa\xe7r\x82\x94\x8a\xb8m\x84\
 logging.basicConfig(format='[%(asctime)s] - %(message)s', level=logging.INFO)
 
 # ========================
+# Initialize Azure Credentials
+# ========================
+azure_utility.get_credential()
+
+# ========================
 # Register Blueprints
 # ========================
 app.register_blueprint(picks_mod, url_prefix='/picks')
@@ -41,15 +47,8 @@ register_filters(app)
 # ========================
 # Start Cron Jobs
 # ========================
-start_jobs()
-
-# =======================
-#   Routes Begin
-# =======================
-@app.route("/")
-def index():
-    return render_template("home.html", year=CURRENT_YEAR)
-
+if ENABLE_CRON_JOBS:
+    start_jobs()
 
 # =======================
 #       Aliases
@@ -63,11 +62,16 @@ def alias_handlers(dest):
 for i, pair in enumerate(ROUTING_ALIASES):
     app.add_url_rule(pair[0], "alias"+str(i), alias_handlers(pair[1]))
 
+# =======================
+#   Routes Begin
+# =======================
+@app.route("/")
+def index():
+    return render_template("home.html", year=CURRENT_YEAR)
 
 @app.route('/test')
 def test_page():
     return render_template('test.html')
-
 
 # ========================
 # Helpers

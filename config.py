@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 
 # =======================
@@ -117,12 +118,15 @@ ROUTING_ALIASES = (
     ("/standings/<int:year>/<tid>", "results.results_past")
 )
 
+IS_PRODUCTION = get_bool("IS_PRODUCTION", False)
 SRC_LOCAL = get_bool("SRC_LOCAL", True)
 PICKS_LOCKED = get_bool("PICKS_LOCKED", True)
 UNLOCK_ALL_PAGES = get_bool("UNLOCK_ALL_PAGES", False)
+ENABLE_CRON_JOBS = get_bool("ENABLE_CRON_JOBS", True)
 
 # Azure Config
 AZURE_TENANT_ID = os.getenv("AZURE_TENANT_ID")
+AZURE_TOKEN_EXPIRY = timedelta(seconds=os.getenv("AZURE_TOKEN_EXPIRY", 120))
 
 # Database credentials
 DB_USER = os.getenv("DB_USER")

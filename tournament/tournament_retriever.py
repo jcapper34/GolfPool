@@ -3,6 +3,7 @@ from typing import List
 import logging
 
 from config import LEADERBOARD_URL, OWGR_LEADERBOARD_URL, POINT_MAP
+from db.database_connection import DatabaseConnection
 from helper.globalcache import GlobalCache
 from helpers import func_find, request_json
 from picksets.pickset import Pickset
@@ -64,7 +65,7 @@ def get_api_tournament(golfcom_tid, year=None, tournament_name=None) -> Tourname
     return tournament
 
 
-def get_db_rankings(tid, year, conn=None) -> List[Player]:
+def get_db_rankings(tid, year) -> List[Player]:
     # Parameters: year, tid
     # Returns: pid, name, points, pos ORDERED BY points
     GET_DB_RANKINGS_QUERY = """
@@ -75,18 +76,19 @@ def get_db_rankings(tid, year, conn=None) -> List[Player]:
             ON t.id = event.tournament_id
         JOIN player AS pl
             ON pl.id = elx.player_id
-        WHERE event.season_year = %s AND elx.tournament_id = COALESCE(%s, elx.tournament_id)
+        WHERE event.season_year = ? AND elx.tournament_id = COALESCE(?, elx.tournament_id)
         GROUP BY pl.id, pl.name)
         SELECT * FROM leaderboard WHERE points > 0
     """
     
     raw_players = None
-    with db_pool.get_conn() as conn:
-        raw_players = conn.exec_fetch(GET_DB_RANKINGS_QUERY, (
-            year, tid if tid != 'cumulative' else None))
-
-    if raw_players:
-        return [Player(**p) for p in raw_players]
+    with DatabaseConnection() as conn:
+        cursor = conn.cursor()
+        raw_players = cursor.execute(
+            GET_DB_RANKINGS_QUERY, (year, tid if tid != 'cumulative' else None)).fetchall()
+    
+        if raw_players:
+            return [Player(id=row['id'], name=row['name'], points=row['points'], pos=row['pos']) for row in raw_players]
 
     return None
 
@@ -101,15 +103,15 @@ def get_db_standings(tid, year, conn=None) -> List[Pickset]:
                     ON esx.pickset_id = ps.id
                 JOIN participant AS pa
                     ON ps.participant_id = pa.id
-            WHERE esx.season_year = %s AND esx.tournament_id = COALESCE(%s, esx.tournament_id)
-            GROUP BY ps.id, name
+            WHERE esx.season_year = ? AND esx.tournament_id = COALESCE(?, esx.tournament_id)
+            GROUP BY ps.id, (pa.name || COALESCE(' - ' || ps.num, ''))
             ORDER BY SUM(esx.points) DESC
     """
 
     results = None
-    with db_pool.get_conn() as conn:
-        results = conn.exec_fetch(GET_DB_STANDINGS_QUERY,
-                                (year, tid if tid != 'cumulative' else None))
+    with DatabaseConnection() as conn:
+        cursor = conn.cursor()
+        results = cursor.execute(GET_DB_STANDINGS_QUERY, (year, tid if tid != 'cumulative' else None)).fetchall()
     if results:
         return [Pickset(id=row['psid'], name=row['name'],
                                 points=row['points'], pos=row['pos']) for row in results]
@@ -125,8 +127,9 @@ def get_past_events(conn=None) -> dict:
             ORDER BY season_year DESC
     """
     results = None
-    with db_pool.get_conn() as conn:
-        results = conn.exec_fetch(PAST_EVENTS_QUERY)
+    with DatabaseConnection() as conn:
+        cursor = conn.cursor()
+        results = cursor.execute(PAST_EVENTS_QUERY).fetchall()
 
     year_tourny = {}
     for row in results:

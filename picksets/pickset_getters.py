@@ -1,5 +1,6 @@
-from typing import List
+from typing import Iterator, List
 
+from db.database_connection import DatabaseConnection
 from helpers import CURRENT_YEAR, resolve_photo
 from picksets.pickset import Pickset
 from players.player import Player
@@ -11,7 +12,7 @@ def get_all_picks(year, separate=False) -> List[Pickset]:
     # Parameters: year
     # Returns: psid, psname, pid, pl.name, level
     GET_ALL_PICKS_QUERY = """
-        SELECT ps.id AS psid, (pa.name || COALESCE(' - ' || ps.num, '')) AS psname, px.player_id AS pid, pl.name, COALESCE(lx.level, 4) AS level
+        SELECT ps.id AS psid, CONCAT(pa.name, COALESCE(CONCAT(' - ', ps.num), '')) AS psname, px.player_id AS pid, pl.name, COALESCE(lx.level, 4) AS level
             FROM picks_xref AS px
             JOIN pickset AS ps
                 ON px.pickset_id = ps.id
@@ -21,12 +22,13 @@ def get_all_picks(year, separate=False) -> List[Pickset]:
                 ON px.player_id = pl.id
             LEFT JOIN level_xref AS lx
                 ON px.player_id = lx.player_id AND ps.season_year = lx.season_year
-            WHERE ps.season_year = %s
+            WHERE ps.season_year = ?
             ORDER BY psname, level, pl.name
             """
     results = None
-    with db_pool.get_conn() as conn:
-        results = conn.exec_fetch(GET_ALL_PICKS_QUERY, (year,))
+    with DatabaseConnection() as conn:
+        cursor = conn.cursor()
+        results = cursor.execute(GET_ALL_PICKS_QUERY, year).fetchall()
     
     if not results:
         return []
@@ -55,7 +57,7 @@ def get_all_picks(year, separate=False) -> List[Pickset]:
     return pickset_list
 
 
-def get_tournament_history(psid, year=CURRENT_YEAR) -> List:
+def get_tournament_history(psid) -> Iterator:
     """
     Parameters: season_year, ps.id
     Returns: tournament.name, pos, points
@@ -64,11 +66,11 @@ def get_tournament_history(psid, year=CURRENT_YEAR) -> List:
         SELECT t.name, esx.position AS pos, esx.points FROM event_standings_xref AS esx
             JOIN tournament AS t
                 ON t.id = esx.tournament_id
-            WHERE esx.pickset_id = %s
+            WHERE esx.pickset_id = ?
         """
-    with db_pool.get_conn() as conn:
-        return conn.exec_fetch(
-            GET_TOURNAMENT_HISTORY_QUERY, (psid,))
+    with DatabaseConnection() as conn:
+        cursor = conn.cursor()
+        return list(cursor.execute(GET_TOURNAMENT_HISTORY_QUERY, psid).fetchall())
 
 
 def get_pickset(psid) -> Pickset:
@@ -80,11 +82,12 @@ def get_pickset(psid) -> Pickset:
         SELECT pa.name, pa.email, ps.pin FROM participant as pa
             JOIN pickset ps
             ON ps.participant_id = pa.id
-            WHERE ps.id = %s
+            WHERE ps.id = ?
     """
-    with db_pool.get_conn() as conn:
-        results = conn.exec_fetch(GET_PICKSET_QUERY, (psid,), fetchall=False)
-        if not results or results is None:
+    with DatabaseConnection() as conn:
+        cursor = conn.cursor()
+        results = cursor.execute(GET_PICKSET_QUERY, psid).fetchone()
+        if results is None:
             return None
         
         return Pickset(id=psid, name=results['name'], email=results['email'], pin=results['pin'])
@@ -105,11 +108,12 @@ def get_picks(psid=None, separate=True) -> List:
             ON pa.id = ps.participant_id
             LEFT JOIN level_xref lx
             ON pl.id = lx.player_id AND ps.season_year = lx.season_year
-            WHERE ps.id = %s ORDER BY lx.level
+            WHERE ps.id = ? ORDER BY lx.level
     """
     picks = None
-    with db_pool.get_conn() as conn:
-        results = conn.exec_fetch(GET_PICKS_QUERY, (psid,))
+    with DatabaseConnection() as conn:
+        cursor = conn.cursor()
+        results = cursor.execute(GET_PICKS_QUERY, psid).fetchall()
 
         picks = [Player(row['pid'], name=row['name'], level=row['level'],
                 photo_url=resolve_photo(row['photo_url'], row['tour_id']))
@@ -129,40 +133,47 @@ def get_most_picked(year) -> List[Player]:
             JOIN picks_xref as pi ON pl.id = pi.player_id
             JOIN pickset ps on pi.pickset_id = ps.id
             LEFT JOIN level_xref lx on pl.id = lx.player_id AND ps.season_year = lx.season_year
-        WHERE ps.season_year = %s
-        GROUP BY pl.id, pl.name, lev
+        WHERE ps.season_year = ?
+        GROUP BY pl.id, pl.name, COALESCE(lx.level, 4)
         ORDER BY num_picked DESC
     """
     results = None
-    with db_pool.get_conn() as conn:
-        results = conn.exec_fetch(GET_MOST_PICKED_QUERY, (year,))
+    with DatabaseConnection() as conn:
+        cursor = conn.cursor()
+        results = cursor.execute(GET_MOST_PICKED_QUERY, year).fetchall()
     
     return [Player(id=row['id'], name=row['name'], level=row['lev'], num_picked=row['num_picked']) for row in results]
 
 
-def get_login(email, pin) -> int:
+def get_login(email, pin, year=CURRENT_YEAR) -> int:
     # Parameters: email, pin, year
     # Returns: ps.id
     GET_LOGIN_QUERY = """
-        SELECT ps.id FROM participant AS pa
+        SELECT TOP 1 ps.id FROM participant AS pa
             JOIN pickset ps on pa.id = ps.participant_id
-            WHERE pa.email = %s AND ps.pin = %s AND ps.season_year = %s
-            LIMIT 1
+            WHERE pa.email = ? AND ps.pin = ? AND ps.season_year = ?
     """
-    with db_pool.get_conn() as conn:
+
+    with DatabaseConnection() as conn:
         # Remember to change year
-        result = conn.exec_fetch(GET_LOGIN_QUERY, (email, pin, CURRENT_YEAR))
+        cursor = conn.cursor()
+        result = cursor.execute(GET_LOGIN_QUERY, (email, pin, year)).fetchone()
 
-        if conn.cur.rowcount == 0:
-            return False
+        if not result:
+            return None
 
-        return result[0][0]
+        return result[0]
 
 
-def get_email_pin(email) -> str:
-    EMAIL_EXISTS_QUERY = "SELECT pin FROM participant WHERE email=%s LIMIT 1"
+def get_email_pin(email, year=CURRENT_YEAR) -> str:
+    EMAIL_PIN_QUERY = """
+        SELECT TOP 1 ps.pin FROM participant AS pa
+            JOIN pickset ps on pa.id = ps.participant_id
+            WHERE pa.email = ? AND ps.season_year = ?
+    """
     
-    with db_pool.get_conn() as conn:
-        result = conn.exec_fetch(EMAIL_EXISTS_QUERY, (email, ), fetchall=False)
+    with DatabaseConnection() as conn:
+        cursor = conn.cursor()
+        result = cursor.execute(EMAIL_PIN_QUERY, (email, year)).fetchone()
 
-        return result
+        return result[0]
