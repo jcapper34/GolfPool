@@ -1,10 +1,12 @@
 # Library imports
+import traceback
 from flask import Blueprint, render_template, request, session, redirect, jsonify, url_for, get_template_attribute
 from http import HTTPStatus
 from config import *
 
 # My function imports
 from helpers import CURRENT_YEAR, request_json
+import logger
 from mailer.postman import Postman
 from picksets.pickset_submission import submit_change_picks, submit_picks
 from picksets.pickset_getters import get_all_picks, get_login, get_most_picked, get_email_pin, get_picks, get_pickset
@@ -89,7 +91,7 @@ def picks_submit():
         if not psid:  # If form not in correct format
             return "Error: Picks not submitted correctly.", HTTPStatus.BAD_REQUEST
     except Exception as e:   # If internal error
-        print(e)
+        traceback.print_exc()
         return "Server Error: Please try again later", HTTPStatus.INTERNAL_SERVER_ERROR
 
     session['psid'] = psid  # Set session
@@ -202,7 +204,7 @@ def picks_submit_changes():
         if not change_success:
             return "Error: Form not filled out correctly", HTTPStatus.BAD_REQUEST
     except Exception as e:
-        print(e)
+        traceback.print_exc()
         return "Server Error: Please try again later", HTTPStatus.INTERNAL_SERVER_ERROR
 
     return "Picks saved successfully, please check your email"

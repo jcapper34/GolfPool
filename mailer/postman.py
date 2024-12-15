@@ -3,6 +3,7 @@ from email.message import EmailMessage
 import smtplib
 
 from helpers import CURRENT_YEAR
+import logger
 
 class Postman:
     MAIL_SERVER = os.getenv('GOLF_POOL_EMAIL_SERVER')
@@ -16,6 +17,8 @@ class Postman:
         self.message_body = message_body
 
     def send_message(self) -> None:
+        logger.info("Sending email to %s" % str(self.recipients))    
+
         msg = EmailMessage()
         msg['From'] = self.SENDER_EMAIL
         msg['To'] = self.recipients
@@ -28,7 +31,7 @@ class Postman:
             smtp_server.login(self.SENDER_EMAIL, self.SENDER_PASSWORD)
             smtp_server.send_message(msg)
 
-        print("Email sent successfully to %s" % str(self.recipients))        
+        logger.info("Email sent successfully to %s" % str(self.recipients))        
 
     def make_picks_message(self, ps_name, ps_pin, picks, update=False) -> None: #Picks must be level separated
         self.message_body = "Name: %s\n" % ps_name

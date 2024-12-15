@@ -1,5 +1,5 @@
 import atexit
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Generator, Iterator, List, Sequence, Union
 from typing_extensions import Self
 import logger
 import pyodbc
@@ -37,22 +37,33 @@ class DatabaseCursor:
     def execute(self, sql: str, *params: Any) -> Self:
         self._cursor.execute(sql, *params)
         return self
+    
+    def executemany(self, sql: str, params: Union[Sequence, Iterator, Generator]) -> Self:
+        self._cursor.executemany(sql, params)
+        return self
 
     def fetchone(self) -> DatabaseTableRow:
         row = self._cursor.fetchone()
         if row is None:
             return None
         
-        return DatabaseTableRow(row, self.get_column_mappings())
+        return DatabaseTableRow(row, self._get_column_mappings())
 
     def fetchall(self) -> Iterator[DatabaseTableRow]:
-        return (DatabaseTableRow(x, self.get_column_mappings()) for x in self._cursor.fetchall())
-
-    def get_column_mappings(self):
-        return {x[0]:i for i, x in enumerate(self._cursor.description)}
+        mappings = self._get_column_mappings()
+        return (DatabaseTableRow(x, mappings) for x in self._cursor.fetchall())
 
     def commit(self) -> None:
         return self._cursor.commit()
+    
+    def rowcount(self) -> int:
+        return self._cursor.rowcount
+    
+    def enable_fastexecutemany(self):
+        self._cursor.fast_executemany = True
+    
+    def _get_column_mappings(self):
+        return {x[0]:i for i, x in enumerate(self._cursor.description)}
     
     def close(self) -> None:
         return self._cursor.close()

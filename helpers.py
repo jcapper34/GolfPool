@@ -138,4 +138,5 @@ def name_match(a, b):
     return name_normalize(a) == name_normalize(b)
 
 """ CONSTANTS """
-CURRENT_YEAR = int(datetime.now().year)
+# CURRENT_YEAR = int(datetime.now().year)
+CURRENT_YEAR = 2025
